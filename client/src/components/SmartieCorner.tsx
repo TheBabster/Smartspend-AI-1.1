@@ -1,189 +1,211 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Heart, TrendingUp, Zap } from "lucide-react";
-import Smartie from "@/components/Smartie";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import SmartieAnimated from "./SmartieAnimated";
+import { Sparkles, TrendingUp, Target, Brain } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
-interface SmartieCornerProps {
-  budgetStreak?: number;
-  budgetPercentage: number;
-  totalSpent: number;
-  monthlyIncome?: string;
+interface SmartieMessage {
+  type: 'motivation' | 'tip' | 'insight' | 'celebration';
+  title: string;
+  message: string;
+  mood: 'happy' | 'thinking' | 'celebrating' | 'proud';
+  showCoin?: boolean;
 }
 
-const dailyMotivations = [
-  "Every penny saved is a step toward your dreams! 💫",
-  "Small budgets can create big futures when spent wisely! 🌱",
-  "You're building wealth one smart decision at a time! 🏗️",
-  "Financial discipline today means freedom tomorrow! ✨",
-  "Remember: needs vs wants - you've got this! 💪",
-  "Your future self is cheering you on right now! 📢",
-  "Mindful spending is the path to financial peace! 🧘‍♀️",
-  "Every budget victory makes you stronger! 🦁"
-];
+export default function SmartieCorner() {
+  const [currentMessage, setCurrentMessage] = useState<SmartieMessage>({
+    type: 'motivation',
+    title: "Welcome back!",
+    message: "Ready to make some smart spending decisions today?",
+    mood: 'happy'
+  });
+  const [isTyping, setIsTyping] = useState(false);
+  const [displayedText, setDisplayedText] = useState("");
 
-const financialTips = [
-  "Try the 24-hour rule: Wait a day before any non-essential purchase over £20!",
-  "Set up automatic savings - even £5/week adds up to £260/year! 🎯",
-  "Use the envelope method: allocate cash for each spending category!",
-  "Track your coffee purchases - small habits make big differences! ☕",
-  "Before buying, ask: 'Will this matter in 6 months?' 🤔",
-  "Try cooking one extra meal at home this week! 👨‍🍳",
-  "Cancel subscriptions you forgot about - check your bank statements! 🔍",
-  "Set spending alerts on your phone for budget categories! 📱"
-];
+  // Fetch user data to personalize messages
+  const { data: user } = useQuery({ queryKey: ['/api/user'] });
+  const { data: budgets } = useQuery({ queryKey: ['/api/budgets'] });
+  const { data: streaks } = useQuery({ queryKey: ['/api/streaks'] });
 
-const getSmartieMessage = (budgetPercentage: number, budgetStreak?: number) => {
-  if (budgetStreak && budgetStreak > 20) {
-    return {
-      message: `WOW! ${budgetStreak} days of budget mastery! You're a financial superstar! 🌟`,
-      emotion: 'celebrating' as const
-    };
-  }
-  
-  if (budgetPercentage < 20) {
-    return {
-      message: "Budget running low, but don't stress! Let's make every pound count. You've got this! 💪",
-      emotion: 'concerned' as const
-    };
-  }
-  
-  if (budgetPercentage > 80) {
-    return {
-      message: "Fantastic budget control! You're setting yourself up for success! 🎉",
-      emotion: 'proud' as const
-    };
-  }
-  
-  if (budgetStreak && budgetStreak > 7) {
-    return {
-      message: `${budgetStreak} days strong! Your consistency is paying off beautifully! ✨`,
-      emotion: 'excited' as const
-    };
-  }
-  
-  return {
-    message: "Ready to crush your financial goals today? I believe in you! 🚀",
-    emotion: 'happy' as const
-  };
-};
+  const currentStreak = Array.isArray(streaks) && streaks.length > 0 ? streaks[0].currentStreak : 7;
+  const healthyBudgets = Array.isArray(budgets) ? budgets.filter(b => (parseFloat(b.spent) / parseFloat(b.monthlyLimit)) < 0.8).length : 3;
 
-export default function SmartieCorner({ budgetStreak, budgetPercentage, totalSpent, monthlyIncome }: SmartieCornerProps) {
-  const [currentTip, setCurrentTip] = useState(0);
-  const [currentMotivation, setCurrentMotivation] = useState(0);
-  
-  const smartieMessage = getSmartieMessage(budgetPercentage, budgetStreak);
-  
+  const smartieMessages: SmartieMessage[] = [
+    {
+      type: 'motivation',
+      title: "You're doing great!",
+      message: "Every smart choice you make today builds a stronger financial future. I believe in you! 💪",
+      mood: 'proud'
+    },
+    {
+      type: 'tip',
+      title: "Smart Tip",
+      message: "Before buying something, try the 24-hour rule. Sleep on it - you might realize you don't really need it!",
+      mood: 'thinking'
+    },
+    {
+      type: 'insight',
+      title: "Brain Power",
+      message: "Your brain is wired to want instant gratification, but YOU have the power to choose long-term happiness over short-term pleasure!",
+      mood: 'happy'
+    },
+    {
+      type: 'celebration',
+      title: "Streak Power!",
+      message: `Amazing! You're on a ${currentStreak}-day streak! Every day you stay on track, you're rewiring your brain for success! 🎉`,
+      mood: 'celebrating',
+      showCoin: true
+    },
+    {
+      type: 'tip',
+      title: "Money Mindset",
+      message: "Think of money as stored time and energy. Every purchase is trading your life energy - make it count!",
+      mood: 'thinking'
+    },
+    {
+      type: 'motivation',
+      title: "Budget Champion",
+      message: `You've got this! ${healthyBudgets} of your budgets are looking healthy. Keep it up!`,
+      mood: 'proud'
+    }
+  ];
+
+  // Typing animation effect
   useEffect(() => {
-    // Rotate tips and motivations daily
-    const today = new Date().getDate();
-    setCurrentTip(today % financialTips.length);
-    setCurrentMotivation(today % dailyMotivations.length);
+    if (!currentMessage.message) return;
+    
+    setIsTyping(true);
+    setDisplayedText("");
+    
+    let index = 0;
+    const typeInterval = setInterval(() => {
+      setDisplayedText(currentMessage.message.slice(0, index + 1));
+      index++;
+      
+      if (index >= currentMessage.message.length) {
+        clearInterval(typeInterval);
+        setIsTyping(false);
+      }
+    }, 50);
+
+    return () => clearInterval(typeInterval);
+  }, [currentMessage.message]);
+
+  // Rotate messages every 10 seconds
+  useEffect(() => {
+    const messageInterval = setInterval(() => {
+      const randomMessage = smartieMessages[Math.floor(Math.random() * smartieMessages.length)];
+      setCurrentMessage(randomMessage);
+    }, 10000);
+
+    return () => clearInterval(messageInterval);
   }, []);
 
-  const getNextTip = () => {
-    setCurrentTip((prev) => (prev + 1) % financialTips.length);
-  };
-
-  const getNextMotivation = () => {
-    setCurrentMotivation((prev) => (prev + 1) % dailyMotivations.length);
+  const getIcon = () => {
+    switch (currentMessage.type) {
+      case 'motivation': return <Sparkles className="w-4 h-4 text-yellow-500" />;
+      case 'tip': return <Brain className="w-4 h-4 text-purple-500" />;
+      case 'insight': return <TrendingUp className="w-4 h-4 text-green-500" />;
+      case 'celebration': return <Target className="w-4 h-4 text-pink-500" />;
+      default: return <Sparkles className="w-4 h-4 text-yellow-500" />;
+    }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-4"
+      className="mb-6"
     >
-      {/* Main Smartie Message */}
-      <Card className="shadow-lg border-l-4 border-l-teal-500">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <span className="text-2xl">🧠</span>
-            Smartie's Corner
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Smartie 
-            message={smartieMessage.message}
-            emotion={smartieMessage.emotion}
-            showTyping={false}
-          />
-        </CardContent>
-      </Card>
+      <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700 p-4">
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100/30 to-pink-100/30 dark:from-purple-500/10 dark:to-pink-500/10 rounded-full blur-3xl" />
+        
+        <div className="relative flex items-start gap-4">
+          {/* Animated Smartie */}
+          <div className="flex-shrink-0">
+            <SmartieAnimated 
+              mood={currentMessage.mood}
+              size="md"
+              showCoin={currentMessage.showCoin}
+              isIdle={!isTyping}
+            />
+          </div>
 
-      {/* Daily Motivation */}
-      <Card className="shadow-md bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <Heart className="text-white" size={18} />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Daily Motivation</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                {dailyMotivations[currentMotivation]}
+          {/* Message Content */}
+          <div className="flex-1 min-w-0">
+            <motion.div
+              key={currentMessage.title}
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-2 mb-2"
+            >
+              {getIcon()}
+              <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                {currentMessage.title}
+              </h3>
+            </motion.div>
+
+            <div className="relative">
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed min-h-[2.5rem]">
+                {displayedText}
+                <AnimatePresence>
+                  {isTyping && (
+                    <motion.span
+                      animate={{ opacity: [1, 0] }}
+                      transition={{ repeat: Infinity, duration: 0.8 }}
+                      className="inline-block w-0.5 h-4 bg-purple-500 ml-1"
+                    />
+                  )}
+                </AnimatePresence>
               </p>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={getNextMotivation}
-                className="mt-2 h-6 px-2 text-xs"
-              >
-                <RefreshCw size={12} className="mr-1" />
-                New Quote
-              </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Financial Tip */}
-      <Card className="shadow-md bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-teal-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="text-white" size={18} />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-1">Smart Tip</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                {financialTips[currentTip]}
-              </p>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={getNextTip}
-                className="mt-2 h-6 px-2 text-xs"
+            {/* Interactive elements */}
+            <div className="flex items-center gap-2 mt-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  const randomMessage = smartieMessages[Math.floor(Math.random() * smartieMessages.length)];
+                  setCurrentMessage(randomMessage);
+                }}
+                className="text-xs text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
               >
-                <RefreshCw size={12} className="mr-1" />
-                New Tip
-              </Button>
+                Tell me more
+              </motion.button>
+              <span className="text-xs text-gray-400">•</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Smartie's Corner
+              </span>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Quick Stats */}
-      <Card className="shadow-md">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="text-yellow-500" size={20} />
-              <span className="font-medium">Your Progress</span>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {budgetStreak ? `${budgetStreak} day streak` : 'Building streak...'}
-              </div>
-              <div className="text-xs text-gray-500">
-                {budgetPercentage.toFixed(0)}% budget remaining
-              </div>
-            </div>
-          </div>
-        </CardContent>
+        {/* Subtle animation particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(3)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-purple-300 dark:bg-purple-500 rounded-full opacity-40"
+              style={{
+                left: `${20 + i * 30}%`,
+                top: `${30 + i * 10}%`,
+              }}
+              animate={{
+                y: [-10, 10, -10],
+                opacity: [0.2, 0.6, 0.2],
+              }}
+              transition={{
+                duration: 3 + i,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.5,
+              }}
+            />
+          ))}
+        </div>
       </Card>
     </motion.div>
   );

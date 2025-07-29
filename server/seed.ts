@@ -112,6 +112,7 @@ export async function seedDatabase() {
       .values([
         {
           userId: "demo-user",
+          type: "budget",
           title: "Budget Master",
           description: "Stayed under budget for 20 consecutive days!",
           icon: "🏆",
@@ -119,6 +120,7 @@ export async function seedDatabase() {
         },
         {
           userId: "demo-user",
+          type: "decision",
           title: "Smart Spender",
           description: "Used Smartie's advice 10 times",
           icon: "🧠",

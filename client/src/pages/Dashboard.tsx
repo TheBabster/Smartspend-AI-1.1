@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, ShoppingCart, TrendingUp, Target } from "lucide-react";
-import Smartie from "@/components/Smartie";
 import BudgetRing from "@/components/BudgetRing";
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
 import CategoryCard from "@/components/CategoryCard";
 import BottomNav from "@/components/BottomNav";
-import PurchaseDecisionModal from "@/components/PurchaseDecisionModal";
+import EnhancedPurchaseDecisionModal from "@/components/EnhancedPurchaseDecisionModal";
 import ExpenseModal from "@/components/ExpenseModal";
 import SmartieCorner from "@/components/SmartieCorner";
+import SmartieAnimated from "@/components/SmartieAnimated";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 
 export default function Dashboard() {
@@ -119,12 +119,7 @@ export default function Dashboard() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mb-6"
         >
-          <SmartieCorner 
-            budgetStreak={budgetStreak?.currentStreak || undefined}
-            budgetPercentage={budgetPercentage}
-            totalSpent={totalSpent}
-            monthlyIncome={user?.monthlyIncome || undefined}
-          />
+          <SmartieCorner />
         </motion.div>
 
         {/* Category Spending Cards */}
@@ -213,7 +208,7 @@ export default function Dashboard() {
       </main>
 
       {/* Modals */}
-      <PurchaseDecisionModal 
+      <EnhancedPurchaseDecisionModal 
         open={showPurchaseModal} 
         onOpenChange={setShowPurchaseModal} 
       />
