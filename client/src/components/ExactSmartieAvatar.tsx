@@ -395,24 +395,24 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             <circle cx="60.5" cy={poseConfig.rightArmY + 18} r="2.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
           </motion.g>
 
-          {/* Left Leg - Properly attached to brain body like reference */}
+          {/* Left Leg - Seamlessly attached to brain body exactly like reference */}
           <motion.rect 
-            x="35" 
-            y="55" 
-            width="3" 
-            height="19" 
+            x="32" 
+            y="56" 
+            width="5" 
+            height="16" 
             fill="#2196F3" 
             stroke="#000000" 
-            strokeWidth="1.5" 
-            rx="1.5"
+            strokeWidth="2" 
+            rx="2.5"
             animate={animated ? (
               pose === "nervous" ? {
                 scaleY: [1, 0.95, 1.05, 1],
-                x: [35, 34.8, 35.2, 35],
+                x: [32, 31.8, 32.2, 32],
                 rotate: [0, -1, 1, 0]
               } : (animationType === "positive" || animationType === "milestone") ? {
                 scaleY: [1, 0.9, 1.1, 1],
-                x: [35, 34.5, 35.5, 35]
+                x: [32, 31.5, 32.5, 32]
               } : {}
             ) : {}}
             transition={{
@@ -422,24 +422,24 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             }}
           />
           
-          {/* Right Leg - Properly attached to brain body like reference */}
+          {/* Right Leg - Seamlessly attached to brain body exactly like reference */}
           <motion.rect 
-            x="42" 
-            y="55" 
-            width="3" 
-            height="19" 
+            x="43" 
+            y="56" 
+            width="5" 
+            height="16" 
             fill="#2196F3" 
             stroke="#000000" 
-            strokeWidth="1.5" 
-            rx="1.5"
+            strokeWidth="2" 
+            rx="2.5"
             animate={animated ? (
               pose === "nervous" ? {
                 scaleY: [1, 0.95, 1.05, 1],
-                x: [42, 42.2, 41.8, 42],
+                x: [43, 43.2, 42.8, 43],
                 rotate: [0, 1, -1, 0]
               } : (animationType === "positive" || animationType === "milestone") ? {
                 scaleY: [1, 0.9, 1.1, 1],
-                x: [42, 42.5, 41.5, 42]
+                x: [43, 43.5, 42.5, 43]
               } : {}
             ) : {}}
             transition={{
@@ -450,20 +450,20 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             }}
           />
 
-          {/* Left Shoe - Blue sneaker with white sole, properly connected */}
+          {/* Left Shoe - Blue sneaker exactly like reference with proper attachment */}
           <g>
-            <ellipse cx="36.5" cy="76" rx="6" ry="3.5" fill="#2196F3" stroke="#000000" strokeWidth="1.5"/>
-            <ellipse cx="36.5" cy="78" rx="7" ry="2" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
-            <line x1="32" y1="74" x2="41" y2="74" stroke="#FFFFFF" strokeWidth="0.8"/>
-            <line x1="31" y1="76" x2="42" y2="76" stroke="#FFFFFF" strokeWidth="0.8"/>
+            <ellipse cx="34.5" cy="74" rx="5.5" ry="3" fill="#2196F3" stroke="#000000" strokeWidth="2"/>
+            <ellipse cx="34.5" cy="75.5" rx="6" ry="1.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
+            <line x1="30" y1="73" x2="39" y2="73" stroke="#FFFFFF" strokeWidth="1"/>
+            <line x1="29" y1="75" x2="40" y2="75" stroke="#FFFFFF" strokeWidth="1"/>
           </g>
 
-          {/* Right Shoe - Blue sneaker with white sole, properly connected */}
+          {/* Right Shoe - Blue sneaker exactly like reference with proper attachment */}
           <g>
-            <ellipse cx="43.5" cy="76" rx="6" ry="3.5" fill="#2196F3" stroke="#000000" strokeWidth="1.5"/>
-            <ellipse cx="43.5" cy="78" rx="7" ry="2" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
-            <line x1="39" y1="74" x2="48" y2="74" stroke="#FFFFFF" strokeWidth="0.8"/>
-            <line x1="38" y1="76" x2="49" y2="76" stroke="#FFFFFF" strokeWidth="0.8"/>
+            <ellipse cx="45.5" cy="74" rx="5.5" ry="3" fill="#2196F3" stroke="#000000" strokeWidth="2"/>
+            <ellipse cx="45.5" cy="75.5" rx="6" ry="1.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
+            <line x1="41" y1="73" x2="50" y2="73" stroke="#FFFFFF" strokeWidth="1"/>
+            <line x1="40" y1="75" x2="51" y2="75" stroke="#FFFFFF" strokeWidth="1"/>
           </g>
 
 
@@ -623,7 +623,7 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
           )}
 
           {/* Shadow */}
-          <ellipse cx="40" cy="82" rx="18" ry="3" fill="#000000" opacity="0.1"/>
+          <ellipse cx="40" cy="79" rx="18" ry="3" fill="#000000" opacity="0.15"/>
         </svg>
       </motion.div>
 
