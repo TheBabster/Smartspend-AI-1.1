@@ -7,10 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Target, Calendar, DollarSign } from "lucide-react";
+import { Plus, Target, Calendar, DollarSign, Trophy, Star } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
+import BadgeSystem from "@/components/BadgeSystem";
+import AnimatedProgressBar from "@/components/AnimatedProgressBar";
+import GlassmorphicCard from "@/components/GlassmorphicCard";
+import AnimatedButton from "@/components/AnimatedButton";
 import { type Goal } from "@shared/schema";
 import { format } from "date-fns";
 
@@ -118,9 +122,9 @@ export default function Goals() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Financial Goals</h1>
+            <h1 className="text-2xl font-bold">🎯 Goals & Achievements</h1>
             <p className="text-white/80 text-sm mt-1">
-              Track your progress and stay motivated
+              Track your progress and unlock badges
             </p>
           </div>
           <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
@@ -192,6 +196,48 @@ export default function Goals() {
 
       {/* Content */}
       <main className="px-6 -mt-6 relative z-20">
+        {/* Achievement Badges Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-8"
+        >
+          <GlassmorphicCard className="p-6 mb-6" gradient="purple" glow>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Achievement Badges</h2>
+                <p className="text-white/80 text-sm">Unlock badges as you reach financial milestones</p>
+              </div>
+            </div>
+          </GlassmorphicCard>
+          
+          <BadgeSystem />
+        </motion.section>
+
+        {/* Goals Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mb-6"
+        >
+          <GlassmorphicCard className="p-6" gradient="blue" glow>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+                <Target className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Savings Goals</h2>
+                <p className="text-white/80 text-sm">Set targets and track your financial journey</p>
+              </div>
+            </div>
+          </GlassmorphicCard>
+        </motion.section>
+
         {goals.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -205,12 +251,14 @@ export default function Goals() {
                 <p className="text-gray-600 dark:text-gray-400 mb-6">
                   Set your first financial goal to start tracking your progress!
                 </p>
-                <Button 
+                <AnimatedButton 
                   onClick={() => setShowCreateModal(true)}
                   className="gradient-bg text-white"
+                  glowOnHover
+                  shimmer
                 >
                   Create Your First Goal
-                </Button>
+                </AnimatedButton>
               </CardContent>
             </Card>
           </motion.div>
@@ -263,7 +311,13 @@ export default function Goals() {
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <Progress value={progress} className="h-3 mb-4" />
+                      <AnimatedProgressBar 
+                        percentage={progress} 
+                        color={progress >= 100 ? 'green' : progress >= 75 ? 'yellow' : 'purple'}
+                        size="lg"
+                        showGlow
+                        animated
+                      />
                       <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>£{(parseFloat(goal.targetAmount) - parseFloat(goal.currentAmount)).toFixed(0)} to go</span>
                         {goal.targetDate && (

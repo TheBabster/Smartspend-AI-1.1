@@ -7,6 +7,10 @@ import { Plus, ShoppingCart, TrendingUp, Target } from "lucide-react";
 import BudgetRing from "@/components/BudgetRing";
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
 import CategoryCard from "@/components/CategoryCard";
+import CategoryCardEnhanced from "@/components/CategoryCardEnhanced";
+import ThemeToggle from "@/components/ThemeToggle";
+import SmartieMotivationalBar from "@/components/SmartieMotivationalBar";
+import BadgeSystem from "@/components/BadgeSystem";
 import BottomNav from "@/components/BottomNav";
 import EnhancedPurchaseDecisionModal from "@/components/EnhancedPurchaseDecisionModal";
 import ExpenseModal from "@/components/ExpenseModal";
@@ -90,6 +94,8 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="px-6 -mt-6 relative z-20">
+        {/* Motivational Bar */}
+        <SmartieMotivationalBar />
         {/* Smartie Introduction */}
         {recentAchievement && (
           <motion.div
@@ -133,7 +139,7 @@ export default function Dashboard() {
           transition={{ duration: 0.5, delay: 0.6 }}
         >
           {budgets.map((budget, index) => (
-            <CategoryCard 
+            <CategoryCardEnhanced 
               key={budget.id} 
               budget={budget} 
               delay={index * 0.1}
