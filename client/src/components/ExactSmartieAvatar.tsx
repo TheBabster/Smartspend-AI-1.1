@@ -6,7 +6,8 @@ interface SmartieAvatarProps {
   animationType?: "idle" | "positive" | "thinking" | "warning" | "milestone" | "greeting";
   animated?: boolean;
   showEffects?: boolean;
-  mood?: "happy" | "thinking" | "concerned" | "celebrating" | "proud" | "sleepy";
+  mood?: "happy" | "thinking" | "concerned" | "celebrating" | "confident" | "worried";
+  accessory?: "none" | "glasses" | "backpack" | "pencil";
 }
 
 const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
@@ -14,7 +15,8 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
   animationType = "idle",
   animated = true,
   showEffects = false,
-  mood = "happy"
+  mood = "happy",
+  accessory = "none"
 }) => {
   const [isBlinking, setIsBlinking] = useState(false);
 
@@ -37,6 +39,49 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
       default: return "w-20 h-24";
     }
   };
+
+  // Enhanced facial expressions based on mood
+  const getFacialExpression = () => {
+    switch (mood) {
+      case "celebrating":
+        return {
+          eyeStyle: "stars", // Stars in eyes
+          mouthPath: "M32 46 Q40 52 48 46", // Big smile
+          blushOpacity: 0.8,
+          eyebrowY: 28
+        };
+      case "thinking":
+        return {
+          eyeStyle: "focused", // Focused stare
+          mouthPath: "M36 48 Q40 46 44 48", // Slight concerned mouth
+          blushOpacity: 0.3,
+          eyebrowY: 26
+        };
+      case "worried":
+        return {
+          eyeStyle: "concerned", // Wide worried eyes
+          mouthPath: "M36 50 Q40 48 44 50", // Downturned mouth
+          blushOpacity: 0.2,
+          eyebrowY: 24
+        };
+      case "confident":
+        return {
+          eyeStyle: "cool", // Cool confident look
+          mouthPath: "M34 46 Q40 50 46 46", // Confident smile
+          blushOpacity: 0.6,
+          eyebrowY: 29
+        };
+      default: // happy
+        return {
+          eyeStyle: "normal",
+          mouthPath: "M35 46 Q40 50 45 46", // Normal smile
+          blushOpacity: 0.5,
+          eyebrowY: 27
+        };
+    }
+  };
+
+  const expression = getFacialExpression();
 
   return (
     <div className={`relative ${getSizeClasses()} flex items-center justify-center`}>
@@ -67,30 +112,35 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
         }}
       >
         <svg width="80" height="100" viewBox="0 0 80 100" className="overflow-visible">
-          {/* Blue Baseball Cap */}
+          {/* Enhanced Snapback Cap with £ Coin Badge */}
           <g>
-            {/* Cap back/crown */}
+            {/* Cap back/crown with snapback style */}
             <ellipse cx="40" cy="18" rx="22" ry="12" fill="#1976D2" stroke="#000000" strokeWidth="2"/>
             
-            {/* Cap front panel */}
+            {/* Cap front panel - more angular snapback style */}
             <path
-              d="M18 18 Q18 8 40 8 Q62 8 62 18 Q62 22 60 22 L20 22 Q18 22 18 18 Z"
+              d="M18 18 Q18 6 40 6 Q62 6 62 18 Q62 24 59 24 L21 24 Q18 24 18 18 Z"
               fill="#2196F3"
               stroke="#000000"
               strokeWidth="2"
             />
             
-            {/* Cap visor */}
-            <ellipse cx="40" cy="25" rx="20" ry="5" fill="#1565C0" stroke="#000000" strokeWidth="2"/>
+            {/* Snapback visor - longer and more curved */}
+            <ellipse cx="40" cy="26" rx="22" ry="6" fill="#1565C0" stroke="#000000" strokeWidth="2"/>
             
-            {/* Cap visor highlight */}
-            <ellipse cx="40" cy="24" rx="16" ry="2.5" fill="#42A5F5" opacity="0.6"/>
+            {/* Visor highlight */}
+            <ellipse cx="40" cy="25" rx="18" ry="3" fill="#42A5F5" opacity="0.7"/>
+            
+            {/* £ Coin Badge on front of cap */}
+            <circle cx="40" cy="16" r="4" fill="#FFD700" stroke="#000000" strokeWidth="1.5"/>
+            <text x="40" y="18" textAnchor="middle" fontSize="4" fill="#000000" fontWeight="bold">£</text>
             
             {/* Cap button on top */}
-            <circle cx="40" cy="10" r="1.5" fill="#0D47A1" stroke="#000000" strokeWidth="1"/>
+            <circle cx="40" cy="8" r="1.5" fill="#0D47A1" stroke="#000000" strokeWidth="1"/>
             
-            {/* Cap panel seams */}
-            <path d="M30 14 Q40 12 50 14" stroke="#000000" strokeWidth="1" fill="none"/>
+            {/* Snapback panel lines */}
+            <path d="M28 12 Q40 10 52 12" stroke="#000000" strokeWidth="1" fill="none"/>
+            <path d="M25 16 Q40 14 55 16" stroke="#000000" strokeWidth="1" fill="none"/>
           </g>
 
           {/* Brain Body - Authentic bumpy brain shape */}
@@ -115,54 +165,117 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             <path d="M40 25 Q40 35 40 45 Q40 55 40 58" stroke="#E8427D" strokeWidth="1.5" fill="none" opacity="0.7"/>
           </g>
 
-          {/* Eyes - Large white circles with black pupils exactly like reference */}
+          {/* Enhanced Eyes with Expression Support */}
           <g>
+            {/* Eyebrows that move with mood */}
+            <path 
+              d={`M28 ${expression.eyebrowY} Q33 ${expression.eyebrowY - 1} 38 ${expression.eyebrowY}`} 
+              stroke="#000000" 
+              strokeWidth="2" 
+              fill="none"
+            />
+            <path 
+              d={`M42 ${expression.eyebrowY} Q47 ${expression.eyebrowY - 1} 52 ${expression.eyebrowY}`} 
+              stroke="#000000" 
+              strokeWidth="2" 
+              fill="none"
+            />
+            
             {/* Left eye */}
             <circle cx="33" cy="35" r="6" fill="#FFFFFF" stroke="#000000" strokeWidth="2"/>
-            <motion.circle 
-              cx="33" 
-              cy="35" 
-              r="3.5" 
-              fill="#000000"
-              animate={isBlinking ? { scaleY: 0.1 } : { scaleY: 1 }}
-              transition={{ duration: 0.1 }}
-            />
+            {expression.eyeStyle === "stars" ? (
+              <g>
+                <text x="33" y="37" textAnchor="middle" fontSize="8" fill="#FFD700">★</text>
+              </g>
+            ) : expression.eyeStyle === "cool" ? (
+              <motion.circle 
+                cx="33" 
+                cy="35" 
+                r="3.5" 
+                fill="#000000"
+                animate={isBlinking ? { scaleY: 0.1 } : { scaleY: 1 }}
+                transition={{ duration: 0.1 }}
+              />
+            ) : (
+              <motion.circle 
+                cx="33" 
+                cy="35" 
+                r={expression.eyeStyle === "concerned" ? 4 : 3.5} 
+                fill="#000000"
+                animate={isBlinking ? { scaleY: 0.1 } : { scaleY: 1 }}
+                transition={{ duration: 0.1 }}
+              />
+            )}
             
             {/* Right eye */}
             <circle cx="47" cy="35" r="6" fill="#FFFFFF" stroke="#000000" strokeWidth="2"/>
-            <motion.circle 
-              cx="47" 
-              cy="35" 
-              r="3.5" 
-              fill="#000000"
-              animate={isBlinking ? { scaleY: 0.1 } : { scaleY: 1 }}
-              transition={{ duration: 0.1 }}
-            />
+            {expression.eyeStyle === "stars" ? (
+              <g>
+                <text x="47" y="37" textAnchor="middle" fontSize="8" fill="#FFD700">★</text>
+              </g>
+            ) : expression.eyeStyle === "cool" ? (
+              <motion.circle 
+                cx="47" 
+                cy="35" 
+                r="3.5" 
+                fill="#000000"
+                animate={isBlinking ? { scaleY: 0.1 } : { scaleY: 1 }}
+                transition={{ duration: 0.1 }}
+              />
+            ) : (
+              <motion.circle 
+                cx="47" 
+                cy="35" 
+                r={expression.eyeStyle === "concerned" ? 4 : 3.5} 
+                fill="#000000"
+                animate={isBlinking ? { scaleY: 0.1 } : { scaleY: 1 }}
+                transition={{ duration: 0.1 }}
+              />
+            )}
           </g>
 
-          {/* Mouth - Simple curved smile exactly like reference */}
+          {/* Blush */}
+          <g opacity={expression.blushOpacity}>
+            <ellipse cx="26" cy="38" rx="3" ry="2" fill="#FF69B4"/>
+            <ellipse cx="54" cy="38" rx="3" ry="2" fill="#FF69B4"/>
+          </g>
+
+          {/* Enhanced Mouth with Expression Support */}
           <g>
             <path
-              d="M35 46 Q40 50 45 46"
+              d={expression.mouthPath}
               stroke="#000000"
               strokeWidth="2"
               fill="none"
             />
+            {/* Simple teeth for big smiles */}
+            {(mood === "celebrating" || mood === "confident") && (
+              <g>
+                <rect x="37" y="48" width="1.5" height="2" fill="#FFFFFF" stroke="#000000" strokeWidth="0.5"/>
+                <rect x="39" y="48" width="1.5" height="2" fill="#FFFFFF" stroke="#000000" strokeWidth="0.5"/>
+                <rect x="41" y="48" width="1.5" height="2" fill="#FFFFFF" stroke="#000000" strokeWidth="0.5"/>
+              </g>
+            )}
           </g>
 
-          {/* Left Arm - Blue stick arm attached to brain */}
+          {/* Left Arm - Enhanced with white gloves and rubbery animation */}
           <motion.g
             animate={animated ? (
               animationType === "positive" ? {
-                rotate: [0, -15, 15, -8, 0]
+                rotate: [0, -15, 15, -8, 0],
+                scaleY: [1, 1.1, 0.9, 1.05, 1]
               } : animationType === "milestone" ? {
-                rotate: [0, -25, 25, -12, 0]
+                rotate: [0, -25, 25, -12, 0],
+                scaleY: [1, 1.2, 0.8, 1.1, 1]
               } : animationType === "greeting" ? {
-                rotate: [0, -30, 10, -20, 0, 0]
+                rotate: [0, -30, 10, -20, 0, 0],
+                scaleY: [1, 1.15, 0.85, 1.1, 1, 1]
               } : animationType === "thinking" ? {
-                rotate: [0, -10, -5, -10]
+                rotate: [0, -10, -5, -10],
+                scaleY: [1, 1.05, 1.05, 1.05]
               } : {
-                rotate: [0, -1, 1, 0]
+                rotate: [0, -1, 1, 0],
+                scaleY: [1, 1.02, 0.98, 1]
               }
             ) : {}}
             transition={{
@@ -173,22 +286,29 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             style={{ transformOrigin: "20px 38px" }}
           >
             <rect x="18" y="38" width="3" height="16" fill="#2196F3" stroke="#000000" strokeWidth="1.5" rx="1.5"/>
-            <circle cx="19.5" cy="56" r="3" fill="#2196F3" stroke="#000000" strokeWidth="1.5"/>
+            {/* White cartoon glove */}
+            <circle cx="19.5" cy="56" r="4" fill="#FFFFFF" stroke="#000000" strokeWidth="1.5"/>
+            <circle cx="19.5" cy="56" r="2.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
           </motion.g>
 
-          {/* Right Arm - Blue stick arm attached to brain */}
+          {/* Right Arm - Enhanced with white gloves and rubbery animation */}
           <motion.g
             animate={animated ? (
               animationType === "positive" ? {
-                rotate: [0, 15, -15, 8, 0]
+                rotate: [0, 15, -15, 8, 0],
+                scaleY: [1, 1.1, 0.9, 1.05, 1]
               } : animationType === "milestone" ? {
-                rotate: [0, 25, -25, 12, 0]
+                rotate: [0, 25, -25, 12, 0],
+                scaleY: [1, 1.2, 0.8, 1.1, 1]
               } : animationType === "greeting" ? {
-                rotate: [0, 30, -10, 20, 0, 0]
+                rotate: [0, 30, -10, 20, 0, 0],
+                scaleY: [1, 1.15, 0.85, 1.1, 1, 1]
               } : animationType === "thinking" ? {
-                rotate: [0, 10, 5, 10]
+                rotate: [0, 10, 5, 10],
+                scaleY: [1, 1.05, 1.05, 1.05]
               } : {
-                rotate: [0, 1, -1, 0]
+                rotate: [0, 1, -1, 0],
+                scaleY: [1, 1.02, 0.98, 1]
               }
             ) : {}}
             transition={{
@@ -200,14 +320,53 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             style={{ transformOrigin: "60px 38px" }}
           >
             <rect x="59" y="38" width="3" height="16" fill="#2196F3" stroke="#000000" strokeWidth="1.5" rx="1.5"/>
-            <circle cx="60.5" cy="56" r="3" fill="#2196F3" stroke="#000000" strokeWidth="1.5"/>
+            {/* White cartoon glove */}
+            <circle cx="60.5" cy="56" r="4" fill="#FFFFFF" stroke="#000000" strokeWidth="1.5"/>
+            <circle cx="60.5" cy="56" r="2.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
           </motion.g>
 
-          {/* Left Leg - Blue stick leg */}
-          <rect x="35" y="58" width="3" height="16" fill="#2196F3" stroke="#000000" strokeWidth="1.5" rx="1.5"/>
+          {/* Left Leg - Enhanced with jelly movement */}
+          <motion.rect 
+            x="35" 
+            y="58" 
+            width="3" 
+            height="16" 
+            fill="#2196F3" 
+            stroke="#000000" 
+            strokeWidth="1.5" 
+            rx="1.5"
+            animate={animated && (animationType === "positive" || animationType === "milestone") ? {
+              scaleY: [1, 0.9, 1.1, 1],
+              x: [35, 34.5, 35.5, 35]
+            } : {}}
+            transition={{
+              duration: 1.2,
+              repeat: 0,
+              ease: "easeInOut"
+            }}
+          />
           
-          {/* Right Leg - Blue stick leg */}
-          <rect x="42" y="58" width="3" height="16" fill="#2196F3" stroke="#000000" strokeWidth="1.5" rx="1.5"/>
+          {/* Right Leg - Enhanced with jelly movement */}
+          <motion.rect 
+            x="42" 
+            y="58" 
+            width="3" 
+            height="16" 
+            fill="#2196F3" 
+            stroke="#000000" 
+            strokeWidth="1.5" 
+            rx="1.5"
+            animate={animated && (animationType === "positive" || animationType === "milestone") ? {
+              scaleY: [1, 0.9, 1.1, 1],
+              x: [42, 42.5, 41.5, 42]
+            } : {}}
+            transition={{
+              duration: 1.2,
+              repeat: 0,
+              ease: "easeInOut",
+              delay: 0.1
+            }}
+          />
 
           {/* Left Shoe - Blue sneaker with white sole exactly like reference */}
           <g>
@@ -224,6 +383,30 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             <line x1="39" y1="76" x2="48" y2="76" stroke="#FFFFFF" strokeWidth="0.8"/>
             <line x1="38" y1="78" x2="49" y2="78" stroke="#FFFFFF" strokeWidth="0.8"/>
           </g>
+
+          {/* Accessories */}
+          {accessory === "glasses" && (
+            <g>
+              <circle cx="33" cy="35" r="8" fill="none" stroke="#000000" strokeWidth="2"/>
+              <circle cx="47" cy="35" r="8" fill="none" stroke="#000000" strokeWidth="2"/>
+              <line x1="41" y1="35" x2="39" y2="35" stroke="#000000" strokeWidth="2"/>
+            </g>
+          )}
+          
+          {accessory === "pencil" && (
+            <g>
+              <rect x="52" y="28" width="1.5" height="12" fill="#FFD700" stroke="#000000" strokeWidth="1" rx="0.7" transform="rotate(15 52 28)"/>
+              <rect x="52" y="26" width="1.5" height="3" fill="#FF69B4" stroke="#000000" strokeWidth="1" transform="rotate(15 52 28)"/>
+            </g>
+          )}
+          
+          {accessory === "backpack" && (
+            <g>
+              <ellipse cx="40" cy="50" rx="8" ry="6" fill="#4CAF50" stroke="#000000" strokeWidth="1.5" opacity="0.8"/>
+              <rect x="36" y="46" width="8" height="8" fill="#388E3C" stroke="#000000" strokeWidth="1" rx="1"/>
+              <circle cx="40" cy="50" r="1" fill="#FFD700" stroke="#000000" strokeWidth="0.5"/>
+            </g>
+          )}
 
           {/* Shadow */}
           <ellipse cx="40" cy="86" rx="18" ry="3" fill="#000000" opacity="0.1"/>

@@ -23,6 +23,7 @@ import PriorityQuickActions from "@/components/PriorityQuickActions";
 import FinancialWellnessScoreVisual from "@/components/FinancialWellnessScoreVisual";
 import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
 import EnhancedQuickActions from "@/components/EnhancedQuickActions";
+import SmartieShowcase from "@/components/SmartieShowcase";
 import { BounceButton, bounceVariants, LiftCard, liftVariants } from "@/components/MicroAnimations";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 import { useLocation } from "wouter";

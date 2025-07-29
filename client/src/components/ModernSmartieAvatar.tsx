@@ -7,7 +7,8 @@ interface ModernSmartieAvatarProps {
   animationType?: "idle" | "positive" | "thinking" | "warning" | "milestone" | "greeting";
   animated?: boolean;
   showEffects?: boolean;
-  mood?: "happy" | "thinking" | "concerned" | "celebrating" | "proud" | "sleepy";
+  mood?: "happy" | "thinking" | "concerned" | "celebrating" | "confident" | "worried";
+  accessory?: "none" | "glasses" | "backpack" | "pencil";
 }
 
 const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
@@ -15,7 +16,8 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
   animationType = "idle",
   animated = true,
   showEffects = false,
-  mood = "happy"
+  mood = "happy",
+  accessory = "none"
 }) => {
   // Use the exact pixel-perfect Smartie instead of complex custom version
   return <ExactSmartieAvatar 
@@ -24,6 +26,7 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
     animated={animated} 
     showEffects={showEffects}
     mood={mood}
+    accessory={accessory}
   />;
 };
 
