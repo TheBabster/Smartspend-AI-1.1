@@ -5,6 +5,7 @@ import { FinTechLayout, FinTechText, FinTechButton, FinTechProgress, FinTechBadg
 import { ProfessionalIcon, CategoryIcon, StatusIcon, NavigationIcon, IconBadge } from './ProfessionalIconSystem';
 import { DelightfulCopy, getRandomMessage, generateContextualMessage } from './DelightfulMicrocopy';
 import ExactSmartieAvatar from './ExactSmartieAvatar';
+import NewSmartSpendLogo from './NewSmartSpendLogo';
 import { Link } from 'wouter';
 
 interface ProfessionalFinTechDashboardProps {
@@ -55,37 +56,37 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
       id: 'smart-decision',
       title: 'Smart Purchase Decision',
       description: 'Get AI guidance before buying',
-      icon: 'brain' as const,
+      icon: 'brain',
       route: '/decisions',
       priority: user.budgetHealth === 'danger' ? 1 : 3,
-      variant: 'primary' as const
+      variant: 'primary'
     },
     {
       id: 'expense-tracking',
       title: 'Track Expense',
       description: 'Log your spending',
-      icon: 'add' as const,
+      icon: 'add',
       route: '/expenses',
       priority: 2,
-      variant: 'secondary' as const
+      variant: 'secondary'
     },
     {
       id: 'goals',
       title: 'Savings Goals',
       description: 'Monitor your progress',
-      icon: 'target' as const,
+      icon: 'target',
       route: '/goals',
       priority: goals.length > 0 ? 3 : 1,
-      variant: 'secondary' as const
+      variant: 'secondary'
     },
     {
       id: 'analytics',
       title: 'Financial Insights',
       description: 'View detailed analytics',
-      icon: 'activity' as const,
+      icon: 'activity',
       route: '/analytics',
       priority: 4,
-      variant: 'ghost' as const
+      variant: 'ghost'
     }
   ].sort((a, b) => a.priority - b.priority);
 
@@ -118,10 +119,22 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
     <FinTechLayout variant="page" className="pb-20">
       <div className="container mx-auto px-4 py-6 max-w-4xl">
         
-        {/* Professional Header */}
+        {/* Professional Header with New Logo */}
+        <motion.div 
+          className="flex items-center justify-center mb-8"
+          {...FinTechDesign.animations.fadeInUp}
+        >
+          <NewSmartSpendLogo 
+            size="lg" 
+            animated={true} 
+            showText={true} 
+          />
+        </motion.div>
+        {/* Greeting Section */}
         <motion.div 
           className="text-center mb-8"
           {...FinTechDesign.animations.fadeInUp}
+          transition={{ delay: 0.2 }}
         >
           <FinTechText.H1 className="mb-2">
             {getTimeBasedGreeting()}
@@ -231,16 +244,17 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
                   <Card className={`${FinTechDesign.cards.interactive} h-full`}>
                     <CardContent className="p-4 text-center h-full flex flex-col justify-between">
                       <div>
-                        <IconBadge 
-                          icon={action.icon} 
-                          category="intelligence"
-                          variant={action.variant === 'primary' ? 'primary' : 'secondary'}
-                          size="md"
-                          className="mx-auto mb-3"
-                        />
-                        <FinTechText.H4 className="text-sm mb-1">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <ProfessionalIcon 
+                            name={action.icon} 
+                            category="intelligence"
+                            size="md"
+                            color="primary"
+                          />
+                        </div>
+                        <FinTechText.H3 className="text-sm mb-1">
                           {action.title}
-                        </FinTechText.H4>
+                        </FinTechText.H3>
                         <FinTechText.Caption>
                           {action.description}
                         </FinTechText.Caption>
@@ -380,16 +394,18 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
           <Card className={FinTechDesign.cards.status.info}>
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <IconBadge 
-                  icon="idea" 
-                  category="intelligence"
-                  variant="info"
-                  size="sm"
-                />
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <ProfessionalIcon 
+                    name="idea" 
+                    category="intelligence"
+                    size="sm"
+                    color="primary"
+                  />
+                </div>
                 <div className="flex-1">
-                  <FinTechText.H4 className="text-sm mb-1">
+                  <FinTechText.H3 className="text-sm mb-1">
                     Daily Smart Tip
-                  </FinTechText.H4>
+                  </FinTechText.H3>
                   <FinTechText.BodySmall>
                     {currentTip}
                   </FinTechText.BodySmall>

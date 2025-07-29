@@ -19,6 +19,7 @@ import FinancialWellnessScore from "@/components/FinancialWellnessScore";
 import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality";
 import ResponsiveLayout from "@/components/ResponsiveLayout";
 import BrandNewSmartSpendLogo from "@/components/BrandNewSmartSpendLogo";
+import NewSmartSpendLogo from "@/components/NewSmartSpendLogo";
 import SmartieIntelligentChat from "@/components/SmartieIntelligentChat";
 import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 import PriorityQuickActions from "@/components/PriorityQuickActions";
@@ -88,16 +89,16 @@ export default function Dashboard() {
           goals={[]} // Will be populated when goals are available
           recentExpenses={[]} // Will be populated when expenses are available
         />
-        <BottomNav currentTab="dashboard" />
+        <BottomNav currentTab="home" />
         
         {/* Modals */}
         <EnhancedPurchaseDecisionModal 
           open={showPurchaseModal} 
-          onClose={() => setShowPurchaseModal(false)} 
+          onOpenChange={setShowPurchaseModal} 
         />
         <ExpenseModal 
           open={showExpenseModal} 
-          onClose={() => setShowExpenseModal(false)} 
+          onOpenChange={setShowExpenseModal} 
         />
         {showSmartieChat && (
           <SmartieIntelligentChat onClose={() => setShowSmartieChat(false)} />
@@ -137,7 +138,7 @@ export default function Dashboard() {
         
         <div className="relative z-10 container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <BrandNewSmartSpendLogo size="lg" animated={true} showText={true} variant="coin-brain" />
+            <NewSmartSpendLogo size="lg" animated={true} showText={true} />
             
             <div className="flex items-center gap-4">
       
