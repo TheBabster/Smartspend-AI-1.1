@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Target } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import { AnimatedSmartieSystem, useSmartieReactions } from "@/components/AnimatedSmartieSystem";
+import { EnhancedSpendingList } from "@/components/EnhancedSpendingList";
 import { type Expense, type Budget } from "@shared/schema";
 
 const COLORS = {
@@ -16,6 +19,9 @@ const COLORS = {
 };
 
 export default function Analytics() {
+  const [smartieReaction, setSmartieReaction] = useState<any>(null);
+  const { trigger, triggerReaction } = useSmartieReactions();
+
   const { data: expenses = [], isLoading: expensesLoading } = useQuery<Expense[]>({ 
     queryKey: ["/api/expenses"] 
   });
@@ -31,18 +37,43 @@ export default function Analytics() {
   const isLoading = expensesLoading || budgetsLoading || analyticsLoading;
 
   // Prepare data for charts
-  const categoryData = Object.entries(analytics?.categorySpending || {}).map(([category, amount]) => ({
+  const categoryData = Object.entries((analytics as any)?.categorySpending || {}).map(([category, amount]) => ({
     name: category,
-    value: amount,
+    value: amount as number,
     color: COLORS[category as keyof typeof COLORS] || "#6B7280",
   }));
 
   const budgetComparisonData = budgets.map(budget => ({
     category: budget.category.split(" ")[0], // Shorten names for chart
     budgeted: parseFloat(budget.monthlyLimit),
-    spent: parseFloat(budget.spent),
-    remaining: parseFloat(budget.monthlyLimit) - parseFloat(budget.spent),
+    spent: parseFloat(budget.spent || "0"),
+    remaining: parseFloat(budget.monthlyLimit) - parseFloat(budget.spent || "0"),
   }));
+
+  // Prepare enhanced spending data for the new system
+  const enhancedSpendingData = budgets.map(budget => {
+    const spent = parseFloat(budget.spent || "0");
+    const limit = parseFloat(budget.monthlyLimit);
+    const percentage = Math.round((spent / limit) * 100);
+    
+    let status: 'overspent' | 'at-risk' | 'on-track' = 'on-track';
+    if (percentage > 100) status = 'overspent';
+    else if (percentage > 75) status = 'at-risk';
+    
+    return {
+      id: budget.id,
+      category: budget.category,
+      spent,
+      budget: limit,
+      percentage,
+      icon: budget.category.includes('Food') ? '🍔' :
+            budget.category.includes('Shopping') ? '🛒' :
+            budget.category.includes('Transport') ? '🚗' :
+            budget.category.includes('Entertainment') ? '🎬' :
+            budget.category.includes('Utilities') ? '⚡' : '💰',
+      status
+    };
+  });
 
   if (isLoading) {
     return (
@@ -92,7 +123,7 @@ export default function Analytics() {
               <div className="w-8 h-8 gradient-bg rounded-full flex items-center justify-center mx-auto mb-2">
                 <DollarSign className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">£{analytics?.totalSpent?.toFixed(0) || 0}</div>
+              <div className="text-lg font-bold">£{((analytics as any)?.totalSpent || 0).toFixed(0)}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">Total Spent</div>
             </CardContent>
           </Card>
@@ -102,7 +133,7 @@ export default function Analytics() {
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
                 <TrendingUp className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">£{analytics?.remaining?.toFixed(0) || 0}</div>
+              <div className="text-lg font-bold">£{((analytics as any)?.remaining || 0).toFixed(0)}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">Remaining</div>
             </CardContent>
           </Card>
@@ -112,7 +143,7 @@ export default function Analytics() {
               <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
                 <Target className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">{analytics?.goals || 0}</div>
+              <div className="text-lg font-bold">{(analytics as any)?.goals || 0}</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">Active Goals</div>
             </CardContent>
           </Card>
@@ -123,7 +154,7 @@ export default function Analytics() {
                 <TrendingDown className="text-white" size={16} />
               </div>
               <div className="text-lg font-bold">
-                {analytics?.totalBudget ? Math.round((analytics.totalSpent / analytics.totalBudget) * 100) : 0}%
+                {(analytics as any)?.totalBudget ? Math.round(((analytics as any).totalSpent / (analytics as any).totalBudget) * 100) : 0}%
               </div>
               <div className="text-xs text-gray-600 dark:text-gray-400">Budget Used</div>
             </CardContent>
@@ -202,7 +233,7 @@ export default function Analytics() {
           </motion.div>
         </div>
 
-        {/* Recent Insights */}
+        {/* Enhanced Spending List with Smartie Breakpoints */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -210,49 +241,30 @@ export default function Analytics() {
         >
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg">Recent Insights</CardTitle>
+              <CardTitle className="text-lg">Smart Spending Analysis</CardTitle>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Organized by spending behavior with Smartie's insights
+              </p>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {expenses.length > 0 ? (
-                  <>
-                    <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <div className="w-8 h-8 smartie-gradient rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-sm">🤖</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Spending Pattern Detected</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          You tend to spend more on {categoryData.length > 0 ? categoryData[0].name : "entertainment"} during weekends. Consider setting weekly limits!
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <div className="w-8 h-8 smartie-gradient rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-sm">🤖</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Great Progress!</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          You're {analytics?.remaining && analytics.remaining > 0 ? "under" : "over"} budget this month. Keep up the excellent work!
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <div className="text-4xl mb-2">📊</div>
-                    <p>Start tracking expenses to see insights here!</p>
-                  </div>
-                )}
-              </div>
+              <EnhancedSpendingList 
+                spendingData={enhancedSpendingData}
+                onSmartieReaction={setSmartieReaction}
+              />
             </CardContent>
           </Card>
         </motion.div>
       </main>
 
       <BottomNav currentTab="analytics" />
+      
+      {/* Animated Smartie System */}
+      <AnimatedSmartieSystem 
+        trigger={trigger}
+        spendingData={enhancedSpendingData}
+        streakCount={7} // This would come from your streak data
+        className="z-50"
+      />
     </div>
   );
 }
