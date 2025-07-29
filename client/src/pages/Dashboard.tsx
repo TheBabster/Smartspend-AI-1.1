@@ -16,7 +16,9 @@ import AdvancedBudgetVisualizer from "@/components/AdvancedBudgetVisualizer";
 import FinancialWellnessScore from "@/components/FinancialWellnessScore";
 import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality";
 import ResponsiveLayout from "@/components/ResponsiveLayout";
-import BrandNewLogo from "@/components/BrandNewLogo";
+import BrandNewSmartSpendLogo from "@/components/BrandNewSmartSpendLogo";
+import SmartieIntelligentChat from "@/components/SmartieIntelligentChat";
+import SmartieAvatarSystem from "@/components/SmartieAvatarSystem";
 import FinancialWellnessScoreVisual from "@/components/FinancialWellnessScoreVisual";
 import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
 import EnhancedQuickActions from "@/components/EnhancedQuickActions";
@@ -27,6 +29,7 @@ import { useLocation } from "wouter";
 export default function Dashboard() {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [showSmartieChat, setShowSmartieChat] = useState(false);
   const [, navigate] = useLocation();
 
   const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
@@ -80,7 +83,7 @@ export default function Dashboard() {
         
         <div className="relative z-10 container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <BrandNewLogo size="lg" animated={true} showText={true} />
+            <BrandNewSmartSpendLogo size="lg" animated={true} showText={true} variant="coin-brain" />
             
             <div className="flex items-center gap-4">
       
@@ -231,6 +234,7 @@ export default function Dashboard() {
             onAddExpense={() => setShowExpenseModal(true)}
             onViewGoals={() => navigate('/goals')}
             onViewAnalytics={() => navigate('/analytics')}
+            onChatWithSmartie={() => setShowSmartieChat(true)}
             userSpendingData={{
               totalSpent,
               budgetUsed: budgetPercentage,
@@ -276,6 +280,16 @@ export default function Dashboard() {
       <ExpenseModal 
         open={showExpenseModal} 
         onOpenChange={setShowExpenseModal} 
+      />
+      <SmartieIntelligentChat
+        isOpen={showSmartieChat}
+        onClose={() => setShowSmartieChat(false)}
+        userSpendingData={{
+          totalSpent,
+          budgetUsed: budgetPercentage,
+          streak: budgetStreak?.currentStreak || 0,
+          recentCategory: "general"
+        }}
       />
 
       {/* Enhanced Smartie Personality */}

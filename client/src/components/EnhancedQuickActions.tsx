@@ -18,6 +18,7 @@ interface EnhancedQuickActionsProps {
   onAddExpense: () => void;
   onViewGoals: () => void;
   onViewAnalytics: () => void;
+  onChatWithSmartie?: () => void;
   userSpendingData?: {
     totalSpent: number;
     budgetUsed: number;
@@ -30,6 +31,7 @@ export default function EnhancedQuickActions({
   onAddExpense,
   onViewGoals,
   onViewAnalytics,
+  onChatWithSmartie,
   userSpendingData
 }: EnhancedQuickActionsProps) {
   const [showSmartieChat, setShowSmartieChat] = useState(false);

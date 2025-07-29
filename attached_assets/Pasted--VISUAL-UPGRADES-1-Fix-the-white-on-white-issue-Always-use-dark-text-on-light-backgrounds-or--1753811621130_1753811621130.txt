@@ -1,0 +1,102 @@
+🎨 VISUAL UPGRADES
+
+1. Fix the white-on-white issue
+	•	Always use dark text on light backgrounds or vice versa.
+	•	Add slight shadows or outline to text for readability on layered visuals.
+
+2. Add rich backgrounds
+	•	Use soft gradient backgrounds or light textures (e.g. subtle waves or dots).
+	•	Assign unique colour themes per category (e.g. blue for Bills, green for Food).
+	•	Allow optional dark mode toggle.
+
+3. Improve Smartie’s design
+	•	Redraw Smartie in vector-style with better proportions, softer outlines, and richer shading.
+	•	Give Smartie multiple emotional states (happy, proud, warning, etc.)
+	•	Use motion: blinking eyes, nodding head, floating idle animation.
+
+4. Replace the smiley face
+	•	Use Smartie or a meaningful emoji (💡, 🎯, 🧠) on the purple page.
+	•	Make it dynamic: change image based on financial mood (e.g. if overspending → sad Smartie).
+
+5. New Logo
+	•	Create a new logo that includes Smartie or something more distinct:
+	•	A coin with a brain engraved.
+	•	A dollar sign inside a lightbulb.
+	•	A “S” and a stylized tree (linking to savings tree).
+	•	Make it simple, flat, and App Store–ready.
+
+6. More visual feedback
+	•	Animate elements like sliders, progress bars, or streaks.
+	•	Add hover animations on buttons.
+	•	Add sparkles, glow, or confetti when a user makes a “smart” decision.
+
+⸻
+
+⚙️ FUNCTIONALITY & EXPERIENCE
+
+7. Add savings goals
+	•	Let users set a goal (e.g. “New Laptop - £1200”) with a target date.
+	•	Progress bar updates as they save.
+	•	Display encouragement from Smartie when progress is made.
+
+8. Allow user input on purchases
+	•	Let users optionally describe their potential purchase (“£50 headphones”) and see if it fits their goals/budget.
+	•	This helps them emotionally visualise decisions.
+
+9. Add a visual money diary
+	•	Calendar-style monthly view with icons (e.g. 💸 or ✅) to track decisions.
+
+10. Introduce Smartie’s voice
+	•	Use prewritten phrases or AI-generated text (“Nice one! You stayed under budget 3 days in a row!”)
+	•	Make these friendly, motivational, and personal.
+
+11. Add “SmartTips”
+	•	Daily or weekly financial tips appear in Smartie’s corner.
+	•	Based on behaviour (e.g. overspending on tech → “Consider waiting 24h before tech purchases.”)
+
+12. Add a Budget Tree animation
+	•	The Savings Tree grows visually as savings increase.
+	•	Use leaves, coins, or even Smartie’s smile growing.
+
+13. Improve home page navigation
+	•	Clear dashboard with:
+	•	Budget categories + live % usage
+	•	Smartie highlight
+	•	Quick access to goal tracker, streak tracker, and decision history.
+
+14. Sound feedback
+	•	Fun, short sounds for “Smart” decisions or daily check-ins.
+	•	Can be turned off, but adds life.
+
+15. Offline save + cloud sync (optional)
+	•	Save user preferences to local storage.
+	•	Later, you could integrate Firebase or similar for sync if you build a user system.
+
+⸻
+
+🔁 INTELLIGENCE & PERSONALISATION
+
+16. Let Smartie learn user patterns
+	•	If the user always says “no” to fashion, Smartie can start saying “Looks like you’re staying stylish and smart!”
+	•	If they often overspend on Food, offer custom advice.
+
+17. Smart Rating System
+	•	After every decision, Smartie rates how smart it was and gives a 1–5 coin rating.
+	•	Over time, users build a “SmartScore.”
+
+18. Custom avatars / outfits for Smartie
+	•	Users unlock hats, sneakers, sunglasses etc. for Smartie by maintaining streaks or saving money.
+	•	Makes users emotionally invested.
+
+⸻
+
+🏁 POLISH, STORE-READY & FINAL PRESENTATION
+
+19. Make the app App Store–ready
+	•	Create a polished icon.
+	•	Create preview images (screenshots with text overlays).
+	•	Write a sharp 2-line description: e.g. “Think before you buy. Save smarter with Smartie.”
+
+20. Add App Tour (optional)
+	•	First-time users see a 4–screen walkthrough explaining how to use it.
+	•	Use Smartie as narrator: “Hi, I’m Smartie! I’ll help you make smart money choices!”

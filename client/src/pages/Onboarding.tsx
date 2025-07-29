@@ -9,6 +9,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
+import SmartieAvatarSystem from "@/components/SmartieAvatarSystem";
+import BrandNewSmartSpendLogo from "@/components/BrandNewSmartSpendLogo";
 
 interface OnboardingData {
   name: string;
