@@ -9,8 +9,9 @@ import Home from "@/pages/Home";
 import Onboarding from "@/pages/Onboarding";
 import Dashboard from "@/pages/Dashboard";
 import Decisions from "@/pages/Decisions";
-import Goals from "@/pages/Goals";
+import EnhancedGoals from "@/pages/EnhancedGoals";
 import Analytics from "@/pages/Analytics";
+import SmartieCorner from "@/pages/SmartieCorner";
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -45,8 +46,9 @@ function Router() {
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/decisions" component={Decisions} />
-      <Route path="/goals" component={Goals} />
+      <Route path="/goals" component={EnhancedGoals} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/smartie" component={SmartieCorner} />
       <Route component={NotFound} />
     </Switch>
   );

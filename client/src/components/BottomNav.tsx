@@ -1,17 +1,17 @@
 import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Home, TrendingUp, Target, History } from "lucide-react";
+import { Home, TrendingUp, Target, History, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
-  currentTab: "home" | "analytics" | "goals" | "decisions";
+  currentTab: "home" | "analytics" | "goals" | "decisions" | "smartie";
 }
 
 const navItems = [
   { id: "home", label: "Home", icon: Home, path: "/dashboard" },
   { id: "analytics", label: "Analytics", icon: TrendingUp, path: "/analytics" },
   { id: "goals", label: "Goals", icon: Target, path: "/goals" },
-  { id: "decisions", label: "Decisions", icon: History, path: "/decisions" },
+  { id: "smartie", label: "Smartie", icon: Brain, path: "/smartie" },
 ];
 
 export default function BottomNav({ currentTab }: BottomNavProps) {
