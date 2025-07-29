@@ -58,45 +58,45 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
   }, [animationType]);
 
   const getAnimationVariants = () => {
-    const baseY = Math.sin(currentFrame * 0.015) * 0.8; // Professional gentle breathing
+    const baseY = Math.sin(currentFrame * 0.01) * 0.3; // Very gentle, natural breathing
 
     switch (animationType) {
-      case "positive": // Celebration jump with fist pump
+      case "positive": // Gentle celebration
         return {
-          y: [baseY, baseY - 8, baseY + 2, baseY],
-          scale: [1, 1.08, 1.03, 1],
-          rotate: [0, 3, -3, 0]
+          y: [baseY, baseY - 3, baseY + 1, baseY],
+          scale: [1, 1.03, 1.01, 1],
+          rotate: [0, 1, -1, 0]
         };
-      case "thinking": // Contemplative gentle sway
-        return {
-          y: [baseY, baseY - 1, baseY],
-          rotate: [0, 1.5, -1.5, 0],
-          scale: [1, 1.01, 1]
-        };
-      case "warning": // Concerned shake
-        return {
-          y: baseY,
-          x: [0, -1.5, 1.5, 0],
-          scale: [1, 0.98, 1],
-          rotate: [0, -1, 1, 0]
-        };
-      case "milestone": // Big celebration with bounce
-        return {
-          y: [baseY, baseY - 12, baseY + 3, baseY - 6, baseY],
-          scale: [1, 1.12, 1.05, 1.08, 1],
-          rotate: [0, 5, -5, 3, 0]
-        };
-      case "greeting": // Friendly welcome bounce
-        return {
-          y: [baseY, baseY - 4, baseY + 1, baseY - 2, baseY],
-          rotate: [0, 2, -1, 2, 0],
-          scale: [1, 1.04, 1.01, 1.02, 1]
-        };
-      default: // idle - Professional breathing
+      case "thinking": // Subtle contemplative movement
         return {
           y: [baseY, baseY - 0.5, baseY],
-          scale: [1, 1.005, 1],
-          rotate: [0, 0.2, -0.2, 0]
+          rotate: [0, 0.8, -0.8, 0],
+          scale: [1, 1.005, 1]
+        };
+      case "warning": // Gentle concerned movement
+        return {
+          y: baseY,
+          x: [0, -0.8, 0.8, 0],
+          scale: [1, 0.99, 1],
+          rotate: [0, -0.5, 0.5, 0]
+        };
+      case "milestone": // Moderate celebration
+        return {
+          y: [baseY, baseY - 4, baseY + 1, baseY - 2, baseY],
+          scale: [1, 1.05, 1.02, 1.03, 1],
+          rotate: [0, 2, -2, 1, 0]
+        };
+      case "greeting": // Friendly gentle movement
+        return {
+          y: [baseY, baseY - 2, baseY + 0.5, baseY - 1, baseY],
+          rotate: [0, 1, -0.5, 1, 0],
+          scale: [1, 1.02, 1.005, 1.01, 1]
+        };
+      default: // idle - Very subtle breathing
+        return {
+          y: [baseY, baseY - 0.2, baseY],
+          scale: [1, 1.002, 1],
+          rotate: [0, 0.1, -0.1, 0]
         };
     }
   };
@@ -229,43 +229,86 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           </div>
         </div>
 
-        {/* Brain Body - Authentic brain shape exactly like reference */}
+        {/* Authentic Brain Shape - Exactly like reference with irregular bumpy outline */}
         <div
-          className={`relative ${config.brain} flex flex-col items-center justify-center`}
+          className={`relative ${config.brain} flex flex-col items-center justify-center smartie-professional-shadow`}
           style={{
-            background: "#FF9BB5", // Pink brain color from reference
-            border: "3px solid #E8427D",
-            borderRadius: "45% 45% 50% 50%", // Brain-like bumpy shape
+            background: "linear-gradient(135deg, #FF9BB5 0%, #FF8A9B 100%)", // 3D gradient effect
             position: "relative",
-            width: "64px",
-            height: "48px"
+            width: "68px",
+            height: "52px",
+            clipPath: "polygon(15% 5%, 25% 0%, 35% 2%, 45% 0%, 55% 3%, 65% 1%, 75% 5%, 85% 8%, 92% 15%, 95% 25%, 98% 35%, 95% 45%, 92% 55%, 88% 65%, 82% 72%, 75% 78%, 65% 82%, 55% 85%, 45% 83%, 35% 85%, 25% 82%, 18% 78%, 12% 72%, 8% 65%, 5% 55%, 2% 45%, 0% 35%, 2% 25%, 5% 15%, 8% 8%)" // Authentic brain outline
           }}
         >
-          {/* Brain Texture - Curved lines like reference */}
-          <div className="absolute inset-1 opacity-40 pointer-events-none">
-            <svg viewBox="0 0 60 45" className="w-full h-full">
-              {/* Brain fold curves exactly like reference */}
+          {/* 3D Brain Border Effect */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "linear-gradient(135deg, transparent 0%, rgba(232, 66, 125, 0.3) 100%)",
+              clipPath: "polygon(15% 5%, 25% 0%, 35% 2%, 45% 0%, 55% 3%, 65% 1%, 75% 5%, 85% 8%, 92% 15%, 95% 25%, 98% 35%, 95% 45%, 92% 55%, 88% 65%, 82% 72%, 75% 78%, 65% 82%, 55% 85%, 45% 83%, 35% 85%, 25% 82%, 18% 78%, 12% 72%, 8% 65%, 5% 55%, 2% 45%, 0% 35%, 2% 25%, 5% 15%, 8% 8%)",
+              border: "2px solid #E8427D"
+            }}
+          />
+
+          {/* Authentic Brain Texture Lines - Like reference */}
+          <div className="absolute inset-2 opacity-50 pointer-events-none">
+            <svg viewBox="0 0 64 48" className="w-full h-full">
+              {/* Brain hemisphere division */}
               <path
-                d="M12 15 Q20 10 28 15 Q35 20 42 15"
+                d="M32 8 Q32 18 32 28 Q32 38 32 44"
+                stroke="#E8427D"
+                fill="none"
+                strokeWidth="1.5"
+                opacity="0.7"
+              />
+              {/* Left hemisphere curves */}
+              <path
+                d="M15 15 Q20 12 25 15 Q28 18 25 22"
                 stroke="#E8427D"
                 fill="none"
                 strokeWidth="1.2"
               />
               <path
-                d="M8 25 Q18 20 28 25 Q38 30 48 25"
+                d="M12 25 Q18 22 24 25 Q28 28 24 32"
                 stroke="#E8427D"
                 fill="none"
                 strokeWidth="1.2"
               />
               <path
-                d="M15 35 Q25 30 35 35 Q45 38 50 32"
+                d="M18 35 Q22 32 26 35 Q28 38 26 40"
                 stroke="#E8427D"
                 fill="none"
                 strokeWidth="1.2"
               />
-              {/* Additional brain texture */}
+              {/* Right hemisphere curves */}
               <path
-                d="M10 18 Q15 15 22 18 Q28 22 35 18"
+                d="M49 15 Q44 12 39 15 Q36 18 39 22"
+                stroke="#E8427D"
+                fill="none"
+                strokeWidth="1.2"
+              />
+              <path
+                d="M52 25 Q46 22 40 25 Q36 28 40 32"
+                stroke="#E8427D"
+                fill="none"
+                strokeWidth="1.2"
+              />
+              <path
+                d="M46 35 Q42 32 38 35 Q36 38 38 40"
+                stroke="#E8427D"
+                fill="none"
+                strokeWidth="1.2"
+              />
+              {/* Additional brain folds */}
+              <path
+                d="M20 20 Q24 18 28 20"
+                stroke="#E8427D"
+                fill="none"
+                strokeWidth="1"
+                opacity="0.6"
+              />
+              <path
+                d="M36 20 Q40 18 44 20"
                 stroke="#E8427D"
                 fill="none"
                 strokeWidth="1"
@@ -333,176 +376,216 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           </div>
         </div>
 
-        {/* Blue Arms with White Gloves - Professional pose system */}
+        {/* Connected Blue Arms - Attached to brain body exactly like reference */}
         <motion.div
-          className="absolute left-0 top-1/2 origin-top"
+          className="absolute origin-bottom"
           style={{ 
-            transformOrigin: "50% 0%",
-            left: "-14px",
-            top: "14px"
+            left: "8px",
+            top: "22px",
+            transformOrigin: "center bottom"
           }}
         >
-          {/* Left Arm */}
+          {/* Left Arm - Connected to brain */}
           <motion.div
-            className="relative"
+            className="relative flex flex-col items-center"
             animate={animated ? (
               animationType === "positive" ? {
-                rotate: [0, -45, 45, -20, 0] // Celebration fist pump
+                rotate: [0, -25, 25, -12, 0] // Gentler celebration
               } : animationType === "milestone" ? {
-                rotate: [0, -60, 60, -30, 0] // Big celebration
+                rotate: [0, -35, 35, -18, 0] // Moderate celebration
               } : animationType === "greeting" ? {
-                rotate: [0, -70, 30, -40, 10, 0] // Friendly wave
+                rotate: [0, -45, 20, -25, 8, 0] // Friendly wave
               } : animationType === "thinking" ? {
-                rotate: [0, -30, -25, -30] // Hand to chin
+                rotate: [0, -20, -15, -20] // Hand to chin
               } : animationType === "warning" ? {
-                rotate: [0, -45, -40, -45] // Facepalm
+                rotate: [0, -25, -20, -25] // Gentle concern
               } : {
-                rotate: [0, -8, 8, 0] // Gentle idle
+                rotate: [0, -3, 3, 0] // Subtle idle
               }
             ) : {}}
             transition={{
-              duration: animationType === "greeting" ? 3.5 : animationType === "positive" ? 2.2 : animationType === "thinking" ? 1.8 : 2,
-              repeat: animationType === "idle" ? Infinity : animationType === "positive" || animationType === "milestone" ? 2 : 1,
+              duration: animationType === "greeting" ? 4 : animationType === "positive" ? 3 : 2.5,
+              repeat: animationType === "idle" ? Infinity : animationType === "positive" || animationType === "milestone" ? 1 : 1,
               ease: "easeInOut"
             }}
           >
+            {/* Arm connected to body */}
             <div
-              className="w-1.5 h-9 rounded-full"
-              style={{ background: "#2196F3" }}
-            />
-            {/* Left White Glove */}
-            <div
-              className="absolute -bottom-1 -left-1.5 w-4 h-4 rounded-full border-2"
+              className="w-2 h-10 rounded-full"
               style={{ 
-                background: "#FFFFFF",
-                borderColor: "#E0E0E0"
+                background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
+                border: "1px solid #1565C0"
+              }}
+            />
+            {/* Hand/Glove */}
+            <div
+              className="w-5 h-5 rounded-full border-2 mt-0.5"
+              style={{ 
+                background: "linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)",
+                borderColor: "#BDBDBD",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
               }}
             />
           </motion.div>
         </motion.div>
         
         <motion.div
-          className="absolute right-0 top-1/2 origin-top"
+          className="absolute origin-bottom"
           style={{ 
-            transformOrigin: "50% 0%",
-            right: "-14px",
-            top: "14px"
+            right: "8px",
+            top: "22px",
+            transformOrigin: "center bottom"
           }}
         >
-          {/* Right Arm */}
+          {/* Right Arm - Connected to brain */}
           <motion.div
-            className="relative"
+            className="relative flex flex-col items-center"
             animate={animated ? (
               animationType === "positive" ? {
-                rotate: [0, 45, -45, 20, 0] // Celebration fist pump
+                rotate: [0, 25, -25, 12, 0] // Gentler celebration
               } : animationType === "milestone" ? {
-                rotate: [0, 60, -60, 30, 0] // Big celebration
+                rotate: [0, 35, -35, 18, 0] // Moderate celebration
               } : animationType === "greeting" ? {
-                rotate: [0, 70, -30, 40, -10, 0] // Friendly wave
+                rotate: [0, 45, -20, 25, -8, 0] // Friendly wave
               } : animationType === "thinking" ? {
-                rotate: [0, 30, 25, 30] // Pointing up thoughtfully
+                rotate: [0, 20, 15, 20] // Pointing thoughtfully
               } : animationType === "warning" ? {
-                rotate: [0, 20, 15, 20] // Gentle gesture
+                rotate: [0, 15, 10, 15] // Gentle gesture
               } : {
-                rotate: [0, 8, -8, 0] // Gentle idle
+                rotate: [0, 3, -3, 0] // Subtle idle
               }
             ) : {}}
             transition={{
-              duration: animationType === "greeting" ? 3.5 : animationType === "positive" ? 2.2 : animationType === "thinking" ? 1.8 : 2,
-              repeat: animationType === "idle" ? Infinity : animationType === "positive" || animationType === "milestone" ? 2 : 1,
+              duration: animationType === "greeting" ? 4 : animationType === "positive" ? 3 : 2.5,
+              repeat: animationType === "idle" ? Infinity : animationType === "positive" || animationType === "milestone" ? 1 : 1,
               ease: "easeInOut",
-              delay: 0.15
+              delay: 0.1
             }}
           >
+            {/* Arm connected to body */}
             <div
-              className="w-1.5 h-9 rounded-full"
-              style={{ background: "#2196F3" }}
-            />
-            {/* Right White Glove */}
-            <div
-              className="absolute -bottom-1 -right-1.5 w-4 h-4 rounded-full border-2"
+              className="w-2 h-10 rounded-full"
               style={{ 
-                background: "#FFFFFF",
-                borderColor: "#E0E0E0"
+                background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
+                border: "1px solid #1565C0"
+              }}
+            />
+            {/* Hand/Glove */}
+            <div
+              className="w-5 h-5 rounded-full border-2 mt-0.5"
+              style={{ 
+                background: "linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)",
+                borderColor: "#BDBDBD",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
               }}
             />
           </motion.div>
         </motion.div>
 
-        {/* Blue Stick Legs - Exactly like reference */}
+        {/* Connected Blue Legs - Attached to brain body like reference */}
         <motion.div 
-          className="relative mt-4 flex gap-2 justify-center"
+          className="relative mt-1 flex gap-3 justify-center"
           animate={animated && (animationType === "positive" || animationType === "milestone") ? {
-            y: [0, -4, 0, -2, 0]
+            y: [0, -2, 0] // Much gentler bounce
           } : {}}
           transition={{
-            duration: 1.5,
-            repeat: animationType === "positive" ? 2 : animationType === "milestone" ? 3 : 0
+            duration: 2,
+            repeat: animationType === "positive" ? 1 : animationType === "milestone" ? 1 : 0
           }}
         >
-          {/* Left Leg */}
+          {/* Left Leg - Connected to brain */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-1 h-8 rounded-full"
-              style={{ background: "#2E86AB" }}
+              className="w-2 h-10 rounded-full"
+              style={{ 
+                background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
+                border: "1px solid #1565C0"
+              }}
             />
-            {/* Left Blue Sneaker - Updated to match reference */}
+            {/* Left Sneaker - High quality 3D appearance */}
             <motion.div
-              className="relative mt-1"
+              className="relative mt-0.5"
               animate={animated ? (
                 animationType === "greeting" ? {
-                  rotate: [0, -8, 8, 0]
-                } : animationType === "positive" || animationType === "milestone" ? {
-                  y: [0, -2, 0]
+                  rotate: [0, -4, 4, 0] // Gentler movement
                 } : {}
               ) : {}}
-              transition={{ duration: 1.2, delay: 0.1 }}
+              transition={{ duration: 2, delay: 0.1 }}
             >
               <div
-                className="w-5 h-4 rounded-lg"
+                className="w-6 h-5 rounded-lg relative"
                 style={{ 
-                  background: "#2196F3",
-                  border: "2px solid #1976D2"
+                  background: "linear-gradient(135deg, #2196F3 0%, #1976D2 50%, #1565C0 100%)",
+                  border: "2px solid #0D47A1",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)"
                 }}
-              />
-              {/* Shoe details */}
-              <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
-                <div className="w-2 h-0.5 bg-white rounded-full opacity-90" />
+              >
+                {/* Shoe laces */}
+                <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                  <div className="w-3 h-0.5 bg-white rounded-full opacity-90" />
+                </div>
+                {/* Shoe sole */}
+                <div 
+                  className="absolute -bottom-0.5 left-0 right-0 h-1.5 rounded-b-lg"
+                  style={{ 
+                    background: "linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)",
+                    border: "1px solid #E0E0E0"
+                  }}
+                />
+                {/* Shoe highlight */}
+                <div 
+                  className="absolute top-0.5 left-1 w-2 h-1 rounded-full opacity-40"
+                  style={{ background: "#FFFFFF" }}
+                />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white rounded-b-lg opacity-80" />
             </motion.div>
           </div>
           
-          {/* Right Leg */}
+          {/* Right Leg - Connected to brain */}
           <div className="flex flex-col items-center">
             <div 
-              className="w-1 h-8 rounded-full"
-              style={{ background: "#2E86AB" }}
+              className="w-2 h-10 rounded-full"
+              style={{ 
+                background: "linear-gradient(135deg, #2196F3 0%, #1976D2 100%)",
+                border: "1px solid #1565C0"
+              }}
             />
-            {/* Right Blue Sneaker - Updated to match reference */}
+            {/* Right Sneaker - High quality 3D appearance */}
             <motion.div
-              className="relative mt-1"
+              className="relative mt-0.5"
               animate={animated ? (
                 animationType === "greeting" ? {
-                  rotate: [0, 8, -8, 0]
-                } : animationType === "positive" || animationType === "milestone" ? {
-                  y: [0, -2, 0]
+                  rotate: [0, 4, -4, 0] // Gentler movement
                 } : {}
               ) : {}}
-              transition={{ duration: 1.2, delay: 0.2 }}
+              transition={{ duration: 2, delay: 0.2 }}
             >
               <div
-                className="w-5 h-4 rounded-lg"
+                className="w-6 h-5 rounded-lg relative"
                 style={{ 
-                  background: "#2196F3",
-                  border: "2px solid #1976D2"
+                  background: "linear-gradient(135deg, #2196F3 0%, #1976D2 50%, #1565C0 100%)",
+                  border: "2px solid #0D47A1",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.2)"
                 }}
-              />
-              {/* Shoe details */}
-              <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
-                <div className="w-2 h-0.5 bg-white rounded-full opacity-90" />
+              >
+                {/* Shoe laces */}
+                <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                  <div className="w-3 h-0.5 bg-white rounded-full opacity-90" />
+                </div>
+                {/* Shoe sole */}
+                <div 
+                  className="absolute -bottom-0.5 left-0 right-0 h-1.5 rounded-b-lg"
+                  style={{ 
+                    background: "linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)",
+                    border: "1px solid #E0E0E0"
+                  }}
+                />
+                {/* Shoe highlight */}
+                <div 
+                  className="absolute top-0.5 left-1 w-2 h-1 rounded-full opacity-40"
+                  style={{ background: "#FFFFFF" }}
+                />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white rounded-b-lg opacity-80" />
             </motion.div>
           </div>
         </motion.div>
