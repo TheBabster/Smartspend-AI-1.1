@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import Smartie from "@/components/Smartie";
+import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
 
 interface OnboardingData {
   name: string;
@@ -141,10 +141,18 @@ export default function Onboarding() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Smartie 
-                  message="Welcome aboard! Let's get you set up with a personalized budget. First, tell me a bit about yourself! 👋"
-                  className="mb-6"
-                />
+                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200/50 dark:border-purple-800/30">
+                  <EnhancedSmartieReactions 
+                    mood="celebrating"
+                    size="lg"
+                    message="Welcome aboard! Let's get you set up with a personalized budget. First, tell me a bit about yourself!"
+                    animated={true}
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-purple-700 dark:text-purple-300 mb-1">Hi there! I'm Smartie 🧠</h3>
+                    <p className="text-sm text-purple-600 dark:text-purple-400">Your AI financial companion ready to help you build great money habits!</p>
+                  </div>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">What's your name?</label>
@@ -173,10 +181,18 @@ export default function Onboarding() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Smartie 
-                  message="Great! Now let's talk money. What's your monthly income? This helps me create realistic budgets for you! 💰"
-                  className="mb-6"
-                />
+                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg border border-blue-200/50 dark:border-blue-800/30">
+                  <EnhancedSmartieReactions 
+                    mood="thinking"
+                    size="lg"
+                    message="Great! Now let's talk money. What's your monthly income? This helps me create realistic budgets for you!"
+                    animated={true}
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-1">Financial Planning 💰</h3>
+                    <p className="text-sm text-blue-600 dark:text-blue-400">Don't worry - your information is secure and helps me create personalized recommendations.</p>
+                  </div>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Currency</label>
@@ -224,10 +240,18 @@ export default function Onboarding() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Smartie 
-                  message="Perfect! Now let's set up your spending categories. How much would you like to budget for each area monthly? 📊"
-                  className="mb-6"
-                />
+                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200/50 dark:border-green-800/30">
+                  <EnhancedSmartieReactions 
+                    mood="lifting_weights"
+                    size="lg"
+                    message="Perfect! Now let's set up your spending categories. How much would you like to budget for each area monthly?"
+                    animated={true}
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-green-700 dark:text-green-300 mb-1">Budget Categories 📊</h3>
+                    <p className="text-sm text-green-600 dark:text-green-400">Set realistic amounts - you can always adjust these later as you learn your patterns!</p>
+                  </div>
+                </div>
                 <div className="space-y-4">
                   {categories.map((category) => (
                     <div key={category.name} className="flex items-center gap-3">
@@ -262,10 +286,18 @@ export default function Onboarding() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Smartie 
-                  message="Awesome! You're all set! I'll be here to help you make smart spending decisions and reach your financial goals. Ready to start your journey? 🎉"
-                  className="mb-6"
-                />
+                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200/50 dark:border-yellow-800/30">
+                  <EnhancedSmartieReactions 
+                    mood="flying"
+                    size="lg"
+                    message="Awesome! You're all set! I'll be here to help you make smart spending decisions and reach your financial goals. Ready to start your journey?"
+                    animated={true}
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-yellow-700 dark:text-yellow-300 mb-1">Setup Complete! 🎉</h3>
+                    <p className="text-sm text-yellow-600 dark:text-yellow-400">I'm excited to be your financial companion. Let's build some great money habits together!</p>
+                  </div>
+                </div>
                 <div className="space-y-4">
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                     <h3 className="font-semibold mb-2">Your Setup Summary:</h3>
@@ -293,7 +325,7 @@ export default function Onboarding() {
                 <Button
                   onClick={nextStep}
                   disabled={!canProceed()}
-                  className="gradient-bg text-white"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
                 >
                   Continue
                 </Button>
@@ -301,7 +333,7 @@ export default function Onboarding() {
                 <Button
                   onClick={handleComplete}
                   disabled={!canProceed() || completeMutation.isPending}
-                  className="gradient-bg text-white"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
                 >
                   {completeMutation.isPending ? "Setting up..." : "Complete Setup"}
                 </Button>

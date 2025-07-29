@@ -249,9 +249,9 @@ export default function Dashboard() {
                 >
                   <ShoppingCart className="text-white" size={20} />
                 </motion.div>
-                <div className="text-left text-white">
+                <div className="text-left text-on-dark">
                   <h3 className="font-semibold">Smart Purchase Decision</h3>
-                  <p className="text-sm text-white/80">Get Smartie's AI advice before buying</p>
+                  <p className="text-sm text-purple-100">Get Smartie's AI advice before buying</p>
                 </div>
               </div>
             </AnimatedButton>
@@ -276,9 +276,9 @@ export default function Dashboard() {
                 >
                   <Plus className="text-white" size={20} />
                 </motion.div>
-                <div className="text-left text-white">
+                <div className="text-left text-on-dark">
                   <h3 className="font-semibold">Add Expense</h3>
-                  <p className="text-sm text-white/80">Track your spending journey</p>
+                  <p className="text-sm text-green-100">Track your spending journey</p>
                 </div>
               </div>
             </AnimatedButton>
@@ -298,7 +298,7 @@ export default function Dashboard() {
               <div className="text-lg font-semibold">
                 {budgetStreak?.currentStreak || 0}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Day Streak</div>
+              <div className="text-sm text-medium-contrast">Day Streak</div>
             </CardContent>
           </Card>
           
@@ -308,7 +308,7 @@ export default function Dashboard() {
               <div className="text-lg font-semibold">
                 £{(totalBudget - totalSpent).toFixed(0)}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Saved</div>
+              <div className="text-sm text-medium-contrast">Saved</div>
             </CardContent>
           </Card>
         </motion.div>
