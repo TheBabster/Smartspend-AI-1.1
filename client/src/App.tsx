@@ -11,6 +11,7 @@ import Dashboard from "@/pages/Dashboard";
 import Decisions from "@/pages/Decisions";
 import EnhancedGoals from "@/pages/EnhancedGoals";
 import Analytics from "@/pages/Analytics";
+import EnhancedAnalytics from "@/pages/EnhancedAnalytics";
 import SmartieCorner from "@/pages/SmartieCorner";
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -47,7 +48,8 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/decisions" component={Decisions} />
       <Route path="/goals" component={EnhancedGoals} />
-      <Route path="/analytics" component={Analytics} />
+      <Route path="/analytics" component={EnhancedAnalytics} />
+      <Route path="/analytics-old" component={Analytics} />
       <Route path="/smartie" component={SmartieCorner} />
       <Route component={NotFound} />
     </Switch>
