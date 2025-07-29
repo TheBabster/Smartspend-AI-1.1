@@ -88,15 +88,15 @@ export default function Dashboard() {
           goals={[]} // Will be populated when goals are available
           recentExpenses={[]} // Will be populated when expenses are available
         />
-        <BottomNav />
+        <BottomNav currentTab="dashboard" />
         
         {/* Modals */}
         <EnhancedPurchaseDecisionModal 
-          isOpen={showPurchaseModal} 
+          open={showPurchaseModal} 
           onClose={() => setShowPurchaseModal(false)} 
         />
         <ExpenseModal 
-          isOpen={showExpenseModal} 
+          open={showExpenseModal} 
           onClose={() => setShowExpenseModal(false)} 
         />
         {showSmartieChat && (

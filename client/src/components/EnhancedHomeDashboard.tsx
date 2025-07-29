@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Target, TrendingUp, Award, Brain, MessageCircle } from 'lucide-react';
 import { BrandedLayout, BrandedText, BrandedButton, BrandedProgress, SmartSpendBrand } from './BrandIdentitySystem';
+import ProfessionalFinTechDashboard from './ProfessionalFinTechDashboard';
 import EmotionalSmartieSystem from './EmotionalSmartieSystem';
 import ContextualSmartieReactions from './ContextualSmartieReactions';
 import FinancialWellnessScore from './FinancialWellnessScore';
@@ -48,6 +49,19 @@ const EnhancedHomeDashboard: React.FC<EnhancedHomeDashboardProps> = ({
   goals,
   recentExpenses
 }) => {
+  // Use the new professional FinTech design system
+  const useProfessionalDesign = true;
+  
+  if (useProfessionalDesign) {
+    return (
+      <ProfessionalFinTechDashboard
+        user={user}
+        budgets={budgets}
+        goals={goals}
+        recentExpenses={recentExpenses}
+      />
+    );
+  }
   const [currentEvent, setCurrentEvent] = useState<{ type: string; data?: any }>({ type: 'app_open' });
   const [showSmartieChat, setShowSmartieChat] = useState(false);
 
