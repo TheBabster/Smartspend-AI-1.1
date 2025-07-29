@@ -1,0 +1,71 @@
+
+1. Download & Upload the Right Smartie Image:
+	•	Use the latest Smartie I made (blue beanie, brain texture, orange shoes, white gloves, expressive eyes, defined arms/legs).
+	•	You can export this as .png with a transparent background.
+	•	Upload that exact image to Replit and place it wherever Smartie appears in your app.
+
+2. Fix Scaling & Sharpness:
+	•	Make sure Smartie scales responsively and retains sharpness on all screen sizes.
+	•	Use SVG or 2x PNG assets to keep high resolution.
+	•	Apply consistent padding/margin so it doesn’t touch edges or float too far.
+
+3. Use Smartie Poses Dynamically:
+	•	Assign different Smartie poses for different contexts:
+	•	🎉 Celebration (arms up)
+	•	👋 Welcome (waving)
+	•	💭 Thinking (hand on chin)
+	•	😔 Sad (head down)
+	•	🏃‍♂️ Running (one leg up)
+
+⸻
+
+🎬 Animation Instructions for Replit Agent
+
+Give Replit these animation prompts to bring Smartie to life:
+
+⸻
+
+🟢 Idle Animations (Looping when Smartie is just present)
+	•	Blinking eyes every 4–6 seconds
+	•	Breathing animation (gentle body rise/fall)
+	•	Occasional glance left/right
+	•	Slight bounce or wiggle on hover
+
+⸻
+
+🟨 Triggered Animations (Reacting to actions)
+
+1. When user saves money:
+	•	Smartie does a fist pump or jumps in joy
+	•	Speech bubble: “Nice save! That’s £X you didn’t waste!”
+
+2. When user spends impulsively:
+	•	Smartie puts hand on forehead (facepalm)
+	•	Frown and shake head gently
+	•	Speech bubble: “Let’s think it through next time…”
+
+3. When streak increases:
+	•	Smartie throws confetti or lifts both arms
+	•	Pulse animation + star effects around
+
+4. When tip or affirmation button is clicked:
+	•	Smartie raises a pointer finger
+	•	Small thought bubble appears: 💡“Here’s an idea…”
+
+5. Chat with Smartie opened:
+	•	Smartie does a friendly wave
+
+⸻
+
+🖌️ Visual Polish Tips
+
+To match the pro version:
+	•	Use flat shadows or soft outlines on Smartie
+	•	Ensure Smartie is slightly above other UI layers so he pops
+	•	Give him a subtle glow or drop shadow to separate from background
+
+⸻
+
+🟣 Example Instructions for Replit Agent
+
+“Replace current Smartie with this PNG version. Set width to 110px, position absolute with slight offset. Animate idle blink every 4s, breathing rise/fall every 2s. When streak increases, play 1s ‘arms up jump’ animation and show confetti particles. On hover, do 1-bounce wiggle. When user saves money, show quick fist pump and sparkle.”

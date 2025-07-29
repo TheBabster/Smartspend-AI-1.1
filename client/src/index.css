@@ -251,6 +251,43 @@
     animation: sparkle 1.5s ease-in-out infinite;
   }
 
+  /* Professional Smartie animations */
+  @keyframes smartie-blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  @keyframes smartie-breathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.01) translateY(-1px); }
+  }
+
+  @keyframes smartie-hover-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .smartie-blink {
+    animation: smartie-blink 4s infinite ease-in-out;
+  }
+
+  .smartie-breathe {
+    animation: smartie-breathe 3s infinite ease-in-out;
+  }
+
+  .smartie-hover-bounce:hover {
+    animation: smartie-hover-bounce 0.6s ease-out;
+  }
+
+  /* Professional drop shadow for Smartie */
+  .smartie-professional-shadow {
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  }
+
+  .smartie-glow-effect {
+    filter: drop-shadow(0 0 8px rgba(76, 175, 80, 0.3));
+  }
+
   /* Safe area for mobile devices */
   .safe-area-inset {
     padding-top: env(safe-area-inset-top);

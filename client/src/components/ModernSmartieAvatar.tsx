@@ -58,43 +58,45 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
   }, [animationType]);
 
   const getAnimationVariants = () => {
-    const baseY = Math.sin(currentFrame * 0.02) * 1; // Subtle gentle floating
+    const baseY = Math.sin(currentFrame * 0.015) * 0.8; // Professional gentle breathing
 
     switch (animationType) {
-      case "positive":
+      case "positive": // Celebration jump with fist pump
         return {
-          y: [baseY, baseY - 4, baseY + 1, baseY],
-          scale: [1, 1.05, 1.02, 1],
-          rotate: [0, 2, -2, 0]
+          y: [baseY, baseY - 8, baseY + 2, baseY],
+          scale: [1, 1.08, 1.03, 1],
+          rotate: [0, 3, -3, 0]
         };
-      case "thinking":
+      case "thinking": // Contemplative gentle sway
         return {
-          y: baseY,
-          rotate: [0, 1, -1, 0],
+          y: [baseY, baseY - 1, baseY],
+          rotate: [0, 1.5, -1.5, 0],
           scale: [1, 1.01, 1]
         };
-      case "warning":
+      case "warning": // Concerned shake
         return {
           y: baseY,
-          x: [0, -1, 1, 0],
-          scale: [1, 0.99, 1]
+          x: [0, -1.5, 1.5, 0],
+          scale: [1, 0.98, 1],
+          rotate: [0, -1, 1, 0]
         };
-      case "milestone":
+      case "milestone": // Big celebration with bounce
         return {
-          y: [baseY, baseY - 6, baseY + 2, baseY],
-          scale: [1, 1.08, 1.03, 1],
-          rotate: [0, 4, -4, 0]
+          y: [baseY, baseY - 12, baseY + 3, baseY - 6, baseY],
+          scale: [1, 1.12, 1.05, 1.08, 1],
+          rotate: [0, 5, -5, 3, 0]
         };
-      case "greeting":
+      case "greeting": // Friendly welcome bounce
         return {
-          y: [baseY, baseY - 3, baseY + 1, baseY],
-          rotate: [0, 3, -2, 3, 0],
-          scale: [1, 1.03, 1]
+          y: [baseY, baseY - 4, baseY + 1, baseY - 2, baseY],
+          rotate: [0, 2, -1, 2, 0],
+          scale: [1, 1.04, 1.01, 1.02, 1]
         };
-      default: // idle
+      default: // idle - Professional breathing
         return {
-          y: baseY,
-          rotate: [0, 0.3, -0.3, 0]
+          y: [baseY, baseY - 0.5, baseY],
+          scale: [1, 1.005, 1],
+          rotate: [0, 0.2, -0.2, 0]
         };
     }
   };
@@ -186,41 +188,42 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           ease: "easeInOut"
         }}
       >
-        {/* Blue Baseball Cap - Exactly like reference */}
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+        {/* Green Beanie/Cap - Exactly like latest reference */}
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-20">
           <div 
             className="relative"
             style={{
-              width: "48px",
-              height: "24px"
+              width: "50px",
+              height: "22px"
             }}
           >
-            {/* Cap main part */}
+            {/* Main beanie part */}
             <div
               className="absolute inset-0 rounded-t-full"
               style={{
-                background: "#2E86AB",
-                border: "2px solid #1E5A8A",
-                borderBottomLeftRadius: "50%",
-                borderBottomRightRadius: "50%"
+                background: "#4CAF50",
+                border: "2px solid #2E7D32",
+                borderBottomLeftRadius: "45%",
+                borderBottomRightRadius: "45%"
               }}
             />
-            {/* Cap visor */}
+            {/* Yellow visor/brim */}
             <div
               className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
               style={{
-                width: "32px",
-                height: "8px",
-                background: "#2E86AB",
-                border: "2px solid #1E5A8A",
-                borderRadius: "0 0 50% 50%"
+                width: "28px",
+                height: "6px",
+                background: "#FFD54F",
+                border: "1px solid #FFC107",
+                borderRadius: "0 0 40% 40%"
               }}
             />
-            {/* Cap button on top */}
+            {/* Small beanie fold line */}
             <div
-              className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full"
+              className="absolute top-2 left-1 right-1 h-0.5 rounded-full"
               style={{
-                background: "#1E5A8A"
+                background: "#2E7D32",
+                opacity: "0.6"
               }}
             />
           </div>
@@ -330,38 +333,50 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           </div>
         </div>
 
-        {/* Blue Stick Arms - Exactly like reference with hands */}
+        {/* Blue Arms with White Gloves - Professional pose system */}
         <motion.div
           className="absolute left-0 top-1/2 origin-top"
           style={{ 
             transformOrigin: "50% 0%",
-            left: "-12px",
-            top: "16px"
+            left: "-14px",
+            top: "14px"
           }}
         >
           {/* Left Arm */}
           <motion.div
             className="relative"
-            animate={animated ? {
-              rotate: animationType === "positive" ? [0, -30, 30, -15, 0] : 
-                     animationType === "milestone" ? [0, -45, 45, -20, 0] :
-                     animationType === "greeting" ? [0, -60, 20, -30, 10, 0] :
-                     animationType === "thinking" ? [0, -20, 20, 0] : [0, -10, 10, 0]
-            } : {}}
+            animate={animated ? (
+              animationType === "positive" ? {
+                rotate: [0, -45, 45, -20, 0] // Celebration fist pump
+              } : animationType === "milestone" ? {
+                rotate: [0, -60, 60, -30, 0] // Big celebration
+              } : animationType === "greeting" ? {
+                rotate: [0, -70, 30, -40, 10, 0] // Friendly wave
+              } : animationType === "thinking" ? {
+                rotate: [0, -30, -25, -30] // Hand to chin
+              } : animationType === "warning" ? {
+                rotate: [0, -45, -40, -45] // Facepalm
+              } : {
+                rotate: [0, -8, 8, 0] // Gentle idle
+              }
+            ) : {}}
             transition={{
-              duration: animationType === "greeting" ? 3 : animationType === "positive" ? 2 : 1.8,
-              repeat: animationType === "idle" ? Infinity : animationType === "positive" ? 2 : 1,
+              duration: animationType === "greeting" ? 3.5 : animationType === "positive" ? 2.2 : animationType === "thinking" ? 1.8 : 2,
+              repeat: animationType === "idle" ? Infinity : animationType === "positive" || animationType === "milestone" ? 2 : 1,
               ease: "easeInOut"
             }}
           >
             <div
-              className="w-1 h-8 rounded-full"
-              style={{ background: "#2E86AB" }}
+              className="w-1.5 h-9 rounded-full"
+              style={{ background: "#2196F3" }}
             />
-            {/* Left Hand */}
+            {/* Left White Glove */}
             <div
-              className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full"
-              style={{ background: "#2E86AB" }}
+              className="absolute -bottom-1 -left-1.5 w-4 h-4 rounded-full border-2"
+              style={{ 
+                background: "#FFFFFF",
+                borderColor: "#E0E0E0"
+              }}
             />
           </motion.div>
         </motion.div>
@@ -370,34 +385,46 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           className="absolute right-0 top-1/2 origin-top"
           style={{ 
             transformOrigin: "50% 0%",
-            right: "-12px",
-            top: "16px"
+            right: "-14px",
+            top: "14px"
           }}
         >
           {/* Right Arm */}
           <motion.div
             className="relative"
-            animate={animated ? {
-              rotate: animationType === "positive" ? [0, 30, -30, 15, 0] : 
-                     animationType === "milestone" ? [0, 45, -45, 20, 0] :
-                     animationType === "greeting" ? [0, 60, -20, 30, -10, 0] :
-                     animationType === "thinking" ? [0, 20, -20, 0] : [0, 10, -10, 0]
-            } : {}}
+            animate={animated ? (
+              animationType === "positive" ? {
+                rotate: [0, 45, -45, 20, 0] // Celebration fist pump
+              } : animationType === "milestone" ? {
+                rotate: [0, 60, -60, 30, 0] // Big celebration
+              } : animationType === "greeting" ? {
+                rotate: [0, 70, -30, 40, -10, 0] // Friendly wave
+              } : animationType === "thinking" ? {
+                rotate: [0, 30, 25, 30] // Pointing up thoughtfully
+              } : animationType === "warning" ? {
+                rotate: [0, 20, 15, 20] // Gentle gesture
+              } : {
+                rotate: [0, 8, -8, 0] // Gentle idle
+              }
+            ) : {}}
             transition={{
-              duration: animationType === "greeting" ? 3 : animationType === "positive" ? 2 : 1.8,
-              repeat: animationType === "idle" ? Infinity : animationType === "positive" ? 2 : 1,
+              duration: animationType === "greeting" ? 3.5 : animationType === "positive" ? 2.2 : animationType === "thinking" ? 1.8 : 2,
+              repeat: animationType === "idle" ? Infinity : animationType === "positive" || animationType === "milestone" ? 2 : 1,
               ease: "easeInOut",
-              delay: 0.1
+              delay: 0.15
             }}
           >
             <div
-              className="w-1 h-8 rounded-full"
-              style={{ background: "#2E86AB" }}
+              className="w-1.5 h-9 rounded-full"
+              style={{ background: "#2196F3" }}
             />
-            {/* Right Hand */}
+            {/* Right White Glove */}
             <div
-              className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full"
-              style={{ background: "#2E86AB" }}
+              className="absolute -bottom-1 -right-1.5 w-4 h-4 rounded-full border-2"
+              style={{ 
+                background: "#FFFFFF",
+                borderColor: "#E0E0E0"
+              }}
             />
           </motion.div>
         </motion.div>
@@ -419,25 +446,30 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
               className="w-1 h-8 rounded-full"
               style={{ background: "#2E86AB" }}
             />
-            {/* Left Red Sneaker */}
+            {/* Left Blue Sneaker - Updated to match reference */}
             <motion.div
               className="relative mt-1"
-              animate={animated && animationType === "greeting" ? {
-                rotate: [0, -5, 5, 0]
-              } : {}}
-              transition={{ duration: 0.8, delay: 0.1 }}
+              animate={animated ? (
+                animationType === "greeting" ? {
+                  rotate: [0, -8, 8, 0]
+                } : animationType === "positive" || animationType === "milestone" ? {
+                  y: [0, -2, 0]
+                } : {}
+              ) : {}}
+              transition={{ duration: 1.2, delay: 0.1 }}
             >
               <div
-                className="w-4 h-3 rounded-full"
+                className="w-5 h-4 rounded-lg"
                 style={{ 
-                  background: "#E74C3C",
-                  border: "1px solid #C0392B"
+                  background: "#2196F3",
+                  border: "2px solid #1976D2"
                 }}
               />
-              {/* Shoe laces */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                <div className="w-1 h-1 bg-white rounded-full opacity-80" />
+              {/* Shoe details */}
+              <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                <div className="w-2 h-0.5 bg-white rounded-full opacity-90" />
               </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white rounded-b-lg opacity-80" />
             </motion.div>
           </div>
           
@@ -447,25 +479,30 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
               className="w-1 h-8 rounded-full"
               style={{ background: "#2E86AB" }}
             />
-            {/* Right Red Sneaker */}
+            {/* Right Blue Sneaker - Updated to match reference */}
             <motion.div
               className="relative mt-1"
-              animate={animated && animationType === "greeting" ? {
-                rotate: [0, 5, -5, 0]
-              } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              animate={animated ? (
+                animationType === "greeting" ? {
+                  rotate: [0, 8, -8, 0]
+                } : animationType === "positive" || animationType === "milestone" ? {
+                  y: [0, -2, 0]
+                } : {}
+              ) : {}}
+              transition={{ duration: 1.2, delay: 0.2 }}
             >
               <div
-                className="w-4 h-3 rounded-full"
+                className="w-5 h-4 rounded-lg"
                 style={{ 
-                  background: "#E74C3C",
-                  border: "1px solid #C0392B"
+                  background: "#2196F3",
+                  border: "2px solid #1976D2"
                 }}
               />
-              {/* Shoe laces */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                <div className="w-1 h-1 bg-white rounded-full opacity-80" />
+              {/* Shoe details */}
+              <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                <div className="w-2 h-0.5 bg-white rounded-full opacity-90" />
               </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white rounded-b-lg opacity-80" />
             </motion.div>
           </div>
         </motion.div>
@@ -491,67 +528,96 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           </motion.div>
         )}
 
-        {/* Special Effects for Fun Animations */}
+        {/* Professional Visual Effects System */}
         <AnimatePresence>
+          {/* Sparkle effect for positive events */}
           {animationType === "positive" && (
             <>
-              {/* Bouncing coins effect */}
-              {[...Array(3)].map((_, i) => (
+              {[...Array(4)].map((_, i) => (
                 <motion.div
-                  key={`coin-${i}`}
+                  key={`sparkle-${i}`}
                   className="absolute text-yellow-400 text-sm pointer-events-none"
                   style={{
-                    left: `${30 + i * 20}%`,
-                    top: `${20 + i * 10}%`
+                    left: `${20 + i * 15}%`,
+                    top: `${15 + i * 8}%`
                   }}
                   initial={{ opacity: 0, scale: 0, y: 0 }}
                   animate={{ 
                     opacity: [0, 1, 0],
-                    scale: [0, 1.2, 0],
-                    y: [0, -20, -30],
-                    rotate: [0, 180, 360]
+                    scale: [0, 1.3, 0],
+                    y: [0, -15, -25],
+                    rotate: [0, 90, 180]
                   }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    duration: 1.5,
-                    delay: i * 0.2,
+                    duration: 1.8,
+                    delay: i * 0.15,
                     ease: "easeOut"
                   }}
                 >
-                  💰
+                  ✨
                 </motion.div>
               ))}
             </>
           )}
           
+          {/* Confetti effect for milestones */}
           {animationType === "milestone" && (
             <>
-              {/* Celebration stars */}
-              {[...Array(6)].map((_, i) => (
+              {[...Array(8)].map((_, i) => (
                 <motion.div
-                  key={`star-${i}`}
-                  className="absolute text-yellow-300 text-lg pointer-events-none"
+                  key={`confetti-${i}`}
+                  className="absolute pointer-events-none"
                   style={{
-                    left: `${10 + i * 15}%`,
-                    top: `${5 + (i % 2) * 70}%`
+                    left: `${5 + i * 12}%`,
+                    top: `${-5 + (i % 3) * 15}%`,
+                    color: i % 3 === 0 ? "#FFD700" : i % 3 === 1 ? "#FF6B6B" : "#4ECDC4"
                   }}
-                  initial={{ opacity: 0, scale: 0 }}
+                  initial={{ opacity: 0, scale: 0, y: -10 }}
                   animate={{ 
                     opacity: [0, 1, 0],
-                    scale: [0, 1.5, 0],
-                    rotate: [0, 180, 360]
+                    scale: [0, 1.4, 0],
+                    y: [-10, -30, -50],
+                    rotate: [0, 360, 720],
+                    x: [0, (i % 2 ? 10 : -10), (i % 2 ? 20 : -20)]
                   }}
                   exit={{ opacity: 0 }}
                   transition={{
-                    duration: 2,
-                    delay: i * 0.3,
+                    duration: 2.5,
+                    delay: i * 0.1,
                     ease: "easeOut"
                   }}
                 >
-                  ⭐
+                  {i % 4 === 0 ? "⭐" : i % 4 === 1 ? "💫" : i % 4 === 2 ? "🎉" : "✨"}
                 </motion.div>
               ))}
             </>
+          )}
+
+          {/* Thought bubble for thinking state */}
+          {animationType === "thinking" && (
+            <motion.div
+              className="absolute -top-8 -right-4 pointer-events-none"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ 
+                opacity: [0, 1, 1],
+                scale: [0, 1.1, 1]
+              }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <div 
+                className="bg-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-lg"
+                style={{ border: "2px solid #E0E0E0" }}
+              >
+                💡
+              </div>
+              {/* Thought bubble tail */}
+              <div 
+                className="absolute top-4 left-2 w-2 h-2 bg-white rounded-full"
+                style={{ border: "1px solid #E0E0E0" }}
+              />
+            </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
