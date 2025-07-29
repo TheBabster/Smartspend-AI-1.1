@@ -76,6 +76,20 @@
   --transport-color: hsl(142, 71%, 45%);
   --utilities-color: hsl(271, 81%, 56%);
   --other-color: hsl(38, 92%, 50%);
+  
+  /* WCAG AA Compliant Text Contrast System */
+  --text-high-contrast: hsl(220, 15%, 15%); /* Perfect readability */
+  --text-medium-contrast: hsl(220, 12%, 35%); /* Enhanced medium contrast */
+  --text-low-contrast: hsl(220, 10%, 55%); /* Better subtle text */
+  --on-gradient: hsl(0, 0%, 100%); /* White text for gradients */
+  --on-dark: hsl(0, 0%, 100%); /* White text for dark backgrounds */
+  
+  /* Cohesive Pastel System - App Store Quality */
+  --color-primary-soft: hsl(250, 55%, 70%);
+  --color-secondary-soft: hsl(200, 55%, 70%);
+  --color-success-soft: hsl(140, 45%, 65%);
+  --color-warning-soft: hsl(45, 65%, 70%);
+  --color-danger-soft: hsl(350, 55%, 70%);
 }
 
 .dark {
@@ -167,6 +181,74 @@
   .animate-shimmer {
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
     animation: shimmer 2s infinite;
+  }
+
+  /* Enhanced Text Contrast Classes */
+  .text-high-contrast {
+    color: var(--text-high-contrast);
+  }
+
+  .text-medium-contrast {
+    color: var(--text-medium-contrast);
+  }
+
+  .text-low-contrast {
+    color: var(--text-low-contrast);
+  }
+
+  .text-on-gradient {
+    color: var(--on-gradient);
+  }
+
+  .text-on-dark {
+    color: var(--on-dark);
+  }
+
+  /* Premium Gradient Backgrounds */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(250, 60%, 75%) 0%, hsl(280, 50%, 70%) 100%);
+  }
+
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, hsl(200, 60%, 75%) 0%, hsl(220, 55%, 70%) 100%);
+  }
+
+  .bg-gradient-success {
+    background: linear-gradient(135deg, hsl(140, 50%, 70%) 0%, hsl(160, 45%, 65%) 100%);
+  }
+
+  /* Enhanced Button Hover Effects */
+  .btn-hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Glassmorphism Effects */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Sparkle Effect for Premium Feel */
+  @keyframes sparkle {
+    0%, 100% { 
+      opacity: 0; 
+      transform: scale(0) rotate(0deg); 
+    }
+    50% { 
+      opacity: 1; 
+      transform: scale(1) rotate(180deg); 
+    }
+  }
+
+  .animate-sparkle {
+    animation: sparkle 1.5s ease-in-out infinite;
   }
 
   /* Safe area for mobile devices */

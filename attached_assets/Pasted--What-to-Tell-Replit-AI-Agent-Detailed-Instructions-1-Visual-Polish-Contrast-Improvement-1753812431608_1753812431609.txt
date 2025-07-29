@@ -1,0 +1,104 @@
+🛠️ What to Tell Replit AI Agent (Detailed Instructions)
+
+1. 🌈 Visual Polish & Contrast Improvements
+
+Tell Replit AI:
+
+Improve colour contrast across all white or pale backgrounds (e.g. pie chart labels, button text on light areas) by using darker or more vibrant text colours. Apply WCAG AA or AAA contrast standards.
+
+Example:
+	•	The white text on the pie chart’s background (e.g. “Shopping 38%”) is hard to read—use dark grey or category-matching bolder labels.
+
+⸻
+
+2. 🎨 Refine Pie Chart Design
+
+Tell Replit AI:
+
+Increase label font size on the pie chart. Add padding between chart and label. Consider hover tooltips for better mobile UX. Add a small legend below or inside chart using category icons.
+
+⸻
+
+3. 📊 Fix Data Glitches & Chart Alignment
+
+Tell Replit AI:
+
+In the “Weekly Performance Analysis” card, correct display bugs:
+
+	•	Fix £NaN and NaN% values
+	•	Prevent number overflow issue (e.g. 67.80180.0045...) by adding max width and overflow: hidden with ellipsis.
+	•	Ensure consistent column widths and alignment on the Budget vs Actual bar chart. Use grid layout if necessary.
+
+⸻
+
+4. 🤖 Enhance Smartie Visuals & Expression
+
+Tell Replit AI:
+
+Redesign Smartie’s face to match modern vector styles (simpler, cleaner eyes, better proportions). Add multiple Smartie expressions (e.g. happy, surprised, thinking) based on advice tone. Consider light motion (e.g. Smartie blink every 10s or bounce gently when tips appear).
+
+⸻
+
+5. 💬 Improve Chat & Coaching UI
+
+Tell Replit AI:
+
+For the “Chat with Smartie” section:
+
+	•	Use a larger input text box with rounded edges and placeholder text like “Ask Smartie anything…”
+	•	Add subtle animation when Smartie sends a new message (e.g. slide in, fade).
+	•	Include example questions under input bar (e.g. “How can I save more this week?”)
+
+⸻
+
+6. 🌱 Savings Tree & Streak UX Boost
+
+Tell Replit AI:
+
+In the Savings Tree view:
+
+	•	Add animations when tree grows (e.g. leaves appear, gentle pop).
+	•	Label growth stages clearly above progress bar.
+	•	Show encouragement text like “You’re £10 away from your first leaves!” in green with a small icon.
+
+⸻
+
+7. 🎯 Streamline Badge Layout
+
+Tell Replit AI:
+
+Redesign the Weekly Badge Board:
+
+	•	Group completed and incomplete badges visually
+	•	Add subtle glow or badge animation on completion
+	•	Use progress rings instead of flat purple bars
+
+⸻
+
+8. ⚙️ Smart Purchase Decision Tool Polish
+
+Tell Replit AI:
+
+Improve visual spacing of “desire” and “urgency” sliders. Ensure both tooltips and sliders scale on mobile. Consider dynamic Smartie advice snippets appearing below sliders before user presses “Get Advice”.
+
+⸻
+
+9. ✏️ Content Tweaks & Typography
+
+Tell Replit AI:
+
+Standardise text font size across modules. Ensure “Recent Insights”, “Regret Radar”, and “Weekly Analysis” use matching typography. Increase padding between list items and group related elements in cards.
+
+⸻
+
+10. 🧠 Add a Motivational Streak Milestone System
+
+Tell Replit AI:
+
+Implement a new motivational system under the Savings Tree:
+
+	•	“3-Day Momentum” = Bronze Badge
+	•	“7-Day Power Saver” = Silver Badge
+	•	“21-Day Master” = Gold Badge
+
+Encourage user to build habits with streak-based affirmations and bonus SmartCoins.

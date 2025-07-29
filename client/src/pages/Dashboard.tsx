@@ -18,7 +18,8 @@ import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality"
 import ResponsiveLayout from "@/components/ResponsiveLayout";
 import BrandNewSmartSpendLogo from "@/components/BrandNewSmartSpendLogo";
 import SmartieIntelligentChat from "@/components/SmartieIntelligentChat";
-import SmartieAvatarSystem from "@/components/SmartieAvatarSystem";
+import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
+import PriorityQuickActions from "@/components/PriorityQuickActions";
 import FinancialWellnessScoreVisual from "@/components/FinancialWellnessScoreVisual";
 import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
 import EnhancedQuickActions from "@/components/EnhancedQuickActions";
@@ -124,6 +125,27 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="px-6 -mt-6 relative z-20">
+        {/* PRIORITY: Main Functions Section - Moved to TOP per user request */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-8"
+        >
+          <PriorityQuickActions
+            onPurchaseDecision={() => setShowPurchaseModal(true)}
+            onAddExpense={() => setShowExpenseModal(true)}
+            onViewGoals={() => navigate('/goals')}
+            onViewAnalytics={() => navigate('/analytics')}
+            onChatWithSmartie={() => setShowSmartieChat(true)}
+            userSpendingData={{
+              totalSpent,
+              budgetUsed: budgetPercentage,
+              streak: budgetStreak?.currentStreak || 0
+            }}
+          />
+        </motion.div>
+
         {/* Enhanced Financial Wellness Score with Smartie */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
