@@ -1,0 +1,33 @@
+1. Visual Polish
+	•	Gradient Refinement: The purple gradient in the header is nice, but make it smoother or add a soft radial glow behind the SmartSpend logo (🎯) to create depth and focus.
+	•	Background Texture or Depth: Add a subtle animated background (e.g., floating currency icons, light wave effect, soft bubbles).
+	•	Rounded Corners + Shadow: Give the entire card container a soft drop shadow and slightly more rounded corners to match modern design trends (e.g., Material Design or Neumorphism light).
+	•	Micro-animations: Make the “Next” button pulse slightly or animate on hover/tap with a ripple or colour shift.
+
+2. Smart Branding and Personality
+	•	Add a mini Smartie face (your app mascot) next to the emoji or beneath the welcome text. Smartie can blink, smile, or nod.
+	•	Consider changing the subtitle from “Let’s set up your financial goals” to something more personalised like:
+“Let’s build your perfect budget together.”
+or
+“We’ll help you master your money — one step at a time.”
+
+3. Typography and Input Styling
+	•	Use a more elegant font pairing (e.g., header in Poppins Bold, input in Inter Regular).
+	•	Style the input box:
+	•	With a subtle icon on the left (e.g., £ symbol).
+	•	Soft inner shadow or glowing border on focus.
+	•	Pre-fill example (£3,000) in grey text until user types (placeholder style).
+
+4. UX Improvements
+	•	Add a progress indicator bar (e.g., Step 1 of 5) below the header, so users know what stage they’re in.
+	•	Include a small “Why we ask this” tooltip (e.g., “To help calculate your spending recommendations”).
+
+5. Responsive and Mobile Tweaks
+	•	Ensure padding is tight enough to look clean on mobile without feeling cramped.
+	•	Button size and touch zone should follow accessibility standards (e.g. 48x48 pixels minimum).
+
+⸻
+
+💡 Optional Next-Level Additions
+	•	Let users toggle between currencies (£, $, €, etc.) in a small dropdown next to the input.
+	•	Add dark mode support — maybe show a toggle at the bottom of the screen or detect system preferences.

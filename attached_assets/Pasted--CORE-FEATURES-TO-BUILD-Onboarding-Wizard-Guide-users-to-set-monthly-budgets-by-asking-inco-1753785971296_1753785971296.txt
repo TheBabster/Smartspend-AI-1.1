@@ -1,0 +1,91 @@
+🔧 CORE FEATURES TO BUILD
+	•	Onboarding Wizard:
+	•	Guide users to set monthly budgets by asking income, fixed expenses, and savings goals.
+	•	Use sliders and emojis to set “financial personality” (e.g. frugal, moderate, impulsive).
+	•	Expense Input:
+	•	Manual input with category selection, tags, and emoji-based desire slider.
+	•	Bank sync integration (e.g. TrueLayer or Plaid) for auto-imported expenses.
+	•	Auto-categorise and label spending using simple ML or rules-based tagging.
+	•	Budget Dashboard:
+	•	Weekly and monthly views.
+	•	Live remaining balance per category.
+	•	Custom progress bars per category (color-coded and animated).
+	•	Circular donut showing total budget left (with % ring animation).
+	•	Smartie (AI Assistant):
+	•	Use GPT-4-turbo API to analyse spending habits and offer advice.
+	•	Generate natural language prompts like “You’ve been great with food spending this week!”
+	•	Smartie should track streaks, trigger motivational or cautionary messages, and answer budget queries.
+	•	Add “Ask Smartie” button on home page.
+	•	Goals Tab:
+	•	Create financial goals with amount and deadline.
+	•	Progress bar fills as user saves.
+	•	“Saving Jars” visual: animated jar with coins, filling up.
+	•	Link goals to decisions (e.g. “Skip this purchase to save £14 towards your Italy trip”).
+	•	Purchase Decision Tool:
+	•	AI decision engine based on utility (1–10), category, current budget, and goal alignment.
+	•	Result = “Yes”, “Think Again”, or “No”.
+	•	Explanation given in friendly language from Smartie.
+
+⸻
+
+🧠 INTELLIGENCE & PERSONALISATION
+	•	Behaviour Tracking:
+	•	Recognise user patterns (e.g. “You tend to overspend on weekends”).
+	•	Set “Impulse Zones” and warn when user makes multiple high-utility purchases.
+	•	Financial Wellness Score:
+	•	Composite metric based on budget use, goal tracking, and decision quality.
+	•	Update live, with score streaks, and trophy badges.
+	•	Custom Nudges & Notifications:
+	•	Push: “Just $4 left in Entertainment — stay strong!” or “Congrats, you’re 25% closer to your goal!”
+
+⸻
+
+🎨 VISUAL & DESIGN IMPROVEMENTS
+	•	Modern UI Overhaul:
+	•	Animated emoji sliders, hover effects, smooth transitions, blur cards.
+	•	Soft shadows, depth layering, rounded corners, and a unified color system.
+	•	Microinteractions:
+	•	Confetti when hitting savings goals.
+	•	Budget bars animate smoothly when updated.
+	•	Interactive hover states and tap feedback.
+	•	Themes:
+	•	Dark mode toggle with soft gradients.
+	•	Optional custom themes (Pro users).
+
+⸻
+
+🕹️ GAMIFICATION & REWARDS
+	•	Badges & Milestones:
+	•	“Budget Master” (3 weeks under budget), “Impulse Blocker”, “Streak Starter”.
+	•	Shareable with social integration.
+	•	Challenges:
+	•	“No Spend Weekend”, “Save £100 in 10 days”, etc.
+	•	Join solo or compete with friends.
+	•	Savings Tree:
+	•	Tree that grows leaves and fruit as user saves more.
+	•	Animated and evolving with progress.
+
+⸻
+
+📱 APP OPTIMISATION & DEPLOYMENT
+	•	Mobile-first PWA:
+	•	Fully responsive layout for iOS/Android/mobile web.
+	•	Smooth PWA install flow.
+	•	Offline Mode:
+	•	Store locally, sync when online.
+	•	Performance:
+	•	Lazy load content.
+	•	Modular components and fast transitions.
+
+⸻
+
+💰 MONETISATION & PREMIUM VERSION
+	•	SmartSpend Pro:
+	•	Smartie Pro: deeper insights and spending simulations.
+	•	Bank sync, advanced export reports.
+	•	Templates (e.g. “Student Budget”, “Freelancer Budget”).
+	•	Small monthly fee or one-time lifetime unlock.
+	•	App Store Prep:
+	•	Animated intro screen.
+	•	Custom logo/icon and splash screen.
+	•	App Store screenshots and feature list.
