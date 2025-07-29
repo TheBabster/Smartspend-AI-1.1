@@ -222,7 +222,7 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             <path d="M30 20 Q40 18 50 20" stroke="#000000" strokeWidth="0.8" fill="none" transform="rotate(-2 40 20)"/>
           </g>
 
-          {/* Enhanced Brain Body with Comic-Style Texture */}
+          {/* Enhanced Brain Body with Comic-Style Texture AND ATTACHED LEGS */}
           <motion.g
             animate={animated && poseConfig.bodyY !== 0 ? {
               y: poseConfig.bodyY
@@ -259,6 +259,77 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             
             {/* Center brain hemisphere division */}
             <path d="M40 25 Q40 35 40 45 Q40 55 40 58" stroke="#E8427D" strokeWidth="1.5" fill="none" opacity="0.7"/>
+            
+            {/* LEFT LEG - ATTACHED TO BRAIN BODY - MOVES WITH BRAIN */}
+            <motion.rect 
+              x="32" 
+              y="56" 
+              width="5" 
+              height="16" 
+              fill="#2196F3" 
+              stroke="#000000" 
+              strokeWidth="2" 
+              rx="2.5"
+              animate={animated ? (
+                pose === "nervous" ? {
+                  scaleY: [1, 0.95, 1.05, 1],
+                  x: [32, 31.8, 32.2, 32],
+                  rotate: [0, -1, 1, 0]
+                } : (animationType === "positive" || animationType === "milestone") ? {
+                  scaleY: [1, 0.9, 1.1, 1],
+                  x: [32, 31.5, 32.5, 32]
+                } : {}
+              ) : {}}
+              transition={{
+                duration: pose === "nervous" ? 0.8 : 1.2,
+                repeat: pose === "nervous" ? Infinity : 0,
+                ease: "easeInOut"
+              }}
+            />
+            
+            {/* RIGHT LEG - ATTACHED TO BRAIN BODY - MOVES WITH BRAIN */}
+            <motion.rect 
+              x="43" 
+              y="56" 
+              width="5" 
+              height="16" 
+              fill="#2196F3" 
+              stroke="#000000" 
+              strokeWidth="2" 
+              rx="2.5"
+              animate={animated ? (
+                pose === "nervous" ? {
+                  scaleY: [1, 0.95, 1.05, 1],
+                  x: [43, 43.2, 42.8, 43],
+                  rotate: [0, 1, -1, 0]
+                } : (animationType === "positive" || animationType === "milestone") ? {
+                  scaleY: [1, 0.9, 1.1, 1],
+                  x: [43, 43.5, 42.5, 43]
+                } : {}
+              ) : {}}
+              transition={{
+                duration: pose === "nervous" ? 0.8 : 1.2,
+                repeat: pose === "nervous" ? Infinity : 0,
+                ease: "easeInOut",
+                delay: 0.1
+              }}
+            />
+
+            {/* LEFT SHOE - ATTACHED TO BRAIN BODY - MOVES WITH BRAIN */}
+            <g>
+              <ellipse cx="34.5" cy="74" rx="5.5" ry="3" fill="#2196F3" stroke="#000000" strokeWidth="2"/>
+              <ellipse cx="34.5" cy="75.5" rx="6" ry="1.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
+              <line x1="30" y1="73" x2="39" y2="73" stroke="#FFFFFF" strokeWidth="1"/>
+              <line x1="29" y1="75" x2="40" y2="75" stroke="#FFFFFF" strokeWidth="1"/>
+            </g>
+
+            {/* RIGHT SHOE - ATTACHED TO BRAIN BODY - MOVES WITH BRAIN */}
+            <g>
+              <ellipse cx="45.5" cy="74" rx="5.5" ry="3" fill="#2196F3" stroke="#000000" strokeWidth="2"/>
+              <ellipse cx="45.5" cy="75.5" rx="6" ry="1.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
+              <line x1="41" y1="73" x2="50" y2="73" stroke="#FFFFFF" strokeWidth="1"/>
+              <line x1="40" y1="75" x2="51" y2="75" stroke="#FFFFFF" strokeWidth="1"/>
+            </g>
           </motion.g>
 
           {/* Enhanced Eyes with Expression Support */}
@@ -395,76 +466,7 @@ const ExactSmartieAvatar: React.FC<SmartieAvatarProps> = ({
             <circle cx="60.5" cy={poseConfig.rightArmY + 18} r="2.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
           </motion.g>
 
-          {/* Left Leg - Seamlessly attached to brain body exactly like reference */}
-          <motion.rect 
-            x="32" 
-            y="56" 
-            width="5" 
-            height="16" 
-            fill="#2196F3" 
-            stroke="#000000" 
-            strokeWidth="2" 
-            rx="2.5"
-            animate={animated ? (
-              pose === "nervous" ? {
-                scaleY: [1, 0.95, 1.05, 1],
-                x: [32, 31.8, 32.2, 32],
-                rotate: [0, -1, 1, 0]
-              } : (animationType === "positive" || animationType === "milestone") ? {
-                scaleY: [1, 0.9, 1.1, 1],
-                x: [32, 31.5, 32.5, 32]
-              } : {}
-            ) : {}}
-            transition={{
-              duration: pose === "nervous" ? 0.8 : 1.2,
-              repeat: pose === "nervous" ? Infinity : 0,
-              ease: "easeInOut"
-            }}
-          />
-          
-          {/* Right Leg - Seamlessly attached to brain body exactly like reference */}
-          <motion.rect 
-            x="43" 
-            y="56" 
-            width="5" 
-            height="16" 
-            fill="#2196F3" 
-            stroke="#000000" 
-            strokeWidth="2" 
-            rx="2.5"
-            animate={animated ? (
-              pose === "nervous" ? {
-                scaleY: [1, 0.95, 1.05, 1],
-                x: [43, 43.2, 42.8, 43],
-                rotate: [0, 1, -1, 0]
-              } : (animationType === "positive" || animationType === "milestone") ? {
-                scaleY: [1, 0.9, 1.1, 1],
-                x: [43, 43.5, 42.5, 43]
-              } : {}
-            ) : {}}
-            transition={{
-              duration: pose === "nervous" ? 0.8 : 1.2,
-              repeat: pose === "nervous" ? Infinity : 0,
-              ease: "easeInOut",
-              delay: 0.1
-            }}
-          />
 
-          {/* Left Shoe - Blue sneaker exactly like reference with proper attachment */}
-          <g>
-            <ellipse cx="34.5" cy="74" rx="5.5" ry="3" fill="#2196F3" stroke="#000000" strokeWidth="2"/>
-            <ellipse cx="34.5" cy="75.5" rx="6" ry="1.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
-            <line x1="30" y1="73" x2="39" y2="73" stroke="#FFFFFF" strokeWidth="1"/>
-            <line x1="29" y1="75" x2="40" y2="75" stroke="#FFFFFF" strokeWidth="1"/>
-          </g>
-
-          {/* Right Shoe - Blue sneaker exactly like reference with proper attachment */}
-          <g>
-            <ellipse cx="45.5" cy="74" rx="5.5" ry="3" fill="#2196F3" stroke="#000000" strokeWidth="2"/>
-            <ellipse cx="45.5" cy="75.5" rx="6" ry="1.5" fill="#FFFFFF" stroke="#000000" strokeWidth="1"/>
-            <line x1="41" y1="73" x2="50" y2="73" stroke="#FFFFFF" strokeWidth="1"/>
-            <line x1="40" y1="75" x2="51" y2="75" stroke="#FFFFFF" strokeWidth="1"/>
-          </g>
 
 
 
