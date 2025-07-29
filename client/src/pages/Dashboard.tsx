@@ -12,6 +12,9 @@ import EnhancedPurchaseDecisionModal from "@/components/EnhancedPurchaseDecision
 import ExpenseModal from "@/components/ExpenseModal";
 import SmartieCorner from "@/components/SmartieCorner";
 import SmartieAnimated from "@/components/SmartieAnimated";
+import AnimatedButton from "@/components/AnimatedButton";
+import GlassmorphicCard from "@/components/GlassmorphicCard";
+import AnimatedProgressBar from "@/components/AnimatedProgressBar";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 
 export default function Dashboard() {
@@ -138,44 +141,66 @@ export default function Dashboard() {
           ))}
         </motion.div>
 
-        {/* Quick Actions Panel */}
+        {/* Enhanced Quick Actions Panel */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
-          <Button
-            onClick={() => setShowPurchaseModal(true)}
-            className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-md p-6 h-auto hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-            variant="ghost"
+          <GlassmorphicCard 
+            gradient="purple" 
+            glow 
+            className="p-0 border-0 shadow-glow-purple"
           >
-            <div className="flex items-center gap-4 w-full">
-              <div className="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center">
-                <ShoppingCart className="text-white" size={20} />
+            <AnimatedButton
+              onClick={() => setShowPurchaseModal(true)}
+              className="w-full h-full p-6 bg-transparent hover:bg-white/10 rounded-2xl border-0"
+              variant="ghost"
+              glowOnHover
+            >
+              <div className="flex items-center gap-4 w-full">
+                <motion.div 
+                  className="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <ShoppingCart className="text-white" size={20} />
+                </motion.div>
+                <div className="text-left text-white">
+                  <h3 className="font-semibold">Smart Purchase Decision</h3>
+                  <p className="text-sm text-white/80">Get Smartie's AI advice before buying</p>
+                </div>
               </div>
-              <div className="text-left">
-                <h3 className="font-semibold">Purchase Decision</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Get AI advice before buying</p>
-              </div>
-            </div>
-          </Button>
+            </AnimatedButton>
+          </GlassmorphicCard>
 
-          <Button
-            onClick={() => setShowExpenseModal(true)}
-            className="bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-2xl shadow-md p-6 h-auto hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-            variant="ghost"
+          <GlassmorphicCard 
+            gradient="green" 
+            glow 
+            className="p-0 border-0 shadow-glow-blue"
           >
-            <div className="flex items-center gap-4 w-full">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                <Plus className="text-white" size={20} />
+            <AnimatedButton
+              onClick={() => setShowExpenseModal(true)}
+              className="w-full h-full p-6 bg-transparent hover:bg-white/10 rounded-2xl border-0"
+              variant="ghost"
+              glowOnHover
+            >
+              <div className="flex items-center gap-4 w-full">
+                <motion.div 
+                  className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center"
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Plus className="text-white" size={20} />
+                </motion.div>
+                <div className="text-left text-white">
+                  <h3 className="font-semibold">Add Expense</h3>
+                  <p className="text-sm text-white/80">Track your spending journey</p>
+                </div>
               </div>
-              <div className="text-left">
-                <h3 className="font-semibold">Add Expense</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Track your spending</p>
-              </div>
-            </div>
-          </Button>
+            </AnimatedButton>
+          </GlassmorphicCard>
         </motion.div>
 
         {/* Stats Cards */}

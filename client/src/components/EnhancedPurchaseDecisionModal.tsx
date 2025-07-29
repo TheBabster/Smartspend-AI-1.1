@@ -10,8 +10,9 @@ import { Card } from "@/components/ui/card";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import SmartieAnimated from "./SmartieAnimated";
+import SmartieDecisionCard from "./SmartieDecisionCard";
+import AnimatedButton from "./AnimatedButton";
 import { Brain, ShoppingCart, Clock, DollarSign, Target, Lightbulb } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 
 interface EnhancedPurchaseDecisionModalProps {
   open: boolean;
@@ -386,67 +387,60 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
             </div>
           </div>
 
-          {/* Decision Results */}
+          {/* Enhanced Decision Results with Smartie Decision Card */}
           <AnimatePresence>
             {decision && (
+              <SmartieDecisionCard
+                recommendation={decision.recommendation}
+                score={decision.confidence}
+                reasoning={decision.reasoning}
+                emotionalInsight={decision.emotional_insight}
+                financialImpact={decision.financial_impact}
+                confidenceLevel={decision.confidence}
+                savingsImpact={decision.recommendation === 'no' ? parseFloat(amount) : decision.recommendation === 'yes' ? -parseFloat(amount) * 0.1 : 0}
+                streakImpact={decision.recommendation === 'yes' ? 1 : decision.recommendation === 'no' ? 1 : 0}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Smart Alternatives */}
+          <AnimatePresence>
+            {decision?.alternatives && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
+                className="mt-4"
               >
-                {/* Emotional Insight */}
-                <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700">
+                <Card className="p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700">
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                    <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Emotional Check-in</h4>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">{decision.emotional_insight}</p>
+                      <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">Smart Alternatives</h4>
+                      <ul className="text-sm text-purple-700 dark:text-purple-300 space-y-1">
+                        {decision.alternatives.map((alt, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
+                            {alt}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </Card>
-
-                {/* Financial Impact */}
-                <Card className="p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
-                  <div className="flex items-start gap-3">
-                    <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-green-900 dark:text-green-100 mb-1">Financial Impact</h4>
-                      <p className="text-sm text-green-700 dark:text-green-300">{decision.financial_impact}</p>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Alternatives */}
-                {decision.alternatives && (
-                  <Card className="p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700">
-                    <div className="flex items-start gap-3">
-                      <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">Smart Alternatives</h4>
-                        <ul className="text-sm text-purple-700 dark:text-purple-300 space-y-1">
-                          {decision.alternatives.map((alt, idx) => (
-                            <li key={idx} className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
-                              {alt}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </Card>
-                )}
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Action Buttons */}
+          {/* Enhanced Action Buttons */}
           <div className="flex gap-3 pt-4">
             {!decision ? (
-              <Button 
+              <AnimatedButton 
                 onClick={analyzeDecision} 
                 disabled={isAnalyzing || !itemName || !amount || !category}
-                className="flex-1"
+                className="flex-1 gradient-bg text-white"
+                glowOnHover
+                shimmer
               >
                 {isAnalyzing ? (
                   <>
@@ -459,15 +453,19 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
                     Get Smartie's Advice
                   </>
                 )}
-              </Button>
+              </AnimatedButton>
             ) : (
               <>
-                <Button variant="outline" onClick={() => setDecision(null)} className="flex-1">
+                <AnimatedButton variant="outline" onClick={() => setDecision(null)} className="flex-1">
                   Ask Again
-                </Button>
-                <Button onClick={handleSubmit} className="flex-1">
+                </AnimatedButton>
+                <AnimatedButton 
+                  onClick={handleSubmit} 
+                  className="flex-1 gradient-bg text-white"
+                  glowOnHover
+                >
                   Save Decision
-                </Button>
+                </AnimatedButton>
               </>
             )}
           </div>

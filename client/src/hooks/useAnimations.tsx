@@ -1,228 +1,181 @@
-import { useEffect, useState } from "react";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useCallback } from 'react';
+import { useAnimation } from 'framer-motion';
 
-interface UseCountUpProps {
-  end: number;
-  duration?: number;
-  startOnInView?: boolean;
-}
+// Enhanced animation hooks for micro-interactions
+export const useButtonAnimation = () => {
+  const controls = useAnimation();
 
-export function useCountUp({ end, duration = 2000, startOnInView = true }: UseCountUpProps) {
-  const [count, setCount] = useState(0);
-  const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef(null);
-  const isInView = useInView(ref);
+  const animatePress = useCallback(async () => {
+    await controls.start({
+      scale: 0.95,
+      transition: { duration: 0.1 }
+    });
+    controls.start({
+      scale: 1,
+      transition: { duration: 0.2, type: "spring", stiffness: 400 }
+    });
+  }, [controls]);
 
-  useEffect(() => {
-    if ((!startOnInView || isInView) && !hasStarted) {
-      setHasStarted(true);
-      
-      const increment = end / (duration / 16); // 60fps
-      let current = 0;
-      
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= end) {
-          setCount(end);
-          clearInterval(timer);
-        } else {
-          setCount(Math.floor(current));
-        }
-      }, 16);
+  const animateHover = useCallback(() => {
+    controls.start({
+      scale: 1.02,
+      y: -2,
+      transition: { duration: 0.2, type: "spring", stiffness: 300 }
+    });
+  }, [controls]);
 
-      return () => clearInterval(timer);
-    }
-  }, [end, duration, isInView, startOnInView, hasStarted]);
+  const animateLeave = useCallback(() => {
+    controls.start({
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.2, type: "spring", stiffness: 300 }
+    });
+  }, [controls]);
 
-  return { count, ref };
-}
+  return { controls, animatePress, animateHover, animateLeave };
+};
 
-interface UseTypingEffectProps {
-  text: string;
-  speed?: number;
-  startDelay?: number;
-  onComplete?: () => void;
-}
+export const useProgressAnimation = () => {
+  const controls = useAnimation();
 
-export function useTypingEffect({ 
-  text, 
-  speed = 50, 
-  startDelay = 0,
-  onComplete 
-}: UseTypingEffectProps) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const animateProgress = useCallback(async (percentage: number) => {
+    await controls.start({
+      width: 0,
+      transition: { duration: 0.1 }
+    });
+    controls.start({
+      width: `${percentage}%`,
+      transition: { duration: 1.2, type: "spring", stiffness: 100 }
+    });
+  }, [controls]);
 
-  useEffect(() => {
-    if (!hasStarted) {
-      const startTimer = setTimeout(() => {
-        setHasStarted(true);
-        setIsTyping(true);
-      }, startDelay);
+  return { controls, animateProgress };
+};
 
-      return () => clearTimeout(startTimer);
-    }
-  }, [hasStarted, startDelay]);
+export const useCardAnimation = () => {
+  const controls = useAnimation();
 
-  useEffect(() => {
-    if (hasStarted && isTyping) {
-      let currentIndex = 0;
-      
-      const typeTimer = setInterval(() => {
-        if (currentIndex < text.length) {
-          setDisplayedText(text.slice(0, currentIndex + 1));
-          currentIndex++;
-        } else {
-          setIsTyping(false);
-          clearInterval(typeTimer);
-          onComplete?.();
-        }
-      }, speed);
+  const animateEntry = useCallback((delay = 0) => {
+    controls.start({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { 
+        duration: 0.6, 
+        delay,
+        type: "spring", 
+        stiffness: 100,
+        damping: 15
+      }
+    });
+  }, [controls]);
 
-      return () => clearInterval(typeTimer);
-    }
-  }, [text, speed, hasStarted, isTyping, onComplete]);
+  const animateExit = useCallback(() => {
+    controls.start({
+      opacity: 0,
+      y: 20,
+      scale: 0.95,
+      transition: { duration: 0.3 }
+    });
+  }, [controls]);
 
-  return {
-    displayedText,
-    isTyping,
-    restart: () => {
-      setDisplayedText("");
-      setIsTyping(false);
-      setHasStarted(false);
-    }
-  };
-}
+  return { controls, animateEntry, animateExit };
+};
 
-interface UseProgressBarProps {
-  targetValue: number;
-  duration?: number;
-  delay?: number;
-}
+export const useSlideAnimation = () => {
+  const controls = useAnimation();
 
-export function useProgressBar({ 
-  targetValue, 
-  duration = 1500, 
-  delay = 0 
-}: UseProgressBarProps) {
-  const [progress, setProgress] = useState(0);
-  const ref = useRef(null);
-  const isInView = useInView(ref);
-
-  useEffect(() => {
-    if (isInView) {
-      const timer = setTimeout(() => {
-        const increment = targetValue / (duration / 16);
-        let current = 0;
-        
-        const progressTimer = setInterval(() => {
-          current += increment;
-          if (current >= targetValue) {
-            setProgress(targetValue);
-            clearInterval(progressTimer);
-          } else {
-            setProgress(current);
-          }
-        }, 16);
-
-        return () => clearInterval(progressTimer);
-      }, delay);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isInView, targetValue, duration, delay]);
-
-  return { progress, ref };
-}
-
-export function useBlinkingAnimation(interval: number = 1000) {
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIsVisible(prev => !prev);
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [interval]);
-
-  return isVisible;
-}
-
-export function usePulseAnimation() {
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setScale(prev => prev === 1 ? 1.05 : 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  return scale;
-}
-
-interface UseConfettiProps {
-  trigger: boolean;
-  duration?: number;
-}
-
-export function useConfetti({ trigger, duration = 3000 }: UseConfettiProps) {
-  const [isActive, setIsActive] = useState(false);
-
-  useEffect(() => {
-    if (trigger) {
-      setIsActive(true);
-      const timer = setTimeout(() => {
-        setIsActive(false);
-      }, duration);
-
-      return () => clearTimeout(timer);
-    }
-  }, [trigger, duration]);
-
-  return isActive;
-}
-
-export function useRippleEffect() {
-  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
-
-  const createRipple = (event: React.MouseEvent<HTMLElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = event.clientX - rect.left - size / 2;
-    const y = event.clientY - rect.top - size / 2;
-    
-    const newRipple = {
-      id: Date.now(),
-      x,
-      y,
+  const slideIn = useCallback((direction: 'left' | 'right' | 'up' | 'down' = 'right') => {
+    const initial = {
+      left: { x: -100, opacity: 0 },
+      right: { x: 100, opacity: 0 },
+      up: { y: -100, opacity: 0 },
+      down: { y: 100, opacity: 0 }
     };
 
-    setRipples(prev => [...prev, newRipple]);
+    controls.set(initial[direction]);
+    controls.start({
+      x: 0,
+      y: 0,
+      opacity: 1,
+      transition: { 
+        duration: 0.5, 
+        type: "spring", 
+        stiffness: 120,
+        damping: 20
+      }
+    });
+  }, [controls]);
 
-    setTimeout(() => {
-      setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
-    }, 600);
-  };
-
-  return { ripples, createRipple };
-}
-
-export function useParallax(speed: number = 0.5) {
-  const [offset, setOffset] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setOffset(window.pageYOffset * speed);
+  const slideOut = useCallback((direction: 'left' | 'right' | 'up' | 'down' = 'left') => {
+    const target = {
+      left: { x: -100, opacity: 0 },
+      right: { x: 100, opacity: 0 },
+      up: { y: -100, opacity: 0 },
+      down: { y: 100, opacity: 0 }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [speed]);
+    controls.start({
+      ...target[direction],
+      transition: { duration: 0.3 }
+    });
+  }, [controls]);
 
-  return offset;
-}
+  return { controls, slideIn, slideOut };
+};
+
+export const usePulseAnimation = () => {
+  const controls = useAnimation();
+
+  const startPulse = useCallback(() => {
+    controls.start({
+      scale: [1, 1.05, 1],
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    });
+  }, [controls]);
+
+  const stopPulse = useCallback(() => {
+    controls.stop();
+    controls.start({
+      scale: 1,
+      transition: { duration: 0.3 }
+    });
+  }, [controls]);
+
+  return { controls, startPulse, stopPulse };
+};
+
+export const useShakeAnimation = () => {
+  const controls = useAnimation();
+
+  const shake = useCallback(() => {
+    controls.start({
+      x: [0, -10, 10, -10, 10, 0],
+      transition: { duration: 0.5 }
+    });
+  }, [controls]);
+
+  return { controls, shake };
+};
+
+export const useBounceAnimation = () => {
+  const controls = useAnimation();
+
+  const bounce = useCallback(() => {
+    controls.start({
+      y: [0, -20, 0],
+      transition: { 
+        duration: 0.6,
+        type: "spring",
+        stiffness: 300,
+        damping: 10
+      }
+    });
+  }, [controls]);
+
+  return { controls, bounce };
+};
