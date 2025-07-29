@@ -1,0 +1,137 @@
+import { db } from "./db";
+import { users, budgets, expenses, goals, streaks, achievements } from "@shared/schema";
+
+export async function seedDatabase() {
+  try {
+    // Create demo user
+    const [user] = await db
+      .insert(users)
+      .values({
+        id: "demo-user",
+        username: "alex",
+        email: "alex@example.com",
+        name: "Alex Johnson",
+        currency: "GBP",
+        monthlyIncome: "3500.00",
+        onboardingCompleted: true,
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    const currentMonth = new Date().toISOString().slice(0, 7);
+
+    // Create demo budgets
+    const budgetData = [
+      { category: "Food & Dining", monthlyLimit: "400.00", spent: "267.50" },
+      { category: "Shopping", monthlyLimit: "200.00", spent: "134.20" },
+      { category: "Entertainment", monthlyLimit: "150.00", spent: "89.30" },
+      { category: "Transport", monthlyLimit: "100.00", spent: "67.80" },
+      { category: "Utilities", monthlyLimit: "200.00", spent: "180.00" },
+      { category: "Other", monthlyLimit: "100.00", spent: "45.60" }
+    ];
+
+    for (const budget of budgetData) {
+      await db
+        .insert(budgets)
+        .values({
+          userId: "demo-user",
+          category: budget.category,
+          monthlyLimit: budget.monthlyLimit,
+          spent: budget.spent,
+          month: currentMonth,
+        })
+        .onConflictDoNothing();
+    }
+
+    // Create demo expenses
+    const expenseData = [
+      { category: "Food & Dining", amount: "12.50", description: "Lunch - Pret A Manger", emotionalTag: "convenience" },
+      { category: "Shopping", amount: "45.99", description: "New headphones", emotionalTag: "want" },
+      { category: "Entertainment", amount: "15.00", description: "Netflix subscription", emotionalTag: null },
+      { category: "Transport", amount: "8.50", description: "Bus fare", emotionalTag: null },
+      { category: "Food & Dining", amount: "28.75", description: "Grocery shopping - Tesco", emotionalTag: null },
+    ];
+
+    for (const expense of expenseData) {
+      await db
+        .insert(expenses)
+        .values({
+          userId: "demo-user",
+          ...expense,
+        })
+        .onConflictDoNothing();
+    }
+
+    // Create demo goals
+    await db
+      .insert(goals)
+      .values([
+        {
+          userId: "demo-user",
+          title: "Emergency Fund",
+          targetAmount: "5000.00",
+          currentAmount: "2340.00",
+          targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
+          icon: "🛡️",
+          completed: false,
+        },
+        {
+          userId: "demo-user",
+          title: "Summer Vacation",
+          targetAmount: "2000.00",
+          currentAmount: "1340.00",
+          targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
+          icon: "✈️",
+          completed: false,
+        },
+      ])
+      .onConflictDoNothing();
+
+    // Create demo streaks
+    await db
+      .insert(streaks)
+      .values([
+        {
+          userId: "demo-user",
+          type: "budget",
+          currentStreak: 21,
+          longestStreak: 21,
+        },
+        {
+          userId: "demo-user",
+          type: "savings",
+          currentStreak: 14,
+          longestStreak: 28,
+        },
+      ])
+      .onConflictDoNothing();
+
+    // Create demo achievements
+    await db
+      .insert(achievements)
+      .values([
+        {
+          userId: "demo-user",
+          title: "Budget Master",
+          description: "Stayed under budget for 20 consecutive days!",
+          icon: "🏆",
+          unlockedAt: new Date(),
+        },
+        {
+          userId: "demo-user",
+          title: "Smart Spender",
+          description: "Used Smartie's advice 10 times",
+          icon: "🧠",
+          unlockedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      ])
+      .onConflictDoNothing();
+
+    console.log("Database seeded successfully!");
+  } catch (error) {
+    console.error("Error seeding database:", error);
+  }
+}
+
+// Auto-seed when this file is imported
+seedDatabase();

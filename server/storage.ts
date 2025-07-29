@@ -1,13 +1,6 @@
-import { 
-  type User, type InsertUser,
-  type Budget, type InsertBudget,
-  type Expense, type InsertExpense,
-  type Goal, type InsertGoal,
-  type Decision, type InsertDecision,
-  type Streak, type InsertStreak,
-  type Achievement, type InsertAchievement
-} from "@shared/schema";
-import { randomUUID } from "crypto";
+import { users, budgets, expenses, goals, decisions, streaks, achievements, type User, type Budget, type Expense, type Goal, type Decision, type Streak, type Achievement, type InsertUser, type InsertBudget, type InsertExpense, type InsertGoal, type InsertDecision, type InsertStreak, type InsertAchievement } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -41,230 +34,188 @@ export interface IStorage {
   // Streaks
   getStreaksByUser(userId: string): Promise<Streak[]>;
   getStreak(userId: string, type: string): Promise<Streak | undefined>;
-  updateStreak(userId: string, type: string, streak: Partial<Streak>): Promise<Streak>;
+  createOrUpdateStreak(streak: InsertStreak): Promise<Streak>;
 
   // Achievements
   getAchievementsByUser(userId: string): Promise<Achievement[]>;
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User> = new Map();
-  private budgets: Map<string, Budget> = new Map();
-  private expenses: Map<string, Expense> = new Map();
-  private goals: Map<string, Goal> = new Map();
-  private decisions: Map<string, Decision> = new Map();
-  private streaks: Map<string, Streak> = new Map();
-  private achievements: Map<string, Achievement> = new Map();
-
-  constructor() {
-    // Initialize with a default user for demo
-    const defaultUser: User = {
-      id: "demo-user",
-      username: "alex",
-      email: "alex@example.com",
-      name: "Alex",
-      currency: "GBP",
-      monthlyIncome: "3000.00",
-      onboardingCompleted: true,
-      createdAt: new Date(),
-    };
-    this.users.set(defaultUser.id, defaultUser);
-
-    // Initialize default budgets
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    const defaultBudgets: Budget[] = [
-      { id: randomUUID(), userId: "demo-user", category: "Food & Dining", monthlyLimit: "300.00", spent: "127.00", month: currentMonth, createdAt: new Date() },
-      { id: randomUUID(), userId: "demo-user", category: "Shopping", monthlyLimit: "200.00", spent: "85.00", month: currentMonth, createdAt: new Date() },
-      { id: randomUUID(), userId: "demo-user", category: "Entertainment", monthlyLimit: "150.00", spent: "45.00", month: currentMonth, createdAt: new Date() },
-    ];
-    defaultBudgets.forEach(budget => this.budgets.set(budget.id, budget));
-
-    // Initialize default goals
-    const defaultGoals: Goal[] = [
-      { id: randomUUID(), userId: "demo-user", title: "Emergency Fund", targetAmount: "5000.00", currentAmount: "2340.00", targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000), icon: "🛡️", completed: false, createdAt: new Date() },
-      { id: randomUUID(), userId: "demo-user", title: "Vacation", targetAmount: "2000.00", currentAmount: "1340.00", targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000), icon: "✈️", completed: false, createdAt: new Date() },
-    ];
-    defaultGoals.forEach(goal => this.goals.set(goal.id, goal));
-
-    // Initialize default streaks
-    const defaultStreaks: Streak[] = [
-      { id: randomUUID(), userId: "demo-user", type: "budget", currentStreak: 21, longestStreak: 21, lastUpdated: new Date() },
-      { id: randomUUID(), userId: "demo-user", type: "savings", currentStreak: 14, longestStreak: 28, lastUpdated: new Date() },
-    ];
-    defaultStreaks.forEach(streak => this.streaks.set(streak.id, streak));
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { 
-      ...insertUser, 
-      id, 
-      createdAt: new Date(),
-      currency: insertUser.currency || 'GBP',
-      monthlyIncome: insertUser.monthlyIncome || null,
-      onboardingCompleted: insertUser.onboardingCompleted || false
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async updateUser(id: string, userUpdate: Partial<User>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
-    const updatedUser = { ...user, ...userUpdate };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    const [user] = await db
+      .update(users)
+      .set(userUpdate)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
   }
 
   async getBudgetsByUser(userId: string): Promise<Budget[]> {
-    return Array.from(this.budgets.values()).filter(budget => budget.userId === userId);
+    return await db.select().from(budgets).where(eq(budgets.userId, userId));
   }
 
   async getBudgetByCategory(userId: string, category: string, month: string): Promise<Budget | undefined> {
-    return Array.from(this.budgets.values()).find(
-      budget => budget.userId === userId && budget.category === category && budget.month === month
-    );
+    const [budget] = await db
+      .select()
+      .from(budgets)
+      .where(and(
+        eq(budgets.userId, userId),
+        eq(budgets.category, category),
+        eq(budgets.month, month)
+      ));
+    return budget || undefined;
   }
 
   async createBudget(insertBudget: InsertBudget): Promise<Budget> {
-    const id = randomUUID();
-    const budget: Budget = { 
-      ...insertBudget, 
-      id, 
-      createdAt: new Date(),
-      spent: insertBudget.spent || "0"
-    };
-    this.budgets.set(id, budget);
+    const [budget] = await db
+      .insert(budgets)
+      .values(insertBudget)
+      .returning();
     return budget;
   }
 
   async updateBudget(id: string, budgetUpdate: Partial<Budget>): Promise<Budget | undefined> {
-    const budget = this.budgets.get(id);
-    if (!budget) return undefined;
-    const updatedBudget = { ...budget, ...budgetUpdate };
-    this.budgets.set(id, updatedBudget);
-    return updatedBudget;
+    const [budget] = await db
+      .update(budgets)
+      .set(budgetUpdate)
+      .where(eq(budgets.id, id))
+      .returning();
+    return budget || undefined;
   }
 
   async getExpensesByUser(userId: string): Promise<Expense[]> {
-    return Array.from(this.expenses.values()).filter(expense => expense.userId === userId);
+    return await db.select().from(expenses).where(eq(expenses.userId, userId));
   }
 
   async createExpense(insertExpense: InsertExpense): Promise<Expense> {
-    const id = randomUUID();
-    const expense: Expense = { 
-      ...insertExpense, 
-      id, 
-      createdAt: new Date(),
-      emotionalTag: insertExpense.emotionalTag || null
-    };
-    this.expenses.set(id, expense);
+    const [expense] = await db
+      .insert(expenses)
+      .values(insertExpense)
+      .returning();
     return expense;
   }
 
   async getExpensesByCategory(userId: string, category: string): Promise<Expense[]> {
-    return Array.from(this.expenses.values()).filter(
-      expense => expense.userId === userId && expense.category === category
-    );
+    return await db
+      .select()
+      .from(expenses)
+      .where(and(
+        eq(expenses.userId, userId),
+        eq(expenses.category, category)
+      ));
   }
 
   async getGoalsByUser(userId: string): Promise<Goal[]> {
-    return Array.from(this.goals.values()).filter(goal => goal.userId === userId);
+    return await db.select().from(goals).where(eq(goals.userId, userId));
   }
 
   async getGoal(id: string): Promise<Goal | undefined> {
-    return this.goals.get(id);
+    const [goal] = await db.select().from(goals).where(eq(goals.id, id));
+    return goal || undefined;
   }
 
   async createGoal(insertGoal: InsertGoal): Promise<Goal> {
-    const id = randomUUID();
-    const goal: Goal = { 
-      ...insertGoal, 
-      id, 
-      createdAt: new Date(),
-      currentAmount: insertGoal.currentAmount || "0",
-      targetDate: insertGoal.targetDate || null,
-      icon: insertGoal.icon || null,
-      completed: insertGoal.completed || false
-    };
-    this.goals.set(id, goal);
+    const [goal] = await db
+      .insert(goals)
+      .values(insertGoal)
+      .returning();
     return goal;
   }
 
   async updateGoal(id: string, goalUpdate: Partial<Goal>): Promise<Goal | undefined> {
-    const goal = this.goals.get(id);
-    if (!goal) return undefined;
-    const updatedGoal = { ...goal, ...goalUpdate };
-    this.goals.set(id, updatedGoal);
-    return updatedGoal;
+    const [goal] = await db
+      .update(goals)
+      .set(goalUpdate)
+      .where(eq(goals.id, id))
+      .returning();
+    return goal || undefined;
   }
 
   async getDecisionsByUser(userId: string): Promise<Decision[]> {
-    return Array.from(this.decisions.values()).filter(decision => decision.userId === userId);
+    return await db.select().from(decisions).where(eq(decisions.userId, userId));
   }
 
   async createDecision(insertDecision: InsertDecision): Promise<Decision> {
-    const id = randomUUID();
-    const decision: Decision = { 
-      ...insertDecision, 
-      id, 
-      createdAt: new Date(),
-      followed: insertDecision.followed || null,
-      regretLevel: insertDecision.regretLevel || null
-    };
-    this.decisions.set(id, decision);
+    const [decision] = await db
+      .insert(decisions)
+      .values(insertDecision)
+      .returning();
     return decision;
   }
 
   async updateDecision(id: string, decisionUpdate: Partial<Decision>): Promise<Decision | undefined> {
-    const decision = this.decisions.get(id);
-    if (!decision) return undefined;
-    const updatedDecision = { ...decision, ...decisionUpdate };
-    this.decisions.set(id, updatedDecision);
-    return updatedDecision;
+    const [decision] = await db
+      .update(decisions)
+      .set(decisionUpdate)
+      .where(eq(decisions.id, id))
+      .returning();
+    return decision || undefined;
   }
 
   async getStreaksByUser(userId: string): Promise<Streak[]> {
-    return Array.from(this.streaks.values()).filter(streak => streak.userId === userId);
+    return await db.select().from(streaks).where(eq(streaks.userId, userId));
   }
 
   async getStreak(userId: string, type: string): Promise<Streak | undefined> {
-    return Array.from(this.streaks.values()).find(
-      streak => streak.userId === userId && streak.type === type
-    );
+    const [streak] = await db
+      .select()
+      .from(streaks)
+      .where(and(
+        eq(streaks.userId, userId),
+        eq(streaks.type, type)
+      ));
+    return streak || undefined;
   }
 
-  async updateStreak(userId: string, type: string, streakUpdate: Partial<Streak>): Promise<Streak> {
-    let streak = await this.getStreak(userId, type);
-    if (!streak) {
-      const id = randomUUID();
-      streak = { id, userId, type, currentStreak: 0, longestStreak: 0, lastUpdated: new Date() };
-      this.streaks.set(id, streak);
+  async createOrUpdateStreak(insertStreak: InsertStreak): Promise<Streak> {
+    const existing = await this.getStreak(insertStreak.userId, insertStreak.type);
+    
+    if (existing) {
+      const [streak] = await db
+        .update(streaks)
+        .set(insertStreak)
+        .where(eq(streaks.id, existing.id))
+        .returning();
+      return streak;
+    } else {
+      const [streak] = await db
+        .insert(streaks)
+        .values(insertStreak)
+        .returning();
+      return streak;
     }
-    const updatedStreak = { ...streak, ...streakUpdate, lastUpdated: new Date() };
-    this.streaks.set(streak.id, updatedStreak);
-    return updatedStreak;
   }
 
   async getAchievementsByUser(userId: string): Promise<Achievement[]> {
-    return Array.from(this.achievements.values()).filter(achievement => achievement.userId === userId);
+    return await db.select().from(achievements).where(eq(achievements.userId, userId));
   }
 
   async createAchievement(insertAchievement: InsertAchievement): Promise<Achievement> {
-    const id = randomUUID();
-    const achievement: Achievement = { ...insertAchievement, id, unlockedAt: new Date() };
-    this.achievements.set(id, achievement);
+    const [achievement] = await db
+      .insert(achievements)
+      .values(insertAchievement)
+      .returning();
     return achievement;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
