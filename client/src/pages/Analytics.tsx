@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Target } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
-import { AnimatedSmartieSystem, useSmartieReactions } from "@/components/AnimatedSmartieSystem";
 import { EnhancedSpendingList } from "@/components/EnhancedSpendingList";
 import { type Expense, type Budget } from "@shared/schema";
 
@@ -20,7 +19,6 @@ const COLORS = {
 
 export default function Analytics() {
   const [smartieReaction, setSmartieReaction] = useState<any>(null);
-  const { trigger, triggerReaction } = useSmartieReactions();
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery<Expense[]>({ 
     queryKey: ["/api/expenses"] 
@@ -257,14 +255,6 @@ export default function Analytics() {
       </main>
 
       <BottomNav currentTab="analytics" />
-      
-      {/* Animated Smartie System */}
-      <AnimatedSmartieSystem 
-        trigger={trigger}
-        spendingData={enhancedSpendingData}
-        streakCount={7} // This would come from your streak data
-        className="z-50"
-      />
     </div>
   );
 }
