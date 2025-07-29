@@ -1,0 +1,47 @@
+1. Smarter Input Form with Emotional & Contextual Awareness
+	•	Product title + cost input
+	•	Category auto-suggestion (detects category using AI from product name)
+	•	Utility & desire sliders — show dynamic feedback (e.g. changing Smartie’s expression or colour as you slide)
+	•	Time pressure input — “Is this time-sensitive?” (Yes/No)
+	•	Emotional state toggle — “How do you feel right now?” (Happy, Sad, Bored, Stressed). This lets the AI detect impulsive spending patterns.
+
+2. AI-Based Decision Engine
+	•	Smartie doesn’t just say yes or no — it gives a short rationale like:
+“You’re 4 days away from payday and already close to your monthly dining budget. This item is a want, not a need. I’d say: Hold off — let’s review again in 3 days.”
+	•	Uses:
+	•	Past spending behaviour
+	•	Your financial goals
+	•	Psychological/emotional context
+	•	Budget timeline and pay cycle
+
+3. Streak & Habit Learning
+	•	Learns if the user ignores advice repeatedly (e.g. keeps buying despite “Think Again” warnings)
+	•	Offers gentle prompts:
+“Last week you bought 4 items I advised against — want me to nudge you next time?”
+
+4. Reflection System
+	•	After purchase, 24–48 hrs later Smartie asks:
+“How do you feel about buying [item]?”
+	•	You rate: Regret / Neutral / Happy
+	•	This helps Smartie adapt future advice.
+
+5. Purchase Timer / Delay Nudges
+	•	For non-urgent items, Smartie can say:
+“Let’s wait 3 days and ask again — I’ve added this to your ‘Wish List’.”
+
+6. Voice Input + Quick Add
+	•	Talk to Smartie:
+“I want to buy the new Nike Tech Fleece hoodie, it’s £110.”
+	•	Smartie replies out loud and/or via text with advice.
+
+7. Visual & Gamified Feedback
+	•	Smartie makes reactions fun:
+	•	Jumps for joy on smart choices
+	•	Looks stressed when spending is risky
+	•	Adds savings or regret points
+	•	Progress bar for your “Financial IQ score” improves when you follow good advice.
+
+8. Decision History + Trends
+	•	Smartie builds a report over time:
+	•	“You made 12 smart decisions this month — 5 saved you from low-utility purchases totaling £280.”
+	•	Visual timeline of purchases and decision accuracy.

@@ -16,13 +16,12 @@ interface ViralGrowthHubProps {
 const ViralGrowthHub: React.FC<ViralGrowthHubProps> = ({ className = "" }) => {
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [selectedShareData, setSelectedShareData] = useState({
-    type: 'milestone' as 'milestone' | 'streak' | 'goal' | 'savings' | 'badge',
-    data: {
-      title: '',
-      value: '',
-      description: '',
-      achievement: ''
-    }
+    type: 'milestone' as const,
+    title: '',
+    description: '',
+    value: '',
+    emoji: '',
+    color: ''
   });
 
   // Sample global stats - would come from API
@@ -63,12 +62,11 @@ const ViralGrowthHub: React.FC<ViralGrowthHubProps> = ({ className = "" }) => {
   const handleShareAchievement = (achievement: any) => {
     setSelectedShareData({
       type: achievement.type,
-      data: {
-        title: achievement.title,
-        value: achievement.value,
-        description: achievement.description,
-        achievement: achievement.title
-      }
+      title: achievement.title,
+      description: achievement.description,
+      value: achievement.value,
+      emoji: achievement.type === 'streak' ? '🔥' : achievement.type === 'savings' ? '💰' : '🎯',
+      color: achievement.type === 'streak' ? '#F59E0B' : achievement.type === 'savings' ? '#10B981' : '#8B5CF6'
     });
     setShowSocialModal(true);
   };
@@ -265,10 +263,15 @@ const ViralGrowthHub: React.FC<ViralGrowthHubProps> = ({ className = "" }) => {
 
       {/* Social Sharing Modal */}
       <SocialSharingModal
-        open={showSocialModal}
-        onOpenChange={setShowSocialModal}
-        shareType={selectedShareData.type}
-        data={selectedShareData.data}
+        isOpen={showSocialModal}
+        onClose={() => setShowSocialModal(false)}
+        shareData={selectedShareData}
+        userStats={{
+          totalSaved: 1250,
+          streakDays: 14,
+          smartDecisions: 89,
+          goalsAchieved: 3
+        }}
       />
     </div>
   );
