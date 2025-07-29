@@ -92,7 +92,7 @@ export default function DailyChallengeSystem({
         title: "Streak Guardian",
         description: "Maintain your current streak for one more day",
         type: "streak" as const,
-        difficulty: (currentStreak >= 7 ? "hard" : "easy") as const,
+        difficulty: currentStreak >= 7 ? "hard" as const : "easy" as const,
         reward: { coins: 8 + currentStreak, wisdomLeaves: 1, xp: 10 + currentStreak },
         smartieMessage: "Consistency is the key to lasting change! 🌟"
       },

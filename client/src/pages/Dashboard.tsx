@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 
 import CategoryCardEnhanced from "@/components/CategoryCardEnhanced";
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
+import EnhancedHomeDashboard from "@/components/EnhancedHomeDashboard";
+import { BrandedLayout } from "@/components/BrandIdentitySystem";
 
 import BottomNav from "@/components/BottomNav";
 import EnhancedPurchaseDecisionModal from "@/components/EnhancedPurchaseDecisionModal";
@@ -53,6 +55,56 @@ export default function Dashboard() {
 
   const budgetStreak = streaks.find(s => s.type === "budget");
   const recentAchievement = achievements[achievements.length - 1];
+
+  // Enhanced user context for emotional design
+  const userContext = {
+    name: user?.name || "SmartSpender",
+    financialScore: calculateFinancialScore(),
+    streak: budgetStreak?.currentStreak || 0,
+    totalSaved: remainingBudget > 0 ? remainingBudget : 0,
+    budgetHealth: budgetPercentage > 80 ? 'good' as const : 
+                  budgetPercentage > 60 ? 'warning' as const : 'danger' as const
+  };
+
+  function calculateFinancialScore(): number {
+    if (!budgets.length) return 75;
+    
+    const budgetScore = Math.max(0, Math.min(100, budgetPercentage));
+    const streakScore = Math.min(20, (budgetStreak?.currentStreak || 0) * 2);
+    const achievementScore = Math.min(15, achievements.length * 3);
+    
+    return Math.round(budgetScore * 0.65 + streakScore + achievementScore);
+  }
+
+  // Check if we should use the enhanced emotional dashboard
+  const shouldUseEnhancedDashboard = true; // Enable the new emotional design system
+
+  if (shouldUseEnhancedDashboard) {
+    return (
+      <>
+        <EnhancedHomeDashboard
+          user={userContext}
+          budgets={budgets}
+          goals={[]} // Will be populated when goals are available
+          recentExpenses={[]} // Will be populated when expenses are available
+        />
+        <BottomNav />
+        
+        {/* Modals */}
+        <EnhancedPurchaseDecisionModal 
+          isOpen={showPurchaseModal} 
+          onClose={() => setShowPurchaseModal(false)} 
+        />
+        <ExpenseModal 
+          isOpen={showExpenseModal} 
+          onClose={() => setShowExpenseModal(false)} 
+        />
+        {showSmartieChat && (
+          <SmartieIntelligentChat onClose={() => setShowSmartieChat(false)} />
+        )}
+      </>
+    );
+  }
 
   return (
     <ResponsiveLayout className="bg-gray-50 dark:bg-gray-900 pb-20" maxWidth="xl" padding="none">
