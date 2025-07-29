@@ -1,0 +1,45 @@
+🔧 1. Replace Placeholder Logo
+	•	The current red target icon next to “SmartSpend” is generic and inconsistent with your branding.
+	•	✅ Fix: Replace it with your real logo (the neural-brain with £ and orbit ring) in SVG format for crisp display. Center it above or to the left of the text.
+
+⸻
+
+🎨 2. Improve the Gradient
+	•	The pink-purple gradient is decent but looks flat and slightly outdated.
+	•	✅ Fix: Use a modern radial or layered gradient (e.g. deep violet fading into fuchsia and peach tones) or subtle textures. Add visual depth using background illustrations (e.g. abstract currency icons or Smartie silhouettes as watermark elements).
+	•	Optional: Animate the background with a slow shimmer effect for premium polish.
+
+⸻
+
+🤖 3. Upgrade Smartie Visual
+	•	The current Smartie avatar is a smiling emoji. This doesn’t match your in-app mascot style.
+	•	✅ Fix: Replace with the Smartie character (animated or static) wearing sneakers and headband. Make sure it’s visually aligned in size and color with the rest of the page.
+
+⸻
+
+🧠 4. AI Text Personalisation
+	•	“Hi! I’m Smartie, your financial assistant” is simple, but lacks flair.
+	•	✅ Fix: Add personality to the message:
+“Hey Alex! I’m Smartie 👋 Ready to take your finances to genius level today?”
+	•	And replace “Smartie is thinking…” with a pulsing animation or typewriter text reveal.
+
+⸻
+
+🧩 5. Button Design
+	•	The “Get Started 🚀” button is fine, but feels like a default Bootstrap style.
+	•	✅ Fix: Use a neumorphic or glowing 3D-style button, larger in size, with hover interaction (e.g. color shift or bounce on tap). Center it better for mobile.
+
+⸻
+
+📱 6. Adjust Layout for Balance
+	•	The top half has too much vertical space before Smartie speaks.
+	•	✅ Fix: Tighten spacing. Consider moving the Smartie assistant card up slightly and add padding only where it improves readability.
+
+⸻
+
+🌎 7. Add Micro Trust Elements
+	•	No credibility indicators currently shown.
+	•	✅ Fix: Add one subtle line near the bottom:
+“Trusted by over 3,500 users across 17 countries”
+or
+“Secure. Private. Backed by advanced AI.”

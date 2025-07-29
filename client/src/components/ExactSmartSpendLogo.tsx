@@ -36,7 +36,7 @@ const ExactSmartSpendLogo: React.FC<ExactSmartSpendLogoProps> = ({
         animate={animated ? { scale: 1, opacity: 1 } : {}}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {/* Orange sparkle/star in top-left */}
+        {/* Orange sparkle/star in top-left - more defined */}
         <motion.g
           transform="translate(90, 70)"
           initial={animated ? { opacity: 0, scale: 0.5 } : {}}
@@ -44,12 +44,13 @@ const ExactSmartSpendLogo: React.FC<ExactSmartSpendLogoProps> = ({
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           <path
-            d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z"
-            fill="#FFA726"
+            d="M0 -20 L6 -6 L20 0 L6 6 L0 20 L-6 6 L-20 0 L-6 -6 Z"
+            fill="url(#sparkleGradient)"
           />
+          <circle cx="0" cy="0" r="4" fill="#FFF3CD" opacity="0.8" />
         </motion.g>
 
-        {/* Pink head profile - exact shape */}
+        {/* Pink head profile - clean and crisp */}
         <motion.path
           d="M140 240 
              C140 220, 150 200, 170 190 
@@ -67,7 +68,9 @@ const ExactSmartSpendLogo: React.FC<ExactSmartSpendLogoProps> = ({
              L160 330 
              C150 320, 140 300, 140 280 
              Z"
-          fill="#FF7BA6"
+          fill="url(#headGradient)"
+          stroke="#E75895"
+          strokeWidth="2"
           initial={animated ? { pathLength: 0 } : {}}
           animate={animated ? { pathLength: 1 } : {}}
           transition={{ delay: 0.1, duration: 0.8 }}
@@ -80,8 +83,8 @@ const ExactSmartSpendLogo: React.FC<ExactSmartSpendLogoProps> = ({
           animate={animated ? { scale: 1, opacity: 1 } : {}}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          {/* Main brain shape */}
-          <ellipse cx="40" cy="30" rx="50" ry="40" fill="#E879B7" />
+          {/* Main brain shape with enhanced gradient */}
+          <ellipse cx="40" cy="30" rx="50" ry="40" fill="url(#brainGradient)" stroke="#C967A3" strokeWidth="1.5" />
           
           {/* Brain hemisphere division */}
           <path
@@ -149,21 +152,56 @@ const ExactSmartSpendLogo: React.FC<ExactSmartSpendLogoProps> = ({
           </motion.text>
         </motion.g>
 
-        {/* Dark blue orbital ring - exact angle and position */}
+        {/* Dark blue orbital ring - enhanced with gradient */}
         <motion.ellipse
           cx="235"
           cy="240"
           rx="130"
           ry="90"
           fill="none"
-          stroke="#1E3A8A"
-          strokeWidth="12"
+          stroke="url(#ringGradient)"
+          strokeWidth="14"
           strokeLinecap="round"
           transform="rotate(-15 235 240)"
+          filter="url(#ringGlow)"
           initial={animated ? { pathLength: 0, opacity: 0 } : {}}
           animate={animated ? { pathLength: 1, opacity: 1 } : {}}
           transition={{ delay: 0.2, duration: 1.5 }}
         />
+        {/* Enhanced gradient and filter definitions */}
+        <defs>
+          <linearGradient id="sparkleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFD700" />
+            <stop offset="50%" stopColor="#FFA726" />
+            <stop offset="100%" stopColor="#FF8F00" />
+          </linearGradient>
+          
+          <linearGradient id="headGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FF8FAB" />
+            <stop offset="50%" stopColor="#FF7BA6" />
+            <stop offset="100%" stopColor="#E75895" />
+          </linearGradient>
+          
+          <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#F48FB1" />
+            <stop offset="50%" stopColor="#E879B7" />
+            <stop offset="100%" stopColor="#C967A3" />
+          </linearGradient>
+          
+          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1E3A8A" />
+            <stop offset="50%" stopColor="#3B82F6" />
+            <stop offset="100%" stopColor="#1E40AF" />
+          </linearGradient>
+          
+          <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
       </motion.svg>
 
       {/* Text - exact font and styling */}
