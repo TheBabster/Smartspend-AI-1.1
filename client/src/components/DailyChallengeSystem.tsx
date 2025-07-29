@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Target, Calendar, Star, Gift, Zap, Shield, Heart, Trophy, Clock, CheckCircle2 } from "lucide-react";
-import SmartieAnimated from "./SmartieAnimated";
+import ExactSmartieAvatar from "./ExactSmartieAvatar";
 import { CountUp, PulseGlow, SuccessCheckmark } from "./MicroAnimations";
 
 interface DailyChallenge {
@@ -92,7 +92,7 @@ export default function DailyChallengeSystem({
         title: "Streak Guardian",
         description: "Maintain your current streak for one more day",
         type: "streak" as const,
-        difficulty: currentStreak >= 7 ? "hard" : "easy",
+        difficulty: (currentStreak >= 7 ? "hard" : "easy") as const,
         reward: { coins: 8 + currentStreak, wisdomLeaves: 1, xp: 10 + currentStreak },
         smartieMessage: "Consistency is the key to lasting change! 🌟"
       },
@@ -230,9 +230,11 @@ export default function DailyChallengeSystem({
           <div className="p-6">
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12">
-                <SmartieAnimated 
+                <ExactSmartieAvatar 
                   mood={todayChallenge.completed ? "celebrating" : "happy"} 
                   size="lg" 
+                  animated={true}
+                  animationType={todayChallenge.completed ? "positive" : "greeting"}
                 />
               </div>
               <div className="flex-1">
@@ -422,7 +424,7 @@ export default function DailyChallengeSystem({
               exit={{ scale: 0.5, y: 50 }}
             >
               <div className="w-16 h-16 mx-auto mb-4">
-                <SmartieAnimated mood="celebrating" size="xl" />
+                <ExactSmartieAvatar mood="celebrating" size="xl" animated={true} animationType="positive" />
               </div>
               
               <h3 className="text-2xl font-bold mb-2">Challenge Complete!</h3>

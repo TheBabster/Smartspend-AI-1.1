@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Quote, Heart, Lightbulb, Star, Gift, ShoppingBag, Shirt, Glasses, Crown } from "lucide-react";
-import SmartieAnimated from "@/components/SmartieAnimated";
+import ExactSmartieAvatar from "@/components/ExactSmartieAvatar";
 import { BounceButton, bounceVariants, LiftCard, liftVariants, staggerContainer, staggerItem } from "@/components/MicroAnimations";
 import BottomNav from "@/components/BottomNav";
 import ResponsiveLayout from "@/components/ResponsiveLayout";
@@ -188,7 +188,7 @@ export default function SmartieCorner() {
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="w-20 h-20 mx-auto mb-4">
-          <SmartieAnimated mood="happy" size="xl" />
+          <ExactSmartieAvatar mood="happy" size="xl" animated={true} animationType="greeting" />
         </div>
         <h1 className="text-3xl font-bold gradient-text mb-2">Smartie's Corner</h1>
         <p className="text-gray-600 dark:text-gray-400">
@@ -404,7 +404,7 @@ export default function SmartieCorner() {
                         <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-4 border border-purple-200/50 dark:border-purple-800/30">
                           <div className="flex items-start gap-3">
                             <div className="w-8 h-8">
-                              <SmartieAnimated mood="thinking" size="sm" />
+                              <ExactSmartieAvatar mood="thinking" size="sm" animated={true} animationType="thinking" />
                             </div>
                             <div>
                               <h5 className="font-medium text-purple-800 dark:text-purple-200 mb-1">

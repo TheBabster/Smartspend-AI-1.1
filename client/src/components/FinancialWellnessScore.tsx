@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Target, Shield, Star, Award } from "lucide-react";
 import { CountUp, PulseGlow } from "./MicroAnimations";
-import SmartieAnimated from "./SmartieAnimated";
+import ExactSmartieAvatar from "./ExactSmartieAvatar";
 
 interface FinancialWellnessScoreProps {
   budgets: any[];
@@ -143,10 +143,10 @@ export default function FinancialWellnessScore({
   };
 
   const getSmartieReaction = (score: number) => {
-    if (score >= 90) return { mood: "celebrating" as const, message: "Outstanding financial discipline! You're crushing it! 🎉" };
-    if (score >= 80) return { mood: "proud" as const, message: "Great job! You're building solid financial habits! 👏" };
-    if (score >= 70) return { mood: "happy" as const, message: "Good progress! Keep up the momentum! 💪" };
-    if (score >= 60) return { mood: "thinking" as const, message: "You're on the right track. Small tweaks will help! 🤔" };
+    // Score-based Smartie expressions as per user specification:
+    // 😊 for 75–100, 😐 for 50–74, 😟 for <50
+    if (score >= 75) return { mood: "happy" as const, message: "Outstanding financial discipline! You're crushing it! 🎉" };
+    if (score >= 50) return { mood: "thinking" as const, message: "You're on the right track. Small tweaks will help! 🤔" };
     return { mood: "concerned" as const, message: "Let's work together to improve your financial wellness! 💙" };
   };
 
@@ -156,7 +156,7 @@ export default function FinancialWellnessScore({
         <CardContent className="p-6">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4">
-              <SmartieAnimated mood="thinking" size="lg" />
+              <ExactSmartieAvatar mood="thinking" size="lg" animated={true} animationType="thinking" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Calculating Your Wellness Score...</h3>
             <div className="space-y-3">
@@ -299,7 +299,12 @@ export default function FinancialWellnessScore({
         >
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 flex-shrink-0">
-              <SmartieAnimated mood={smartieReaction.mood} size="md" />
+              <ExactSmartieAvatar 
+                mood={smartieReaction.mood} 
+                size="md" 
+                animated={true} 
+                animationType={smartieReaction.mood === "celebrating" ? "celebration" : smartieReaction.mood === "thinking" ? "thinking" : "greeting"} 
+              />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">

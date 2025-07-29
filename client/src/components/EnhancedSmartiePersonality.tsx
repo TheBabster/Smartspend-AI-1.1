@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, X, Heart, Brain, Sparkles } from "lucide-react";
-import SmartieAnimated from "./SmartieAnimated";
+import ExactSmartieAvatar from "./ExactSmartieAvatar";
 
 interface SmartieMessage {
   id: string;
   text: string;
-  mood: "happy" | "thinking" | "concerned" | "celebrating" | "proud" | "sleepy";
+  mood: "happy" | "thinking" | "concerned" | "celebrating" | "confident" | "worried";
   type: "advice" | "celebration" | "motivation" | "warning" | "affirmation";
   trigger?: string;
 }
@@ -36,7 +36,7 @@ export default function EnhancedSmartiePersonality({
     {
       id: "motivation-1",
       text: "Remember, you're not your bank balance - you're your smart choices! 💪",
-      mood: "proud",
+      mood: "confident",
       type: "affirmation"
     },
     {
@@ -75,7 +75,7 @@ export default function EnhancedSmartiePersonality({
     {
       id: "anxious-support", 
       text: "Feeling anxious? Deep breaths. Your worth isn't measured by your spending. You've got this! 🌟",
-      mood: "proud",
+      mood: "confident",
       type: "affirmation",
       trigger: "anxious"
     },
@@ -217,7 +217,7 @@ export default function EnhancedSmartiePersonality({
                       className="flex gap-3"
                     >
                       <div className="w-8 h-8 flex-shrink-0">
-                        <SmartieAnimated mood={currentMessage.mood} size="sm" />
+                        <ExactSmartieAvatar mood={currentMessage.mood} size="sm" animated={true} animationType="greeting" />
                       </div>
                       <div className="flex-1">
                         <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 rounded-2xl p-3 border border-purple-100/50 dark:border-purple-800/30">
@@ -242,7 +242,7 @@ export default function EnhancedSmartiePersonality({
                       className="flex gap-3"
                     >
                       <div className="w-8 h-8 flex-shrink-0 opacity-60">
-                        <SmartieAnimated mood={message.mood} size="sm" />
+                        <ExactSmartieAvatar mood={message.mood} size="sm" animated={false} />
                       </div>
                       <div className="flex-1">
                         <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-3 border border-gray-200/50 dark:border-gray-700/30">
@@ -270,7 +270,7 @@ export default function EnhancedSmartiePersonality({
                       onClick={() => setCurrentMessage({
                         id: "affirmation",
                         text: "You're doing great! Every small step towards financial wellness counts. Keep it up! 🌟",
-                        mood: "proud",
+                        mood: "confident",
                         type: "affirmation"
                       })}
                       className="flex-1 text-xs"
