@@ -226,7 +226,7 @@ export default function Onboarding() {
                         className="pl-8"
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-contrast mt-1">
                       Include salary, freelance income, and any regular earnings
                     </p>
                   </div>
@@ -259,7 +259,7 @@ export default function Onboarding() {
                       <div className="flex-1">
                         <label className="block text-sm font-medium">{category.name}</label>
                         <div className="relative mt-1">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-contrast">
                             {currencies.find(c => c.code === data.currency)?.symbol}
                           </span>
                           <Input

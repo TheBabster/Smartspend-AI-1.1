@@ -3,22 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, ShoppingCart, TrendingUp, Target, BarChart3 } from "lucide-react";
-import BudgetRing from "@/components/BudgetRing";
-import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
-import CategoryCard from "@/components/CategoryCard";
+
 import CategoryCardEnhanced from "@/components/CategoryCardEnhanced";
-import ThemeToggle from "@/components/ThemeToggle";
-import SmartieMotivationalBar from "@/components/SmartieMotivationalBar";
-import BadgeSystem from "@/components/BadgeSystem";
+import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
+
 import BottomNav from "@/components/BottomNav";
 import EnhancedPurchaseDecisionModal from "@/components/EnhancedPurchaseDecisionModal";
 import ExpenseModal from "@/components/ExpenseModal";
 import SmartieCorner from "@/components/SmartieCorner";
-import SmartieAnimated from "@/components/SmartieAnimated";
-import AnimatedButton from "@/components/AnimatedButton";
-import GlassmorphicCard from "@/components/GlassmorphicCard";
-import AnimatedProgressBar from "@/components/AnimatedProgressBar";
+
 import AdvancedBudgetVisualizer from "@/components/AdvancedBudgetVisualizer";
 import FinancialWellnessScore from "@/components/FinancialWellnessScore";
 import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality";
@@ -26,12 +19,15 @@ import ResponsiveLayout from "@/components/ResponsiveLayout";
 import BrandNewLogo from "@/components/BrandNewLogo";
 import FinancialWellnessScoreVisual from "@/components/FinancialWellnessScoreVisual";
 import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
+import EnhancedQuickActions from "@/components/EnhancedQuickActions";
 import { BounceButton, bounceVariants, LiftCard, liftVariants } from "@/components/MicroAnimations";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [, navigate] = useLocation();
 
   const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
   const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
@@ -87,7 +83,7 @@ export default function Dashboard() {
             <BrandNewLogo size="lg" animated={true} showText={true} />
             
             <div className="flex items-center gap-4">
-              <ThemeToggle />
+      
               
               {/* User Welcome */}
               <motion.div
@@ -203,8 +199,8 @@ export default function Dashboard() {
         >
           <FinancialWellnessScore
             budgets={budgets}
-            streak={budgetStreak?.currentCount || 0}
-            goalsCompleted={achievements.filter(a => a.unlocked).length}
+            streak={budgetStreak?.currentStreak || 0}
+            goalsCompleted={achievements.filter(a => a.unlockedAt !== null).length}
             totalGoals={achievements.length}
             previousScore={85} // This would come from historical data
           />
@@ -225,64 +221,22 @@ export default function Dashboard() {
 
         {/* Enhanced Quick Actions Panel */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.2 }}
+          className="mb-6"
         >
-          <GlassmorphicCard 
-            gradient="purple" 
-            glow 
-            className="p-0 border-0 shadow-glow-purple"
-          >
-            <AnimatedButton
-              onClick={() => setShowPurchaseModal(true)}
-              className="w-full h-full p-6 bg-transparent hover:bg-white/10 rounded-2xl border-0"
-              variant="ghost"
-              glowOnHover
-            >
-              <div className="flex items-center gap-4 w-full">
-                <motion.div 
-                  className="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center"
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <ShoppingCart className="text-white" size={20} />
-                </motion.div>
-                <div className="text-left text-on-dark">
-                  <h3 className="font-semibold">Smart Purchase Decision</h3>
-                  <p className="text-sm text-purple-100">Get Smartie's AI advice before buying</p>
-                </div>
-              </div>
-            </AnimatedButton>
-          </GlassmorphicCard>
-
-          <GlassmorphicCard 
-            gradient="green" 
-            glow 
-            className="p-0 border-0 shadow-glow-blue"
-          >
-            <AnimatedButton
-              onClick={() => setShowExpenseModal(true)}
-              className="w-full h-full p-6 bg-transparent hover:bg-white/10 rounded-2xl border-0"
-              variant="ghost"
-              glowOnHover
-            >
-              <div className="flex items-center gap-4 w-full">
-                <motion.div 
-                  className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Plus className="text-white" size={20} />
-                </motion.div>
-                <div className="text-left text-on-dark">
-                  <h3 className="font-semibold">Add Expense</h3>
-                  <p className="text-sm text-green-100">Track your spending journey</p>
-                </div>
-              </div>
-            </AnimatedButton>
-          </GlassmorphicCard>
+          <EnhancedQuickActions
+            onPurchaseDecision={() => setShowPurchaseModal(true)}
+            onAddExpense={() => setShowExpenseModal(true)}
+            onViewGoals={() => navigate('/goals')}
+            onViewAnalytics={() => navigate('/analytics')}
+            userSpendingData={{
+              totalSpent,
+              budgetUsed: budgetPercentage,
+              streak: budgetStreak?.currentStreak || 0
+            }}
+          />
         </motion.div>
 
         {/* Stats Cards */}
@@ -295,7 +249,7 @@ export default function Dashboard() {
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-2">🎯</div>
-              <div className="text-lg font-semibold">
+              <div className="text-lg font-semibold text-high-contrast">
                 {budgetStreak?.currentStreak || 0}
               </div>
               <div className="text-sm text-medium-contrast">Day Streak</div>
@@ -305,7 +259,7 @@ export default function Dashboard() {
           <Card>
             <CardContent className="p-4 text-center">
               <div className="text-2xl mb-2">💰</div>
-              <div className="text-lg font-semibold">
+              <div className="text-lg font-semibold text-high-contrast">
                 £{(totalBudget - totalSpent).toFixed(0)}
               </div>
               <div className="text-sm text-medium-contrast">Saved</div>
@@ -329,7 +283,7 @@ export default function Dashboard() {
         userMood="neutral"
         recentSpending={totalSpent}
         budgetHealth={budgetPercentage > 90 ? "danger" : budgetPercentage > 75 ? "warning" : "good"}
-        streak={budgetStreak?.currentCount || 0}
+        streak={budgetStreak?.currentStreak || 0}
       />
 
       {/* Bottom Navigation */}

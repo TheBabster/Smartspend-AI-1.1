@@ -265,6 +265,25 @@
   color: hsl(0, 0%, 98%);
 }
 
+.text-on-purple {
+  color: hsl(0, 0%, 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.text-on-green {
+  color: hsl(0, 0%, 100%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.text-on-gradient {
+  color: hsl(0, 0%, 100%);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.text-muted-contrast {
+  color: hsl(215, 16%, 47%);
+}
+
 /* Improved button hover effects */
 .btn-enhanced:hover {
   transform: translateY(-2px);
