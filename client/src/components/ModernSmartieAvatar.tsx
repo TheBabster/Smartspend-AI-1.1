@@ -58,14 +58,14 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
   }, [animationType]);
 
   const getAnimationVariants = () => {
-    const baseY = Math.sin(currentFrame * 0.03) * 1.5; // Gentle floating
+    const baseY = Math.sin(currentFrame * 0.02) * 1; // Subtle gentle floating
 
     switch (animationType) {
       case "positive":
         return {
-          y: [baseY, baseY - 6, baseY + 2, baseY],
-          scale: [1, 1.08, 1.02, 1],
-          rotate: [0, 3, -3, 0]
+          y: [baseY, baseY - 4, baseY + 1, baseY],
+          scale: [1, 1.05, 1.02, 1],
+          rotate: [0, 2, -2, 0]
         };
       case "thinking":
         return {
@@ -77,24 +77,24 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
         return {
           y: baseY,
           x: [0, -1, 1, 0],
-          scale: [1, 0.98, 1]
+          scale: [1, 0.99, 1]
         };
       case "milestone":
         return {
-          y: [baseY, baseY - 10, baseY + 3, baseY],
-          scale: [1, 1.12, 1.05, 1],
-          rotate: [0, 8, -8, 0]
+          y: [baseY, baseY - 6, baseY + 2, baseY],
+          scale: [1, 1.08, 1.03, 1],
+          rotate: [0, 4, -4, 0]
         };
       case "greeting":
         return {
-          y: [baseY, baseY - 4, baseY + 2, baseY],
-          rotate: [0, 6, -3, 6, 0],
-          scale: [1, 1.05, 1]
+          y: [baseY, baseY - 3, baseY + 1, baseY],
+          rotate: [0, 3, -2, 3, 0],
+          scale: [1, 1.03, 1]
         };
       default: // idle
         return {
           y: baseY,
-          rotate: [0, 0.5, -0.5, 0]
+          rotate: [0, 0.3, -0.3, 0]
         };
     }
   };
@@ -186,215 +186,306 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
           ease: "easeInOut"
         }}
       >
-        {/* Brain Body - Authentic brain shape with proper folds */}
+        {/* Blue Baseball Cap - Exactly like reference */}
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+          <div 
+            className="relative"
+            style={{
+              width: "48px",
+              height: "24px"
+            }}
+          >
+            {/* Cap main part */}
+            <div
+              className="absolute inset-0 rounded-t-full"
+              style={{
+                background: "#2E86AB",
+                border: "2px solid #1E5A8A",
+                borderBottomLeftRadius: "50%",
+                borderBottomRightRadius: "50%"
+              }}
+            />
+            {/* Cap visor */}
+            <div
+              className="absolute -bottom-1 left-1/2 transform -translate-x-1/2"
+              style={{
+                width: "32px",
+                height: "8px",
+                background: "#2E86AB",
+                border: "2px solid #1E5A8A",
+                borderRadius: "0 0 50% 50%"
+              }}
+            />
+            {/* Cap button on top */}
+            <div
+              className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full"
+              style={{
+                background: "#1E5A8A"
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Brain Body - Authentic brain shape exactly like reference */}
         <div
-          className={`relative ${config.brain} flex flex-col items-center justify-center shadow-lg`}
+          className={`relative ${config.brain} flex flex-col items-center justify-center`}
           style={{
-            background: "#FF9CA0", // Consistent pink from reference
-            border: "3px solid #D63447",
-            borderRadius: "65% 65% 65% 65% / 70% 70% 50% 50%", // More brain-like rounded bumps
-            position: "relative"
+            background: "#FF9BB5", // Pink brain color from reference
+            border: "3px solid #E8427D",
+            borderRadius: "45% 45% 50% 50%", // Brain-like bumpy shape
+            position: "relative",
+            width: "64px",
+            height: "48px"
           }}
         >
-          {/* Brain Folds/Texture - More realistic brain texture */}
-          <div className="absolute inset-1 opacity-30 pointer-events-none">
-            <svg viewBox="0 0 60 60" className="w-full h-full">
-              {/* Brain fold lines to look more brain-like */}
+          {/* Brain Texture - Curved lines like reference */}
+          <div className="absolute inset-1 opacity-40 pointer-events-none">
+            <svg viewBox="0 0 60 45" className="w-full h-full">
+              {/* Brain fold curves exactly like reference */}
               <path
-                d="M15 20 Q25 15 35 20 Q45 25 50 35"
-                stroke="#D63447"
+                d="M12 15 Q20 10 28 15 Q35 20 42 15"
+                stroke="#E8427D"
                 fill="none"
-                strokeWidth="1.5"
+                strokeWidth="1.2"
               />
               <path
-                d="M10 30 Q20 25 30 30 Q40 35 45 40"
-                stroke="#D63447"
+                d="M8 25 Q18 20 28 25 Q38 30 48 25"
+                stroke="#E8427D"
                 fill="none"
-                strokeWidth="1.5"
+                strokeWidth="1.2"
               />
               <path
-                d="M20 40 Q30 35 40 40"
-                stroke="#D63447"
+                d="M15 35 Q25 30 35 35 Q45 38 50 32"
+                stroke="#E8427D"
                 fill="none"
-                strokeWidth="1.5"
+                strokeWidth="1.2"
               />
-              {/* Center line to separate brain hemispheres */}
+              {/* Additional brain texture */}
               <path
-                d="M30 15 Q30 25 30 45"
-                stroke="#D63447"
+                d="M10 18 Q15 15 22 18 Q28 22 35 18"
+                stroke="#E8427D"
                 fill="none"
                 strokeWidth="1"
-                opacity="0.5"
+                opacity="0.6"
               />
             </svg>
           </div>
 
-          {/* Smaller Green Headband - Much thinner like reference */}
-          <div
-            className="absolute top-3 left-2 right-2 h-2 rounded-full z-5"
-            style={{
-              background: "#4CAF50",
-              border: "1px solid #2E7D32"
-            }}
-          />
-
-          {/* Round Glasses - More accurate to reference */}
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10">
-            <svg viewBox="0 0 20 7" className="w-7 h-3">
-              {/* Left lens */}
-              <circle cx="5" cy="3.5" r="2.5" fill="none" stroke="#000" strokeWidth="1.5"/>
-              {/* Right lens */}
-              <circle cx="15" cy="3.5" r="2.5" fill="none" stroke="#000" strokeWidth="1.5"/>
-              {/* Bridge */}
-              <line x1="7.5" y1="3.5" x2="12.5" y2="3.5" stroke="#000" strokeWidth="1.5"/>
-            </svg>
-          </div>
-
-          {/* Real Eyes with pupils - Inside glasses */}
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-8">
-            <div className="flex gap-2">
+          {/* Big Round Eyes - Exactly like reference */}
+          <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-10">
+            <div className="flex gap-1">
               {/* Left Eye */}
               <div 
-                className="w-4 h-4 rounded-full bg-white flex items-center justify-center"
-                style={{ marginLeft: "-8px" }}
+                className="rounded-full bg-white flex items-center justify-center"
+                style={{ 
+                  width: "16px", 
+                  height: "16px",
+                  border: "2px solid #000"
+                }}
               >
                 <div 
-                  className="w-2 h-2 rounded-full bg-black"
+                  className="rounded-full bg-black"
                   style={{
+                    width: "8px",
+                    height: "8px",
                     transform: isBlinking ? 'scaleY(0)' : 'scaleY(1)',
-                    transition: 'transform 0.1s ease'
+                    transition: 'transform 0.15s ease'
                   }}
                 />
               </div>
               
               {/* Right Eye */}
               <div 
-                className="w-4 h-4 rounded-full bg-white flex items-center justify-center"
-                style={{ marginRight: "-8px" }}
+                className="rounded-full bg-white flex items-center justify-center"
+                style={{ 
+                  width: "16px", 
+                  height: "16px",
+                  border: "2px solid #000"
+                }}
               >
                 <div 
-                  className="w-2 h-2 rounded-full bg-black"
+                  className="rounded-full bg-black"
                   style={{
+                    width: "8px",
+                    height: "8px",
                     transform: isBlinking ? 'scaleY(0)' : 'scaleY(1)',
-                    transition: 'transform 0.1s ease'
+                    transition: 'transform 0.15s ease'
                   }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Cute Small Mouth - Below glasses */}
-          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 z-8">
+          {/* Mouth - Small curved mouth like reference */}
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 z-8">
             <div 
-              className="w-3 h-2 rounded-full"
               style={{
-                background: moodStyles.mouthColor || "#000",
-                transform: mood === "celebrating" ? "scaleX(1.5)" : "scaleX(1)"
+                width: "12px",
+                height: "6px",
+                borderBottom: "2px solid #000",
+                borderRadius: "0 0 12px 12px",
+                background: moodStyles.mouthColor || "transparent"
               }}
             />
           </div>
         </div>
 
-        {/* Animated Arms - Fun moving arms like reference */}
+        {/* Blue Stick Arms - Exactly like reference with hands */}
         <motion.div
-          className="absolute left-0 top-1/2 w-3 h-8 rounded-full bg-blue-400 origin-top"
+          className="absolute left-0 top-1/2 origin-top"
           style={{ 
             transformOrigin: "50% 0%",
-            left: "-6px"
-          }}
-          animate={animated ? {
-            rotate: animationType === "positive" ? [0, -25, 25, -15, 15, 0] : 
-                   animationType === "milestone" ? [0, -30, 30, -20, 20, 0] :
-                   animationType === "greeting" ? [0, -40, 40, -20, 20, 0] :
-                   animationType === "thinking" ? [0, -15, 15, 0] : [0, -8, 8, 0],
-            y: animationType === "positive" || animationType === "milestone" ? [0, -2, 2, 0] : [0]
-          } : {}}
-          transition={{
-            duration: animationType === "positive" ? 1.8 : animationType === "milestone" ? 2.2 : animationType === "greeting" ? 2.5 : 1.5,
-            repeat: animationType === "idle" ? Infinity : animationType === "positive" ? 2 : 1,
-            ease: "easeInOut"
-          }}
-        />
-        
-        <motion.div
-          className="absolute right-0 top-1/2 w-3 h-8 rounded-full bg-blue-400 origin-top"
-          style={{ 
-            transformOrigin: "50% 0%",
-            right: "-6px"
-          }}
-          animate={animated ? {
-            rotate: animationType === "positive" ? [0, 25, -25, 15, -15, 0] : 
-                   animationType === "milestone" ? [0, 30, -30, 20, -20, 0] :
-                   animationType === "greeting" ? [0, 40, -40, 20, -20, 0] :
-                   animationType === "thinking" ? [0, 15, -15, 0] : [0, 8, -8, 0],
-            y: animationType === "positive" || animationType === "milestone" ? [0, -2, 2, 0] : [0]
-          } : {}}
-          transition={{
-            duration: animationType === "positive" ? 1.8 : animationType === "milestone" ? 2.2 : animationType === "greeting" ? 2.5 : 1.5,
-            repeat: animationType === "idle" ? Infinity : animationType === "positive" ? 2 : 1,
-            ease: "easeInOut",
-            delay: 0.1
-          }}
-        />
-
-        {/* Legs - Blue legs like reference with fun bounce */}
-        <motion.div 
-          className="relative mt-2 flex gap-1 justify-center"
-          animate={animated && animationType === "positive" ? {
-            y: [0, -3, 0, -2, 0]
-          } : animated && animationType === "greeting" ? {
-            rotate: [0, 5, -5, 0]
-          } : {}}
-          transition={{
-            duration: 1,
-            repeat: animationType === "positive" ? 2 : 0
+            left: "-12px",
+            top: "16px"
           }}
         >
-          <motion.div 
-            className="w-3 h-8 rounded-full"
-            style={{ background: "#5DADE2", border: "2px solid #3498DB" }}
-            animate={animated && animationType === "greeting" ? {
-              scaleY: [1, 0.8, 1.1, 1]
+          {/* Left Arm */}
+          <motion.div
+            className="relative"
+            animate={animated ? {
+              rotate: animationType === "positive" ? [0, -30, 30, -15, 0] : 
+                     animationType === "milestone" ? [0, -45, 45, -20, 0] :
+                     animationType === "greeting" ? [0, -60, 20, -30, 10, 0] :
+                     animationType === "thinking" ? [0, -20, 20, 0] : [0, -10, 10, 0]
             } : {}}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          />
-          <motion.div 
-            className="w-3 h-8 rounded-full"
-            style={{ background: "#5DADE2", border: "2px solid #3498DB" }}
-            animate={animated && animationType === "greeting" ? {
-              scaleY: [1, 1.1, 0.8, 1]
+            transition={{
+              duration: animationType === "greeting" ? 3 : animationType === "positive" ? 2 : 1.8,
+              repeat: animationType === "idle" ? Infinity : animationType === "positive" ? 2 : 1,
+              ease: "easeInOut"
+            }}
+          >
+            <div
+              className="w-1 h-8 rounded-full"
+              style={{ background: "#2E86AB" }}
+            />
+            {/* Left Hand */}
+            <div
+              className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full"
+              style={{ background: "#2E86AB" }}
+            />
+          </motion.div>
+        </motion.div>
+        
+        <motion.div
+          className="absolute right-0 top-1/2 origin-top"
+          style={{ 
+            transformOrigin: "50% 0%",
+            right: "-12px",
+            top: "16px"
+          }}
+        >
+          {/* Right Arm */}
+          <motion.div
+            className="relative"
+            animate={animated ? {
+              rotate: animationType === "positive" ? [0, 30, -30, 15, 0] : 
+                     animationType === "milestone" ? [0, 45, -45, 20, 0] :
+                     animationType === "greeting" ? [0, 60, -20, 30, -10, 0] :
+                     animationType === "thinking" ? [0, 20, -20, 0] : [0, 10, -10, 0]
             } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          />
+            transition={{
+              duration: animationType === "greeting" ? 3 : animationType === "positive" ? 2 : 1.8,
+              repeat: animationType === "idle" ? Infinity : animationType === "positive" ? 2 : 1,
+              ease: "easeInOut",
+              delay: 0.1
+            }}
+          >
+            <div
+              className="w-1 h-8 rounded-full"
+              style={{ background: "#2E86AB" }}
+            />
+            {/* Right Hand */}
+            <div
+              className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full"
+              style={{ background: "#2E86AB" }}
+            />
+          </motion.div>
         </motion.div>
 
-        {/* Money Bag - Golden bag like reference with fun animations */}
-        {showMoneyBag && (
+        {/* Blue Stick Legs - Exactly like reference */}
+        <motion.div 
+          className="relative mt-4 flex gap-2 justify-center"
+          animate={animated && (animationType === "positive" || animationType === "milestone") ? {
+            y: [0, -4, 0, -2, 0]
+          } : {}}
+          transition={{
+            duration: 1.5,
+            repeat: animationType === "positive" ? 2 : animationType === "milestone" ? 3 : 0
+          }}
+        >
+          {/* Left Leg */}
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-1 h-8 rounded-full"
+              style={{ background: "#2E86AB" }}
+            />
+            {/* Left Red Sneaker */}
+            <motion.div
+              className="relative mt-1"
+              animate={animated && animationType === "greeting" ? {
+                rotate: [0, -5, 5, 0]
+              } : {}}
+              transition={{ duration: 0.8, delay: 0.1 }}
+            >
+              <div
+                className="w-4 h-3 rounded-full"
+                style={{ 
+                  background: "#E74C3C",
+                  border: "1px solid #C0392B"
+                }}
+              />
+              {/* Shoe laces */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
+                <div className="w-1 h-1 bg-white rounded-full opacity-80" />
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Right Leg */}
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-1 h-8 rounded-full"
+              style={{ background: "#2E86AB" }}
+            />
+            {/* Right Red Sneaker */}
+            <motion.div
+              className="relative mt-1"
+              animate={animated && animationType === "greeting" ? {
+                rotate: [0, 5, -5, 0]
+              } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div
+                className="w-4 h-3 rounded-full"
+                style={{ 
+                  background: "#E74C3C",
+                  border: "1px solid #C0392B"
+                }}
+              />
+              {/* Shoe laces */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
+                <div className="w-1 h-1 bg-white rounded-full opacity-80" />
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Optional Coin - Only show for financial achievements */}
+        {showMoneyBag && animationType === "milestone" && (
           <motion.div
-            className={`absolute -right-2 top-1/4 ${config.bag} rounded-full flex items-center justify-center text-xs`}
+            className="absolute -right-3 top-1/3 w-6 h-6 rounded-full flex items-center justify-center text-xs"
             style={{
-              background: "#F1C232",
-              border: "2px solid #B8860B",
-              boxShadow: "0 2px 8px rgba(241, 194, 50, 0.3)"
+              background: "#FFD700",
+              border: "2px solid #FFA500",
+              boxShadow: "0 2px 8px rgba(255, 215, 0, 0.4)"
             }}
-            animate={animated ? (
-              animationType === "positive" ? {
-                scale: [1, 1.3, 1.1, 1],
-                rotate: [0, 15, -15, 5, 0],
-                y: [0, -3, 2, 0]
-              } : animationType === "milestone" ? {
-                scale: [1, 1.4, 1.2, 1],
-                rotate: [0, 20, -20, 10, 0],
-                y: [0, -5, 3, 0]
-              } : animationType === "greeting" ? {
-                scale: [1, 1.1, 1],
-                rotate: [0, 8, -8, 0]
-              } : {
-                scale: [1, 1.05, 1],
-                rotate: [0, 2, -2, 0]
-              }
-            ) : {}}
-            transition={{ duration: animationType === "positive" || animationType === "milestone" ? 1.2 : 2, ease: "easeOut" }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              scale: [0, 1.2, 1, 0],
+              rotate: [0, 180, 360]
+            }}
+            transition={{ duration: 2, ease: "easeOut" }}
           >
             💰
           </motion.div>
