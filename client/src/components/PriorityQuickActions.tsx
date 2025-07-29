@@ -134,13 +134,13 @@ const PriorityQuickActions: React.FC<PriorityQuickActionsProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-high-contrast mb-1">Main Functions</h2>
-              <p className="text-medium-contrast text-sm">Your core financial tools, always accessible</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Main Functions</h2>
+              <p className="text-gray-700 dark:text-gray-300 font-medium">Your core financial tools, always accessible</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-sm font-medium text-high-contrast">{smartieMessage.text}</p>
-                <p className="text-xs text-medium-contrast">Smartie says</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{smartieMessage.text}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">Smartie says</p>
               </div>
               <ModernSmartieAvatar
                 mood={smartieMessage.mood}

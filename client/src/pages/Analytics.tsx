@@ -98,13 +98,13 @@ export default function Analytics() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       {/* Header */}
       <motion.header 
-        className="gradient-bg text-white px-6 py-8"
+        className="bg-gradient-to-r from-purple-800 via-pink-600 to-blue-700 text-white px-6 py-8 shadow-lg"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="text-2xl font-bold">Analytics & Insights</h1>
-        <p className="text-white/80 text-sm mt-1">
+        <h1 className="text-4xl font-bold text-white drop-shadow-lg">Analytics & Insights</h1>
+        <p className="text-white text-lg font-semibold mt-2 drop-shadow-md">
           Your financial patterns and trends
         </p>
       </motion.header>
@@ -123,8 +123,8 @@ export default function Analytics() {
               <div className="w-8 h-8 gradient-bg rounded-full flex items-center justify-center mx-auto mb-2">
                 <DollarSign className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">£{((analytics as any)?.totalSpent || 0).toFixed(0)}</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Total Spent</div>
+              <div className="text-xl font-bold text-gray-900 dark:text-gray-100">£{((analytics as any)?.totalSpent || 0).toFixed(0)}</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Total Spent</div>
             </CardContent>
           </Card>
 
@@ -133,8 +133,8 @@ export default function Analytics() {
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
                 <TrendingUp className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">£{((analytics as any)?.remaining || 0).toFixed(0)}</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Remaining</div>
+              <div className="text-xl font-bold text-gray-900 dark:text-gray-100">£{((analytics as any)?.remaining || 0).toFixed(0)}</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Remaining</div>
             </CardContent>
           </Card>
 
@@ -143,8 +143,8 @@ export default function Analytics() {
               <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-2">
                 <Target className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">{(analytics as any)?.goals || 0}</div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Active Goals</div>
+              <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{(analytics as any)?.goals || 0}</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Active Goals</div>
             </CardContent>
           </Card>
 
@@ -153,10 +153,10 @@ export default function Analytics() {
               <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-2">
                 <TrendingDown className="text-white" size={16} />
               </div>
-              <div className="text-lg font-bold">
+              <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                 {(analytics as any)?.totalBudget ? Math.round(((analytics as any).totalSpent / (analytics as any).totalBudget) * 100) : 0}%
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">Budget Used</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Budget Used</div>
             </CardContent>
           </Card>
         </motion.div>
@@ -171,7 +171,7 @@ export default function Analytics() {
           >
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg">Spending by Category</CardTitle>
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">Spending by Category</CardTitle>
               </CardHeader>
               <CardContent>
                 {categoryData.length > 0 ? (
@@ -209,7 +209,7 @@ export default function Analytics() {
           >
             <Card className="shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg">Budget vs Actual</CardTitle>
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">Budget vs Actual</CardTitle>
               </CardHeader>
               <CardContent>
                 {budgetComparisonData.length > 0 ? (
@@ -241,8 +241,8 @@ export default function Analytics() {
         >
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-lg">Smart Spending Analysis</CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">Smart Spending Analysis</CardTitle>
+              <p className="text-base text-gray-700 dark:text-gray-300 font-medium">
                 Organized by spending behavior with Smartie's insights
               </p>
             </CardHeader>

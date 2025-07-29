@@ -78,9 +78,9 @@
   --other-color: hsl(38, 92%, 50%);
   
   /* WCAG AA Compliant Text Contrast System */
-  --text-high-contrast: hsl(220, 15%, 15%); /* Perfect readability */
-  --text-medium-contrast: hsl(220, 12%, 35%); /* Enhanced medium contrast */
-  --text-low-contrast: hsl(220, 10%, 55%); /* Better subtle text */
+  --text-high-contrast: hsl(220, 25%, 10%); /* Maximum readability */
+  --text-medium-contrast: hsl(220, 18%, 25%); /* Strong medium contrast */
+  --text-low-contrast: hsl(220, 12%, 45%); /* Improved subtle text */
   --on-gradient: hsl(0, 0%, 100%); /* White text for gradients */
   --on-dark: hsl(0, 0%, 100%); /* White text for dark backgrounds */
   

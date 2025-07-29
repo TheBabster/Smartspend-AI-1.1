@@ -58,14 +58,14 @@ export default function Dashboard() {
     <ResponsiveLayout className="bg-gray-50 dark:bg-gray-900 pb-20" maxWidth="xl" padding="none">
       {/* Header with Enhanced Brand Logo */}
       <motion.div
-        className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white shadow-lg relative overflow-hidden"
+        className="bg-gradient-to-r from-purple-800 via-pink-600 to-blue-700 text-white shadow-lg relative overflow-hidden"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100 }}
       >
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/80 to-pink-600/80" />
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/70 to-pink-800/70" />
+        <div className="absolute inset-0 opacity-15">
           <motion.div 
             className="absolute top-4 left-4 w-16 h-16 rounded-full bg-white/10"
             animate={{ scale: [1, 1.1, 1] }}
@@ -97,8 +97,8 @@ export default function Dashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <p className="text-sm text-purple-100">{getGreeting()}</p>
-                <p className="font-semibold text-on-dark">{user?.username || "Financial Explorer"}</p>
+                <p className="text-sm text-white/90 font-medium">{getGreeting()}</p>
+                <p className="font-bold text-white text-lg">{user?.username || "Financial Explorer"}</p>
               </motion.div>
             </div>
           </div>
@@ -108,10 +108,10 @@ export default function Dashboard() {
         <div className="mt-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-on-dark">
+              <h2 className="text-2xl font-bold text-white drop-shadow-md">
                 You have £{remainingBudget.toFixed(0)} left this month
               </h2>
-              <p className="text-purple-100 text-sm">
+              <p className="text-white/95 text-base font-medium drop-shadow-sm">
                 {budgetPercentage >= 80 ? "Excellent budget control!" : budgetPercentage >= 60 ? "Good progress!" : "Keep an eye on spending"}
               </p>
             </div>
