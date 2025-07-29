@@ -40,21 +40,21 @@
 
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --foreground: hsl(215, 28%, 17%); /* Dark navy for better contrast */
+  --muted: hsl(210, 40%, 94%); /* Slightly darker for better contrast */
+  --muted-foreground: hsl(215, 20%, 35%); /* Much better contrast for subtext */
   --popover: hsl(0, 0%, 100%);
   --popover-foreground: hsl(20, 14.3%, 4.1%);
   --card: hsl(0, 0%, 100%);
   --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
+  --border: hsl(214.3, 31.8%, 88%); /* More visible borders */
+  --input: hsl(214.3, 31.8%, 88%);
   --primary: hsl(267, 84%, 65%);
   --primary-foreground: hsl(0, 0%, 98%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
+  --secondary: hsl(210, 40%, 94%); /* Better contrast */
+  --secondary-foreground: hsl(215, 28%, 17%);
+  --accent: hsl(210, 40%, 94%);
+  --accent-foreground: hsl(215, 28%, 17%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(20, 14.3%, 4.1%);
@@ -235,6 +235,49 @@
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 5px rgba(147, 51, 234, 0.3); }
   50% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.4); }
+}
+
+/* Enhanced visual polish and backgrounds */
+.gradient-background {
+  background: linear-gradient(135deg, 
+    hsl(267, 84%, 65%) 0%, 
+    hsl(327, 73%, 73%) 35%, 
+    hsl(188, 94%, 43%) 100%);
+}
+
+.category-food { background: linear-gradient(135deg, hsl(25, 95%, 53%), hsl(45, 95%, 60%)); }
+.category-shopping { background: linear-gradient(135deg, hsl(267, 84%, 65%), hsl(327, 73%, 73%)); }
+.category-entertainment { background: linear-gradient(135deg, hsl(207, 90%, 54%), hsl(227, 90%, 64%)); }
+.category-transport { background: linear-gradient(135deg, hsl(142, 71%, 45%), hsl(162, 71%, 55%)); }
+.category-utilities { background: linear-gradient(135deg, hsl(271, 81%, 56%), hsl(291, 81%, 66%)); }
+.category-other { background: linear-gradient(135deg, hsl(38, 92%, 50%), hsl(58, 92%, 60%)); }
+
+/* Enhanced text contrast classes */
+.text-high-contrast {
+  color: hsl(215, 28%, 17%);
+}
+
+.text-medium-contrast {
+  color: hsl(215, 20%, 35%);
+}
+
+.text-on-dark {
+  color: hsl(0, 0%, 98%);
+}
+
+/* Improved button hover effects */
+.btn-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+/* Glassmorphism enhancements */
+.glass-enhanced {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive design helpers */

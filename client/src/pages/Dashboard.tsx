@@ -23,6 +23,9 @@ import AdvancedBudgetVisualizer from "@/components/AdvancedBudgetVisualizer";
 import FinancialWellnessScore from "@/components/FinancialWellnessScore";
 import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality";
 import ResponsiveLayout from "@/components/ResponsiveLayout";
+import BrandNewLogo from "@/components/BrandNewLogo";
+import FinancialWellnessScoreVisual from "@/components/FinancialWellnessScoreVisual";
+import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
 import { BounceButton, bounceVariants, LiftCard, liftVariants } from "@/components/MicroAnimations";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 
@@ -52,40 +55,63 @@ export default function Dashboard() {
 
   return (
     <ResponsiveLayout className="bg-gray-50 dark:bg-gray-900 pb-20" maxWidth="xl" padding="none">
-      {/* Header with Gradient */}
-      <motion.header 
-        className="gradient-bg text-white px-6 py-8 relative overflow-hidden"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+      {/* Header with Enhanced Brand Logo */}
+      <motion.div
+        className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white shadow-lg relative overflow-hidden"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: "spring", stiffness: 100 }}
       >
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/80 to-pink-600/80" />
+        <div className="absolute inset-0 opacity-20">
           <motion.div 
-            className="absolute top-4 left-4 w-16 h-16 rounded-full bg-white"
+            className="absolute top-4 left-4 w-16 h-16 rounded-full bg-white/10"
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
           <motion.div 
-            className="absolute top-8 right-8 w-10 h-10 rounded-full bg-white"
+            className="absolute top-8 right-8 w-10 h-10 rounded-full bg-white/10"
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
           />
           <motion.div 
-            className="absolute bottom-4 right-4 w-12 h-12 rounded-full bg-white"
+            className="absolute bottom-4 right-4 w-12 h-12 rounded-full bg-white/10"
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity, delay: 1 }}
           />
         </div>
-
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
+        
+        <div className="relative z-10 container mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <BrandNewLogo size="lg" animated={true} showText={true} />
+            
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              
+              {/* User Welcome */}
+              <motion.div
+                className="text-right"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <p className="text-sm text-purple-100">{getGreeting()}</p>
+                <p className="font-semibold text-on-dark">{user?.username || "Financial Explorer"}</p>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Enhanced dashboard stats with budget ring */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">
-                {getGreeting()}, {user?.name || "Alex"}! 👋
-              </h1>
-              <p className="text-white/80 text-sm">
-                You have £{remainingBudget.toFixed(0)} left to spend this month
+              <h2 className="text-xl font-semibold text-on-dark">
+                You have £{remainingBudget.toFixed(0)} left this month
+              </h2>
+              <p className="text-purple-100 text-sm">
+                {budgetPercentage >= 80 ? "Excellent budget control!" : budgetPercentage >= 60 ? "Good progress!" : "Keep an eye on spending"}
               </p>
             </div>
             <EnhancedBudgetRing 
@@ -95,12 +121,28 @@ export default function Dashboard() {
             />
           </div>
         </div>
-      </motion.header>
+      </motion.div>
 
       {/* Main Content */}
       <main className="px-6 -mt-6 relative z-20">
-        {/* Motivational Bar */}
-        <SmartieMotivationalBar />
+        {/* Enhanced Financial Wellness Score with Smartie */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-6"
+        >
+          <FinancialWellnessScoreVisual
+            score={75}
+            previousScore={65}
+            breakdown={{
+              budgetAdherence: Math.round(budgetPercentage),
+              savingsProgress: 68,
+              spendingWisdom: 82,
+              streakConsistency: budgetStreak?.currentStreak ? Math.min(budgetStreak.currentStreak * 5, 100) : 45
+            }}
+          />
+        </motion.div>
         {/* Smartie Introduction */}
         {recentAchievement && (
           <motion.div
