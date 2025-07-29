@@ -138,7 +138,7 @@ export default function PurchaseDecisionModal({ open, onOpenChange }: PurchaseDe
 
   const selectedBudget = budgets.find(b => b.category === formData.category);
   const remainingBudget = selectedBudget 
-    ? parseFloat(selectedBudget.monthlyLimit) - parseFloat(selectedBudget.spent)
+    ? parseFloat(selectedBudget.monthlyLimit) - parseFloat(selectedBudget.spent || "0")
     : 0;
 
   return (
@@ -308,6 +308,12 @@ export default function PurchaseDecisionModal({ open, onOpenChange }: PurchaseDe
                 <Smartie 
                   message={decision?.reasoning || "Let me think about this..."}
                   showTyping={true}
+                  emotion={
+                    decision?.recommendation === 'yes' ? 'excited' :
+                    decision?.recommendation === 'no' ? 'concerned' :
+                    decision?.recommendation === 'think_again' ? 'thinking' :
+                    'thinking'
+                  }
                 />
               </div>
 

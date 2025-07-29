@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Plus, ShoppingCart, TrendingUp, Target } from "lucide-react";
 import Smartie from "@/components/Smartie";
 import BudgetRing from "@/components/BudgetRing";
+import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
 import CategoryCard from "@/components/CategoryCard";
 import BottomNav from "@/components/BottomNav";
 import PurchaseDecisionModal from "@/components/PurchaseDecisionModal";
 import ExpenseModal from "@/components/ExpenseModal";
+import SmartieCorner from "@/components/SmartieCorner";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 
 export default function Dashboard() {
@@ -22,7 +24,7 @@ export default function Dashboard() {
   const { data: achievements = [] } = useQuery<Achievement[]>({ queryKey: ["/api/achievements"] });
 
   const totalBudget = budgets.reduce((sum, budget) => sum + parseFloat(budget.monthlyLimit), 0);
-  const totalSpent = budgets.reduce((sum, budget) => sum + parseFloat(budget.spent), 0);
+  const totalSpent = budgets.reduce((sum, budget) => sum + parseFloat(budget.spent || "0"), 0);
   const remainingBudget = totalBudget - totalSpent;
   const budgetPercentage = totalBudget > 0 ? (remainingBudget / totalBudget) * 100 : 0;
 
@@ -74,7 +76,11 @@ export default function Dashboard() {
                 You have £{remainingBudget.toFixed(0)} left to spend this month
               </p>
             </div>
-            <BudgetRing percentage={budgetPercentage} />
+            <EnhancedBudgetRing 
+              percentage={budgetPercentage} 
+              size="lg"
+              showConfetti={budgetPercentage >= 80}
+            />
           </div>
         </div>
       </motion.header>
@@ -106,25 +112,19 @@ export default function Dashboard() {
           </motion.div>
         )}
 
-        {/* Smartie Message */}
+        {/* Smartie Corner */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
           className="mb-6"
         >
-          <Card className="shadow-lg">
-            <CardContent className="p-6">
-              <Smartie 
-                message={
-                  budgetStreak?.currentStreak 
-                    ? `You're crushing it! ${budgetStreak.currentStreak} days under budget! 🔥 Keep up the amazing work!`
-                    : "Ready to make some smart spending decisions today? I'm here to help! 💪"
-                }
-                showTyping={false}
-              />
-            </CardContent>
-          </Card>
+          <SmartieCorner 
+            budgetStreak={budgetStreak?.currentStreak || undefined}
+            budgetPercentage={budgetPercentage}
+            totalSpent={totalSpent}
+            monthlyIncome={user?.monthlyIncome || undefined}
+          />
         </motion.div>
 
         {/* Category Spending Cards */}

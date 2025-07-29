@@ -107,9 +107,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const budget = await storage.getBudgetByCategory("demo-user", category, currentMonth);
       const remainingBudget = budget ? parseFloat(budget.monthlyLimit) - parseFloat(budget.spent || "0") : 0;
 
-      // Generate AI recommendation using GPT-4o
-      // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-      const prompt = `You are Smartie, a friendly AI financial assistant. Analyze this purchase decision and provide advice.
+      let aiResponse;
+      
+      try {
+        // Generate AI recommendation using GPT-4o
+        // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        const prompt = `You are Smartie, a friendly AI financial assistant. Analyze this purchase decision and provide advice.
 
 Purchase Details:
 - Item: ${itemName}
@@ -125,13 +128,41 @@ Provide a recommendation (yes/think_again/no) and friendly reasoning in JSON for
   "reasoning": "Your friendly advice here"
 }`;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" },
-      });
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" },
+        });
 
-      const aiResponse = JSON.parse(response.choices[0].message.content || '{"recommendation": "think_again", "reasoning": "Let me think about this..."}');
+        aiResponse = JSON.parse(response.choices[0].message.content || '{"recommendation": "think_again", "reasoning": "Let me think about this..."}');
+      } catch (error) {
+        console.log("AI unavailable, using smart fallback logic:", (error as Error).message);
+        
+        // Smart fallback logic based on financial rules
+        const costRatio = remainingBudget > 0 ? parseFloat(amount) / remainingBudget : 1;
+        const totalScore = parseInt(desireLevel) + parseInt(urgency);
+        
+        let recommendation, reasoning;
+        
+        if (costRatio > 1) {
+          recommendation = "no";
+          reasoning = "🧠💸 Whoa there! This would put you over budget for this category. Smartie suggests waiting until next month or finding a cheaper alternative!";
+        } else if (costRatio > 0.7 && totalScore < 12) {
+          recommendation = "think_again";
+          reasoning = "🤔 This is a big chunk of your remaining budget. Since it's not super urgent or desired, maybe sleep on it? Future you will thank you!";
+        } else if (totalScore >= 16 && costRatio <= 0.3) {
+          recommendation = "yes";
+          reasoning = "✨ You really want this and it fits comfortably in your budget! Go for it - you've earned this treat!";
+        } else if (totalScore >= 14) {
+          recommendation = "think_again";
+          reasoning = "🎯 You want this pretty badly, but let's be smart about it. Can you wait a few days or find it cheaper elsewhere?";
+        } else {
+          recommendation = "no";
+          reasoning = "💪 Smartie's proud of you for checking first! This seems like an impulse buy. Your future self will thank you for skipping it!";
+        }
+        
+        aiResponse = { recommendation, reasoning };
+      }
 
       const decisionData = insertDecisionSchema.parse({
         userId: "demo-user",
