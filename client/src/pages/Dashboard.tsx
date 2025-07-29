@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, ShoppingCart, TrendingUp, Target } from "lucide-react";
+import { Plus, ShoppingCart, TrendingUp, Target, BarChart3 } from "lucide-react";
 import BudgetRing from "@/components/BudgetRing";
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
 import CategoryCard from "@/components/CategoryCard";
@@ -19,6 +19,11 @@ import SmartieAnimated from "@/components/SmartieAnimated";
 import AnimatedButton from "@/components/AnimatedButton";
 import GlassmorphicCard from "@/components/GlassmorphicCard";
 import AnimatedProgressBar from "@/components/AnimatedProgressBar";
+import AdvancedBudgetVisualizer from "@/components/AdvancedBudgetVisualizer";
+import FinancialWellnessScore from "@/components/FinancialWellnessScore";
+import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality";
+import ResponsiveLayout from "@/components/ResponsiveLayout";
+import { BounceButton, bounceVariants, LiftCard, liftVariants } from "@/components/MicroAnimations";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 
 export default function Dashboard() {
@@ -46,7 +51,7 @@ export default function Dashboard() {
   const recentAchievement = achievements[achievements.length - 1];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+    <ResponsiveLayout className="bg-gray-50 dark:bg-gray-900 pb-20" maxWidth="xl" padding="none">
       {/* Header with Gradient */}
       <motion.header 
         className="gradient-bg text-white px-6 py-8 relative overflow-hidden"
@@ -147,12 +152,41 @@ export default function Dashboard() {
           ))}
         </motion.div>
 
+        {/* Financial Wellness Score */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="mb-6"
+        >
+          <FinancialWellnessScore
+            budgets={budgets}
+            streak={budgetStreak?.currentCount || 0}
+            goalsCompleted={achievements.filter(a => a.unlocked).length}
+            totalGoals={achievements.length}
+            previousScore={85} // This would come from historical data
+          />
+        </motion.div>
+
+        {/* Advanced Budget Visualizer */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.0 }}
+          className="mb-6"
+        >
+          <AdvancedBudgetVisualizer 
+            budgets={budgets}
+            totalIncome={user?.monthlyIncome ? parseFloat(user.monthlyIncome) : 3000}
+          />
+        </motion.div>
+
         {/* Enhanced Quick Actions Panel */}
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
+          transition={{ duration: 0.5, delay: 1.2 }}
         >
           <GlassmorphicCard 
             gradient="purple" 
@@ -248,8 +282,16 @@ export default function Dashboard() {
         onOpenChange={setShowExpenseModal} 
       />
 
+      {/* Enhanced Smartie Personality */}
+      <EnhancedSmartiePersonality
+        userMood="neutral"
+        recentSpending={totalSpent}
+        budgetHealth={budgetPercentage > 90 ? "danger" : budgetPercentage > 75 ? "warning" : "good"}
+        streak={budgetStreak?.currentCount || 0}
+      />
+
       {/* Bottom Navigation */}
       <BottomNav currentTab="home" />
-    </div>
+    </ResponsiveLayout>
   );
 }
