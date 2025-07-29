@@ -5,7 +5,7 @@ import { FinTechLayout, FinTechText, FinTechButton, FinTechProgress, FinTechBadg
 import { ProfessionalIcon, CategoryIcon, StatusIcon, NavigationIcon, IconBadge } from './ProfessionalIconSystem';
 import { DelightfulCopy, getRandomMessage, generateContextualMessage } from './DelightfulMicrocopy';
 import ExactSmartieAvatar from './ExactSmartieAvatar';
-import NewSmartSpendLogo from './NewSmartSpendLogo';
+import ExactSmartSpendLogo from './ExactSmartSpendLogo';
 import { Link } from 'wouter';
 
 interface ProfessionalFinTechDashboardProps {
@@ -124,7 +124,7 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
           className="flex items-center justify-center mb-8"
           {...FinTechDesign.animations.fadeInUp}
         >
-          <NewSmartSpendLogo 
+          <ExactSmartSpendLogo 
             size="lg" 
             animated={true} 
             showText={true} 
@@ -286,7 +286,7 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
                 <FinTechText.H3>Monthly Budget Health</FinTechText.H3>
                 <FinTechBadge 
                   variant={
-                    user.budgetHealth === 'good' ? 'success' :
+                    user.budgetHealth === 'good' ? 'primary' :
                     user.budgetHealth === 'warning' ? 'warning' : 'danger'
                   }
                 >
@@ -299,7 +299,7 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
                 value={totalBudgetUsage * 100}
                 max={100}
                 variant={
-                  user.budgetHealth === 'good' ? 'success' :
+                  user.budgetHealth === 'good' ? 'safe' :
                   user.budgetHealth === 'warning' ? 'warning' : 'danger'
                 }
                 showLabel={true}
@@ -351,9 +351,9 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
                             size="md"
                           />
                           <div className="flex-1 min-w-0">
-                            <FinTechText.H4 className="text-sm truncate">
+                            <FinTechText.H3 className="text-sm truncate">
                               {budget.category}
-                            </FinTechText.H4>
+                            </FinTechText.H3>
                             <FinTechText.Caption>
                               £{remaining.toFixed(0)} left
                             </FinTechText.Caption>
@@ -363,7 +363,7 @@ const ProfessionalFinTechDashboard: React.FC<ProfessionalFinTechDashboardProps> 
                         <FinTechProgress
                           value={percentage}
                           max={100}
-                          variant={percentage > 90 ? 'danger' : percentage > 70 ? 'warning' : 'success'}
+                          variant={percentage > 90 ? 'danger' : percentage > 70 ? 'warning' : 'safe'}
                           size="sm"
                           animated={true}
                         />

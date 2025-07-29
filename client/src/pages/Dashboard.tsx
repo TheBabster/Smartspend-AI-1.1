@@ -19,7 +19,7 @@ import FinancialWellnessScore from "@/components/FinancialWellnessScore";
 import EnhancedSmartiePersonality from "@/components/EnhancedSmartiePersonality";
 import ResponsiveLayout from "@/components/ResponsiveLayout";
 import BrandNewSmartSpendLogo from "@/components/BrandNewSmartSpendLogo";
-import NewSmartSpendLogo from "@/components/NewSmartSpendLogo";
+import ExactSmartSpendLogo from "@/components/ExactSmartSpendLogo";
 import SmartieIntelligentChat from "@/components/SmartieIntelligentChat";
 import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 import PriorityQuickActions from "@/components/PriorityQuickActions";
@@ -138,7 +138,7 @@ export default function Dashboard() {
         
         <div className="relative z-10 container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <NewSmartSpendLogo size="lg" animated={true} showText={true} />
+            <ExactSmartSpendLogo size="lg" animated={true} showText={true} />
             
             <div className="flex items-center gap-4">
       
