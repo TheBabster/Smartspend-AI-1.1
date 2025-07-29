@@ -8,7 +8,8 @@ interface ModernSmartieAvatarProps {
   animated?: boolean;
   showEffects?: boolean;
   mood?: "happy" | "thinking" | "concerned" | "celebrating" | "confident" | "worried";
-  accessory?: "none" | "glasses" | "backpack" | "pencil";
+  accessory?: "none" | "glasses" | "backpack" | "pencil" | "clipboard" | "speech-bubble";
+  pose?: "default" | "waving" | "thinking-chin" | "celebrating-arms-up" | "nervous";
 }
 
 const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
@@ -17,7 +18,8 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
   animated = true,
   showEffects = false,
   mood = "happy",
-  accessory = "none"
+  accessory = "none",
+  pose = "default"
 }) => {
   // Use the exact pixel-perfect Smartie instead of complex custom version
   return <ExactSmartieAvatar 
@@ -27,6 +29,7 @@ const ModernSmartieAvatar: React.FC<ModernSmartieAvatarProps> = ({
     showEffects={showEffects}
     mood={mood}
     accessory={accessory}
+    pose={pose}
   />;
 };
 

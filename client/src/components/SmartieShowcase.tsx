@@ -8,86 +8,68 @@ const SmartieShowcase: React.FC = () => {
         Enhanced Smartie Expressions & Accessories
       </h2>
       
-      {/* Expression Modes */}
+      {/* New Pose System */}
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
-          5 Expression Modes
-        </h3>
-        <div className="grid grid-cols-5 gap-4">
-          <div className="text-center">
-            <ExactSmartieAvatar 
-              size="md" 
-              mood="celebrating" 
-              animationType="positive"
-              animated={true}
-            />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🥳 Celebrating</p>
-            <p className="text-xs text-gray-500">Stars in eyes</p>
-          </div>
-          
-          <div className="text-center">
-            <ExactSmartieAvatar 
-              size="md" 
-              mood="thinking" 
-              animationType="thinking"
-              animated={true}
-            />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🧠 Thinking</p>
-            <p className="text-xs text-gray-500">Focused stare</p>
-          </div>
-          
-          <div className="text-center">
-            <ExactSmartieAvatar 
-              size="md" 
-              mood="worried" 
-              animationType="warning"
-              animated={true}
-            />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">😬 Worried</p>
-            <p className="text-xs text-gray-500">For overspending</p>
-          </div>
-          
-          <div className="text-center">
-            <ExactSmartieAvatar 
-              size="md" 
-              mood="confident" 
-              animationType="milestone"
-              animated={true}
-            />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">😎 Confident</p>
-            <p className="text-xs text-gray-500">Post good decision</p>
-          </div>
-          
-          <div className="text-center">
-            <ExactSmartieAvatar 
-              size="md" 
-              mood="happy" 
-              animationType="greeting"
-              animated={true}
-            />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">😊 Happy</p>
-            <p className="text-xs text-gray-500">Default friendly</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Accessories */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
-          Accessory Options
+          ✋ Enhanced Pose & Emotion Pack
         </h3>
         <div className="grid grid-cols-4 gap-4">
           <div className="text-center">
             <ExactSmartieAvatar 
               size="md" 
               mood="happy" 
-              accessory="none"
+              pose="waving"
+              animationType="greeting"
               animated={true}
             />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Default</p>
-            <p className="text-xs text-gray-500">No accessories</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">✋ Waving</p>
+            <p className="text-xs text-gray-500">Friendly greeting</p>
           </div>
           
+          <div className="text-center">
+            <ExactSmartieAvatar 
+              size="md" 
+              mood="thinking" 
+              pose="thinking-chin"
+              animationType="thinking"
+              animated={true}
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🤔 Hand on Chin</p>
+            <p className="text-xs text-gray-500">Deep thinking</p>
+          </div>
+          
+          <div className="text-center">
+            <ExactSmartieAvatar 
+              size="md" 
+              mood="celebrating" 
+              pose="celebrating-arms-up"
+              animationType="milestone"
+              animated={true}
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🥳 Arms Up</p>
+            <p className="text-xs text-gray-500">Celebration stars</p>
+          </div>
+          
+          <div className="text-center">
+            <ExactSmartieAvatar 
+              size="md" 
+              mood="worried" 
+              pose="nervous"
+              animationType="warning"
+              animated={true}
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">😬 Nervous</p>
+            <p className="text-xs text-gray-500">Wobbly + sweat</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Accessories */}
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
+          🎒 Contextual Accessories
+        </h3>
+        <div className="grid grid-cols-5 gap-3">
           <div className="text-center">
             <ExactSmartieAvatar 
               size="md" 
@@ -95,8 +77,8 @@ const SmartieShowcase: React.FC = () => {
               accessory="glasses"
               animated={true}
             />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🤓 Smart Mode</p>
-            <p className="text-xs text-gray-500">Glasses for analysis</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🤓 Glasses</p>
+            <p className="text-xs text-gray-500">Smart mode</p>
           </div>
           
           <div className="text-center">
@@ -106,8 +88,8 @@ const SmartieShowcase: React.FC = () => {
               accessory="pencil"
               animated={true}
             />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">✏️ Learning</p>
-            <p className="text-xs text-gray-500">Pencil behind ear</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">✏️ Pencil</p>
+            <p className="text-xs text-gray-500">Behind ear</p>
           </div>
           
           <div className="text-center">
@@ -117,8 +99,30 @@ const SmartieShowcase: React.FC = () => {
               accessory="backpack"
               animated={true}
             />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🎒 Adventure</p>
-            <p className="text-xs text-gray-500">Ready to save</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">🎒 Backpack</p>
+            <p className="text-xs text-gray-500">Adventure ready</p>
+          </div>
+          
+          <div className="text-center">
+            <ExactSmartieAvatar 
+              size="md" 
+              mood="thinking" 
+              accessory="clipboard"
+              animated={true}
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">📋 Clipboard</p>
+            <p className="text-xs text-gray-500">Taking notes</p>
+          </div>
+          
+          <div className="text-center">
+            <ExactSmartieAvatar 
+              size="md" 
+              mood="happy" 
+              accessory="speech-bubble"
+              animated={true}
+            />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">💬 Chart Bubble</p>
+            <p className="text-xs text-gray-500">Analytics mode</p>
           </div>
         </div>
       </div>
@@ -126,17 +130,21 @@ const SmartieShowcase: React.FC = () => {
       {/* Key Features */}
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 rounded-lg p-4">
         <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          ✅ Enhanced Features
+          ✅ Complete Enhancement Pack
         </h3>
         <div className="grid grid-cols-2 gap-3 text-sm text-gray-600 dark:text-gray-400">
-          <div>• Snapback cap with £ coin badge</div>
+          <div>• 3D snapback cap with glowing £ badge</div>
+          <div>• Comic-style brain texture loops</div>
+          <div>• 4 distinct pose variations</div>
+          <div>• Contextual special effects</div>
           <div>• White cartoon gloves</div>
-          <div>• Expressive eyebrows</div>
-          <div>• Rubbery arm animations</div>
-          <div>• Facial blush effects</div>
-          <div>• Jelly leg movements</div>
-          <div>• Simple teeth for big smiles</div>
-          <div>• Optional accessories</div>
+          <div>• Nervous wobble + sweat drops</div>
+          <div>• Celebration stars animation</div>
+          <div>• Thought bubbles for thinking</div>
+          <div>• Wave motion lines</div>
+          <div>• Enhanced accessory system</div>
+          <div>• Pose-specific arm positioning</div>
+          <div>• Jelly leg movement</div>
         </div>
       </div>
     </div>
