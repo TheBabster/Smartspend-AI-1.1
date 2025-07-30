@@ -26,12 +26,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = await getDemoUserId();
       const user = await storage.getUser(userId);
       if (!user) {
-        res.status(404).json({ error: "No user found" });
+        // Create a default user if none exists
+        const defaultUser = await storage.createUser({
+          username: "alex",
+          email: "alex@example.com",
+          password: "demo-password-hash",
+          name: "Alex Johnson",
+          currency: "GBP",
+          monthlyIncome: "3500.00",
+          onboardingCompleted: true,
+        });
+        res.json(defaultUser);
         return;
       }
       res.json(user);
     } catch (error) {
-      res.status(500).json({ error: "Failed to get user" });
+      console.error("Error fetching user:", error);
+      res.status(500).json({ error: "Failed to get user", details: error.message });
     }
   });
 
@@ -48,9 +59,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Budget endpoints
   app.get("/api/budgets", async (req, res) => {
-    const userId = await getDemoUserId();
-    const budgets = await storage.getBudgetsByUser(userId);
-    res.json(budgets);
+    try {
+      const userId = await getDemoUserId();
+      const budgets = await storage.getBudgetsByUser(userId);
+      res.json(budgets);
+    } catch (error) {
+      console.error("Error fetching budgets:", error);
+      res.status(500).json({ error: "Failed to fetch budgets", details: error.message });
+    }
   });
 
   app.post("/api/budgets", async (req, res) => {
@@ -66,9 +82,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Expense endpoints
   app.get("/api/expenses", async (req, res) => {
-    const userId = await getDemoUserId();
-    const expenses = await storage.getExpensesByUser(userId);
-    res.json(expenses);
+    try {
+      const userId = await getDemoUserId();
+      const expenses = await storage.getExpensesByUser(userId);
+      res.json(expenses);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      res.status(500).json({ error: "Failed to fetch expenses", details: error.message });
+    }
   });
 
   app.post("/api/expenses", async (req, res) => {
@@ -93,9 +114,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Goals endpoints
   app.get("/api/goals", async (req, res) => {
-    const userId = await getDemoUserId();
-    const goals = await storage.getGoalsByUser(userId);
-    res.json(goals);
+    try {
+      const userId = await getDemoUserId();
+      const goals = await storage.getGoalsByUser(userId);
+      res.json(goals);
+    } catch (error) {
+      console.error("Error fetching goals:", error);
+      res.status(500).json({ error: "Failed to fetch goals", details: error.message });
+    }
   });
 
   app.post("/api/goals", async (req, res) => {
@@ -121,9 +147,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Decision endpoints
   app.get("/api/decisions", async (req, res) => {
-    const userId = await getDemoUserId();
-    const decisions = await storage.getDecisionsByUser(userId);
-    res.json(decisions);
+    try {
+      const userId = await getDemoUserId();
+      const decisions = await storage.getDecisionsByUser(userId);
+      res.json(decisions);
+    } catch (error) {
+      console.error("Error fetching decisions:", error);
+      res.status(500).json({ error: "Failed to fetch decisions", details: error.message });
+    }
   });
 
   app.post("/api/decisions", async (req, res) => {
