@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, budgets, expenses, goals, streaks, achievements } from "@shared/schema";
+import { users, budgets, expenses, goals, streaks, achievements, decisions } from "@shared/schema";
 
 export async function seedDatabase() {
   try {
@@ -125,6 +125,41 @@ export async function seedDatabase() {
           description: "Used Smartie's advice 10 times",
           icon: "🧠",
           unlockedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      ])
+      .onConflictDoNothing();
+
+    // Create demo decisions
+    await db
+      .insert(decisions)
+      .values([
+        {
+          userId: user?.id || "demo-user-fallback",
+          itemName: "Gaming Headset",
+          amount: "89.99",
+          category: "Entertainment",
+          desireLevel: 7,
+          urgency: 3,
+          emotion: "excited",
+          notes: "Saw good reviews online",
+          recommendation: "think_again",
+          reasoning: "You already have working headphones. Consider waiting until your current ones break.",
+          followed: true,
+          regretLevel: null,
+        },
+        {
+          userId: user?.id || "demo-user-fallback",
+          itemName: "Coffee Subscription",
+          amount: "25.00",
+          category: "Food & Dining",
+          desireLevel: 6,
+          urgency: 2,
+          emotion: "content",
+          notes: "Monthly subscription",
+          recommendation: "yes",
+          reasoning: "This fits within your food budget and you enjoy good coffee daily.",
+          followed: true,
+          regretLevel: 2,
         },
       ])
       .onConflictDoNothing();
