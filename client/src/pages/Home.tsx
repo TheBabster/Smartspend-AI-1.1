@@ -340,20 +340,36 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        {/* Professional Header with Real Logo */}
+        {/* Professional Header with Text-Only Branding */}
         <motion.header 
           className={`${darkMode ? 'text-slate-100' : 'text-white'} px-6 py-6 text-center`}
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
+          {/* Text-Only SmartSpend Branding */}
+          <motion.div 
+            className="mb-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+          >
+            <div className={`inline-block p-8 rounded-3xl ${darkMode ? 'bg-slate-800/80' : 'bg-white/20'} backdrop-blur-sm border ${darkMode ? 'border-slate-600/50' : 'border-white/30'} shadow-2xl`}>
+              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-3 text-[#1A237E] leading-none tracking-tight">
+                SmartSpend
+              </h1>
+              <p className="text-2xl md:text-3xl lg:text-4xl font-semibold text-[#1A237E] leading-tight">
+                Think Smart. Spend Smarter.
+              </p>
+            </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
           >
-            <h2 className={`text-4xl font-black mb-3 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
+            <h2 className={`text-3xl font-bold mb-3 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
               {isFirstVisit ? 'Welcome to SmartSpend!' : `Welcome back! You're on day ${currentStreak} of your streak 🔥`}
             </h2>
             <p className={`text-lg ${darkMode ? 'opacity-90' : 'opacity-95'} font-semibold mb-3 ${darkMode ? 'text-indigo-200' : 'text-purple-100'}`}>
