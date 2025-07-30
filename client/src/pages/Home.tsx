@@ -13,16 +13,18 @@ export default function Home() {
   const [smartieMessage, setSmartieMessage] = useState("Hi there! I'm Smartie 👋");
   const [isTyping, setIsTyping] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    // Enhanced background styles
+    // Enhanced background styles with floating animations
     document.body.style.background = "radial-gradient(ellipse at top, #667eea 0%, #764ba2 100%)";
+    document.body.classList.toggle('dark', darkMode);
     
-    // Animate Smartie's greeting
+    // Animate Smartie's greeting with improved message
     setTimeout(() => {
       setIsTyping(true);
       setTimeout(() => {
-        setSmartieMessage("Hey! Ready to take your finances to genius level today? 🚀");
+        setSmartieMessage("Hey! I'm Smartie, your AI money coach. Let's turn every penny into progress! 💸");
         setIsTyping(false);
       }, 1500);
     }, 1000);
@@ -72,6 +74,41 @@ export default function Home() {
           $
         </motion.div>
         
+        {/* Floating stars */}
+        <motion.div 
+          className="absolute top-16 left-20 text-white/10 text-xl"
+          animate={{ 
+            y: [-10, 20, -10], 
+            rotate: [0, 360],
+            scale: [1, 1.2, 1]
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+        >
+          ⭐
+        </motion.div>
+        <motion.div 
+          className="absolute top-40 right-32 text-white/10 text-sm"
+          animate={{ 
+            y: [20, -10, 20], 
+            rotate: [360, 0],
+            scale: [1.2, 1, 1.2]
+          }}
+          transition={{ duration: 6, repeat: Infinity }}
+        >
+          ✨
+        </motion.div>
+        <motion.div 
+          className="absolute bottom-40 left-16 text-white/10 text-lg"
+          animate={{ 
+            y: [-15, 15, -15], 
+            rotate: [0, 180, 360],
+            scale: [1, 1.3, 1]
+          }}
+          transition={{ duration: 9, repeat: Infinity }}
+        >
+          💫
+        </motion.div>
+        
         {/* Smartie silhouettes as watermarks */}
         <motion.div 
           className="absolute top-20 left-1/4 w-16 h-16 opacity-5"
@@ -83,6 +120,19 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Dark Mode Toggle */}
+        <motion.button
+          onClick={() => setDarkMode(!darkMode)}
+          className="absolute top-4 right-4 z-50 p-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-white hover:bg-white/30 transition-all duration-300"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        >
+          {darkMode ? "☀️" : "🌙"}
+        </motion.button>
+
         {/* Professional Header with Real Logo */}
         <motion.header 
           className="text-white px-6 py-6 text-center"
@@ -102,11 +152,14 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent">
-              Welcome to Financial Freedom!
+            <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent">
+              Welcome to SmartSpend
             </h2>
-            <p className="text-lg opacity-90 font-medium mb-2">
-              Take control of your money with AI-powered insights
+            <p className="text-xl opacity-95 font-semibold mb-2">
+              Master your money with AI, habits, and fun
+            </p>
+            <p className="text-base opacity-80 font-medium">
+              Your personal AI coach makes every financial decision smarter
             </p>
           </motion.div>
         </motion.header>
@@ -125,6 +178,8 @@ export default function Home() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
+                whileHover={{ scale: 1.1 }}
+                className="cursor-pointer"
               >
                 <ExactSmartieAvatar 
                   mood="happy" 
@@ -186,6 +241,24 @@ export default function Home() {
             </div>
           </motion.div>
 
+          {/* Daily AI Tip Card */}
+          <motion.div 
+            className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-xl p-6 mb-6 border border-blue-200"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Star className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-bold text-gray-800 text-lg">Today's Smart Insight</h3>
+            </div>
+            <p className="text-gray-700 leading-relaxed font-medium">
+              "Track your emotional spending triggers! Users who log their mood before purchases save 23% more on average."
+            </p>
+          </motion.div>
+
           {/* Enhanced Core Features Preview */}
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
@@ -194,7 +267,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/20 hover:shadow-2xl transition-all duration-300"
+              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-7 border border-white/20 hover:shadow-2xl transition-all duration-300"
               whileHover={{ y: -5, scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -210,7 +283,7 @@ export default function Home() {
             </motion.div>
             
             <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/20 hover:shadow-2xl transition-all duration-300"
+              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-7 border border-white/20 hover:shadow-2xl transition-all duration-300"
               whileHover={{ y: -5, scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -226,7 +299,7 @@ export default function Home() {
             </motion.div>
             
             <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-6 border border-white/20 hover:shadow-2xl transition-all duration-300"
+              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-7 border border-white/20 hover:shadow-2xl transition-all duration-300"
               whileHover={{ y: -5, scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -255,7 +328,10 @@ export default function Home() {
             >
               <Button 
                 onClick={() => setShowOnboarding(true)}
-                className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-5 px-12 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 w-full md:w-auto text-lg relative overflow-hidden group"
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-6 px-14 rounded-2xl shadow-2xl hover:shadow-purple-500/50 hover:shadow-2xl transition-all duration-300 w-full md:w-auto text-lg relative overflow-hidden group border-2 border-purple-400/50"
+                style={{
+                  boxShadow: "0 0 30px rgba(168, 85, 247, 0.4), 0 20px 40px rgba(0, 0, 0, 0.2)"
+                }}
               >
                 <span className="relative z-10 flex items-center gap-2">
                   Get Started 🚀
