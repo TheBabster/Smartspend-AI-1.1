@@ -1,336 +1,352 @@
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import ModernSmartieAvatar from './ModernSmartieAvatar';
 import { 
-  Share2, 
-  Twitter, 
-  Facebook, 
-  Instagram, 
-  Linkedin, 
-  Link2, 
-  Download, 
-  Camera,
-  Sparkles,
-  Trophy,
-  Target,
-  TrendingUp,
-  X,
+  Share2,
+  Download,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
   Copy,
-  Check
+  CheckCircle,
+  Star,
+  Award,
+  TrendingUp,
+  Target,
+  Calendar
 } from 'lucide-react';
-import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
-import ExactSmartSpendLogo from '@/components/ExactSmartSpendLogo';
-
-interface ShareData {
-  type: 'achievement' | 'streak' | 'milestone' | 'savings' | 'smart_decision';
-  title: string;
-  description: string;
-  value: string;
-  emoji: string;
-  color: string;
-}
 
 interface SocialSharingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  shareData: ShareData;
-  userStats?: {
-    totalSaved: number;
-    streakDays: number;
-    smartDecisions: number;
-    goalsAchieved: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  shareData: {
+    type: 'achievement' | 'weekly_summary' | 'goal_milestone' | 'streak';
+    title: string;
+    description: string;
+    stats: {
+      smartnessScore?: number;
+      streak?: number;
+      goalProgress?: number;
+      savings?: number;
+      level?: number;
+    };
+    achievements?: string[];
   };
 }
 
-const SocialSharingModal: React.FC<SocialSharingModalProps> = ({
-  isOpen,
-  onClose,
-  shareData,
-  userStats = {
-    totalSaved: 1250,
-    streakDays: 14,
-    smartDecisions: 89,
-    goalsAchieved: 3
-  }
-}) => {
-  const [copySuccess, setCopySuccess] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(0);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export default function SocialSharingModal({ open, onOpenChange, shareData }: SocialSharingModalProps) {
+  const [copied, setCopied] = useState(false);
+  const [downloadingImage, setDownloadingImage] = useState(false);
 
-  const shareTemplates = [
-    {
-      id: 'achievement',
-      title: 'Achievement Post',
-      content: `🎉 Just hit a new milestone with SmartSpend! ${shareData.emoji}\n\n${shareData.title}: ${shareData.value}\n\n${shareData.description}\n\n💡 Ready to take control of your finances? Join me on SmartSpend!\n\n#SmartSpend #FinancialWellness #MoneyGoals #PersonalFinance`
-    },
-    {
-      id: 'stats',
-      title: 'Progress Update',
-      content: `📊 My SmartSpend Progress Update:\n\n💰 Total Saved: £${userStats.totalSaved}\n🔥 Current Streak: ${userStats.streakDays} days\n🧠 Smart Decisions: ${userStats.smartDecisions}\n🎯 Goals Achieved: ${userStats.goalsAchieved}\n\n${shareData.description}\n\n#SmartSpend #FinancialGoals #MoneyWins`
-    },
-    {
-      id: 'inspirational',
-      title: 'Motivational Share',
-      content: `✨ Financial wisdom from my SmartSpend journey:\n\n"${shareData.description}"\n\n${shareData.emoji} Latest achievement: ${shareData.title}\n\nEvery smart decision counts! What's your next financial goal?\n\n#SmartSpend #FinancialWisdom #MoneyMindset`
-    }
-  ];
-
-  const socialPlatforms = [
-    { name: 'Twitter', icon: Twitter, color: 'bg-blue-500', shareUrl: 'https://twitter.com/intent/tweet?text=' },
-    { name: 'Facebook', icon: Facebook, color: 'bg-blue-600', shareUrl: 'https://www.facebook.com/sharer/sharer.php?u=' },
-    { name: 'LinkedIn', icon: Linkedin, color: 'bg-blue-700', shareUrl: 'https://www.linkedin.com/sharing/share-offsite/?url=' },
-    { name: 'Instagram', icon: Instagram, color: 'bg-gradient-to-tr from-yellow-400 to-pink-600', shareUrl: '' }
-  ];
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
+  // Generate shareable text based on share type
+  const generateShareText = () => {
+    const { type, title, description, stats } = shareData;
+    
+    switch (type) {
+      case 'achievement':
+        return `🎉 Just unlocked "${title}" in SmartSpend! My financial intelligence is growing. ${description} #SmartSpend #FinancialWellness`;
+      
+      case 'weekly_summary':
+        return `📊 Weekly SmartSpend Report: ${stats.smartnessScore}/100 Smart Score, ${stats.streak}-day streak! ${description} #FinancialGoals #SmartSpending`;
+      
+      case 'goal_milestone':
+        return `🎯 Milestone reached! ${stats.goalProgress}% towards my goal. ${description} Thanks to SmartSpend for keeping me on track! #SavingsGoal #SmartSpend`;
+      
+      case 'streak':
+        return `🔥 ${stats.streak}-day smart spending streak with SmartSpend! ${description} #FinancialDiscipline #SmartSpend`;
+      
+      default:
+        return `Making smarter financial decisions with SmartSpend! ${description} #SmartSpend #FinancialWellness`;
     }
   };
 
-  const generateShareableImage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas size
-    canvas.width = 600;
-    canvas.height = 400;
-
-    // Create gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 600, 400);
-    gradient.addColorStop(0, '#8B5CF6');
-    gradient.addColorStop(1, '#EC4899');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 600, 400);
-
-    // Add logo area
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.fillRect(20, 20, 120, 40);
-
-    // Add main content area
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-    ctx.roundRect(50, 80, 500, 240, 20);
-    ctx.fill();
-
-    // Add text content
-    ctx.fillStyle = '#1F2937';
-    ctx.font = 'bold 24px Arial';
-    ctx.fillText(shareData.title, 80, 130);
-
-    ctx.font = '18px Arial';
-    ctx.fillStyle = '#6B7280';
-    ctx.fillText(shareData.description, 80, 160);
-
-    ctx.font = 'bold 32px Arial';
-    ctx.fillStyle = shareData.color;
-    ctx.fillText(shareData.value, 80, 210);
-
-    // Add SmartSpend branding
-    ctx.font = 'bold 16px Arial';
-    ctx.fillStyle = '#8B5CF6';
-    ctx.fillText('SmartSpend - AI Financial Assistant', 80, 280);
-
-    // Download the image
-    const link = document.createElement('a');
-    link.download = `smartspend-${shareData.type}-${Date.now()}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
+  // Copy text to clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generateShareText()).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
-  const shareToSocial = (platform: typeof socialPlatforms[0]) => {
-    const text = encodeURIComponent(shareTemplates[selectedTemplate].content);
+  // Generate downloadable image (simplified implementation)
+  const downloadShareImage = async () => {
+    setDownloadingImage(true);
+    
+    // In a real implementation, this would generate an image using Canvas API
+    // For now, we'll simulate the download
+    setTimeout(() => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      if (ctx) {
+        canvas.width = 800;
+        canvas.height = 600;
+        
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 800, 600);
+        gradient.addColorStop(0, '#8B5CF6');
+        gradient.addColorStop(1, '#3B82F6');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 800, 600);
+        
+        // Title
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(shareData.title, 400, 150);
+        
+        // Stats
+        ctx.font = '32px Arial';
+        let yPos = 250;
+        
+        if (shareData.stats.smartnessScore) {
+          ctx.fillText(`Smart Score: ${shareData.stats.smartnessScore}/100`, 400, yPos);
+          yPos += 60;
+        }
+        
+        if (shareData.stats.streak) {
+          ctx.fillText(`${shareData.stats.streak}-day streak`, 400, yPos);
+          yPos += 60;
+        }
+        
+        if (shareData.stats.goalProgress) {
+          ctx.fillText(`${shareData.stats.goalProgress}% goal progress`, 400, yPos);
+          yPos += 60;
+        }
+        
+        // Footer
+        ctx.font = '24px Arial';
+        ctx.fillText('SmartSpend - AI Financial Coach', 400, 550);
+        
+        // Download
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `smartspend-${shareData.type}-${Date.now()}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }
+          setDownloadingImage(false);
+        });
+      } else {
+        setDownloadingImage(false);
+      }
+    }, 1000);
+  };
+
+  // Social platform sharing
+  const shareOnPlatform = (platform: string) => {
+    const text = encodeURIComponent(generateShareText());
     const url = encodeURIComponent(window.location.origin);
     
-    switch (platform.name) {
-      case 'Twitter':
-        window.open(`${platform.shareUrl}${text}`, '_blank');
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
         break;
-      case 'Facebook':
-        window.open(`${platform.shareUrl}${url}`, '_blank');
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
         break;
-      case 'LinkedIn':
-        window.open(`${platform.shareUrl}${url}`, '_blank');
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
         break;
-      case 'Instagram':
-        // Instagram doesn't support direct text sharing, so generate image
-        generateShareableImage();
-        break;
+      case 'instagram':
+        // Instagram doesn't support URL sharing, so we'll copy text for manual posting
+        copyToClipboard();
+        return;
+    }
+    
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+  };
+
+  const getShareIcon = () => {
+    switch (shareData.type) {
+      case 'achievement': return '🏆';
+      case 'weekly_summary': return '📊';
+      case 'goal_milestone': return '🎯';
+      case 'streak': return '🔥';
+      default: return '✨';
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <Share2 className="w-5 h-5 text-white" />
-            </div>
+          <DialogTitle className="flex items-center gap-2">
+            <Share2 className="w-5 h-5" />
             Share Your Success
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Achievement Preview Card */}
-          <motion.div
-            className={`relative rounded-2xl p-6 text-white overflow-hidden`}
-            style={{ background: `linear-gradient(135deg, ${shareData.color}, ${shareData.color}dd)` }}
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-4 right-4 text-6xl">{shareData.emoji}</div>
-              <Sparkles className="absolute bottom-4 left-4 w-8 h-8" />
-            </div>
-
-            <div className="relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <ExactSmartSpendLogo size="sm" animated={false} showText={true} />
-                </div>
-                <ExactSmartieAvatar mood="celebrating" size="md" animated={true} />
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-2xl font-bold">{shareData.title}</h3>
-                <p className="text-3xl font-bold">{shareData.value}</p>
-                <p className="text-white/90">{shareData.description}</p>
-              </div>
-
-              <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/20">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4" />
-                  <span className="text-sm">{userStats.goalsAchieved} Goals</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">£{userStats.totalSaved} Saved</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4" />
-                  <span className="text-sm">{userStats.streakDays} Day Streak</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Share Template Selection */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-gray-800">Choose Your Message Style</h4>
-            <div className="grid gap-3">
-              {shareTemplates.map((template, index) => (
-                <motion.button
-                  key={template.id}
-                  onClick={() => setSelectedTemplate(index)}
-                  className={`text-left p-4 rounded-xl border-2 transition-all ${
-                    selectedTemplate === index
-                      ? 'border-purple-300 bg-purple-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <h5 className="font-medium mb-2">{template.title}</h5>
-                  <p className="text-sm text-gray-600 line-clamp-3">
-                    {template.content}
-                  </p>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-
-          {/* Share Content Preview */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-gray-800">Your Share Message</h4>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => copyToClipboard(shareTemplates[selectedTemplate].content)}
-                className="flex items-center gap-2"
+          {/* Preview Card */}
+          <Card className="p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-700">
+            <div className="text-center">
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="mb-4"
               >
-                {copySuccess ? (
-                  <>
-                    <Check className="w-4 h-4 text-green-500" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            </div>
-            
-            <div className="bg-gray-50 rounded-xl p-4 max-h-32 overflow-y-auto">
-              <p className="text-sm text-gray-700 whitespace-pre-line">
-                {shareTemplates[selectedTemplate].content}
+                <span className="text-6xl">{getShareIcon()}</span>
+              </motion.div>
+              
+              <h3 className="text-2xl font-bold text-purple-900 dark:text-purple-100 mb-2">
+                {shareData.title}
+              </h3>
+              
+              <p className="text-purple-700 dark:text-purple-300 mb-4">
+                {shareData.description}
               </p>
+              
+              {/* Stats Display */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {shareData.stats.smartnessScore && (
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {shareData.stats.smartnessScore}/100
+                    </div>
+                    <div className="text-sm text-gray-600">Smart Score</div>
+                  </div>
+                )}
+                
+                {shareData.stats.streak && (
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {shareData.stats.streak}
+                    </div>
+                    <div className="text-sm text-gray-600">Day Streak</div>
+                  </div>
+                )}
+                
+                {shareData.stats.goalProgress && (
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {shareData.stats.goalProgress}%
+                    </div>
+                    <div className="text-sm text-gray-600">Goal Progress</div>
+                  </div>
+                )}
+                
+                {shareData.stats.level && (
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {shareData.stats.level}
+                    </div>
+                    <div className="text-sm text-gray-600">Level</div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                <ModernSmartieAvatar mood="happy" size="sm" />
+                <span>SmartSpend - AI Financial Coach</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Share Options */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-gray-800 dark:text-white">
+              Share on Social Media
+            </h4>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <motion.button
+                onClick={() => shareOnPlatform('twitter')}
+                className="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Twitter className="w-6 h-6 text-blue-500 mb-2" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Twitter</span>
+              </motion.button>
+              
+              <motion.button
+                onClick={() => shareOnPlatform('facebook')}
+                className="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Facebook className="w-6 h-6 text-blue-600 mb-2" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Facebook</span>
+              </motion.button>
+              
+              <motion.button
+                onClick={() => shareOnPlatform('linkedin')}
+                className="flex flex-col items-center p-4 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Linkedin className="w-6 h-6 text-blue-700 mb-2" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">LinkedIn</span>
+              </motion.button>
+              
+              <motion.button
+                onClick={() => shareOnPlatform('instagram')}
+                className="flex flex-col items-center p-4 bg-pink-50 hover:bg-pink-100 dark:bg-pink-900/20 dark:hover:bg-pink-900/30 rounded-lg transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Instagram className="w-6 h-6 text-pink-600 mb-2" />
+                <span className="text-sm font-medium text-pink-700 dark:text-pink-300">Instagram</span>
+              </motion.button>
             </div>
           </div>
 
-          {/* Social Platform Buttons */}
+          {/* Copy Link and Download Options */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-gray-800">Share On</h4>
-            <div className="grid grid-cols-2 gap-3">
-              {socialPlatforms.map((platform) => {
-                const Icon = platform.icon;
-                return (
-                  <motion.button
-                    key={platform.name}
-                    onClick={() => shareToSocial(platform)}
-                    className={`flex items-center gap-3 p-4 rounded-xl text-white font-medium ${platform.color} hover:shadow-lg transition-all`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>Share on {platform.name}</span>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Additional Actions */}
-          <div className="flex gap-3">
             <Button
-              onClick={generateShareableImage}
+              onClick={copyToClipboard}
+              className="w-full flex items-center justify-center gap-2"
               variant="outline"
-              className="flex-1 flex items-center gap-2"
             >
-              <Download className="w-4 h-4" />
-              Download Image
+              {copied ? (
+                <>
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  Copied to Clipboard!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  Copy Share Text
+                </>
+              )}
             </Button>
+            
             <Button
-              onClick={() => copyToClipboard(window.location.origin)}
-              variant="outline"
-              className="flex-1 flex items-center gap-2"
+              onClick={downloadShareImage}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
+              disabled={downloadingImage}
             >
-              <Link2 className="w-4 h-4" />
-              Copy App Link
+              {downloadingImage ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                  Generating Image...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download Share Image
+                </>
+              )}
             </Button>
           </div>
         </div>
-
-        {/* Hidden canvas for image generation */}
-        <canvas ref={canvasRef} style={{ display: 'none' }} />
       </DialogContent>
     </Dialog>
   );
-};
-
-export default SocialSharingModal;
+}

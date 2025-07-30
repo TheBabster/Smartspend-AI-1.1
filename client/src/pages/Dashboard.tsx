@@ -4,12 +4,15 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Target, MessageCircle, Settings, Sun, Moon, Sparkles, TrendingUp, PiggyBank, Zap, Heart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Target, MessageCircle, Settings, Sun, Moon, Sparkles, TrendingUp, PiggyBank, Zap, Heart, Flame } from "lucide-react";
 
 import CategoryCardEnhanced from "@/components/CategoryCardEnhanced";
 import { EnhancedCategoryCard, MoodSelector, SmartTipCard } from "@/components/VisualEnhancements";
 import { SlideAnimation, StaggerContainer, AnimatedButton } from "@/components/SlideAnimations";
 import { SmartieToast, HoverLift } from "@/components/MicroInteractions";
+import WeeklySmartieCoachingSummary from "@/components/WeeklySmartieCoachingSummary";
+import EnhancedPurchaseDecision from "@/components/EnhancedPurchaseDecision";
 
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
 import EnhancedHomeDashboard from "@/components/EnhancedHomeDashboard";
@@ -495,27 +498,38 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        {/* Enhanced Smart Tip Card */}
+        {/* Weekly Smartie Coaching Summary */}
         <SlideAnimation direction="right" delay={0.4} className="mb-6">
-          <SmartTipCard
-            tip={{
-              title: "Daily Smart Tip",
-              content: "Try the \"24-hour rule\" - wait a full day before making any purchase over £50. You'll be surprised how many impulse buys you avoid!",
-              category: "psychology"
-            }}
-            onMarkHelpful={() => {
-              console.log('Marked as helpful');
-              setShowToast({
-                message: "Thanks for the feedback! This helps me learn what tips are most useful 📚",
-                type: 'success'
-              });
-            }}
-            onSaveTip={() => {
-              console.log('Tip saved');
-              setShowToast({
-                message: "Tip saved to your personal collection! You can review it anytime",
-                type: 'info'
-              });
+          <WeeklySmartieCoachingSummary
+            weeklyData={{
+              smartnessScoreChange: 12,
+              totalSpent: totalSpent,
+              goalProgress: 67,
+              emotionSpendingPatterns: [
+                { emotion: 'stressed', amount: 45, percentage: 35 },
+                { emotion: 'happy', amount: 32, percentage: 25 },
+                { emotion: 'bored', amount: 28, percentage: 22 },
+                { emotion: 'excited', amount: 23, percentage: 18 }
+              ],
+              regretCosts: {
+                weeklyRegret: 23,
+                yearlyProjection: 1196,
+                avoidedImpulses: 4
+              },
+              predictions: {
+                goalCompletionWeeks: 8,
+                monthlyTrend: 'improving'
+              },
+              highlights: [
+                "Your smartness score improved 12% this week!",
+                "You successfully avoided 4 impulse purchases",
+                "Stayed within budget in 3 out of 4 categories"
+              ],
+              challenges: [
+                "Try mindful breathing before stress-shopping",
+                "Consider the 24-hour rule for purchases over £25",
+                "Redirect boredom spending to free activities"
+              ]
             }}
           />
         </SlideAnimation>
@@ -593,7 +607,10 @@ export default function Dashboard() {
             {budgets.map((budget, index) => (
               <HoverLift key={budget.id} lift="medium">
                 <EnhancedCategoryCard 
-                  budget={budget} 
+                  budget={{
+                    ...budget,
+                    spent: budget.spent || "0"
+                  }} 
                   delay={index * 0.1}
                 />
               </HoverLift>
@@ -601,18 +618,65 @@ export default function Dashboard() {
           </StaggerContainer>
         </SlideAnimation>
 
-        {/* Mood Selector */}
+        {/* Smart Points System */}
         <SlideAnimation direction="left" delay={0.8} className="mb-6">
-          <MoodSelector
-            selectedMood={userContext.mood || undefined}
-            onMoodSelect={(mood) => {
-              console.log('Selected mood:', mood);
-              setShowToast({
-                message: `Got it! Understanding your ${mood} mood helps me give better spending advice`,
-                type: 'success'
-              });
-            }}
-          />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                Smart Points & Achievements
+              </h3>
+              <Badge className="bg-yellow-100 text-yellow-800 border-0">
+                Level {Math.floor(userContext.financialScore / 10) + 1}
+              </Badge>
+            </div>
+            
+            {/* Smart Points Summary Card */}
+            <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-700">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      <ModernSmartieAvatar mood="celebrating" size="sm" />
+                    </motion.div>
+                    <div>
+                      <p className="font-semibold text-yellow-800 dark:text-yellow-200">
+                        {(userContext.financialScore * 10 + userContext.streak * 5).toLocaleString()} Smart Points
+                      </p>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                        +{userContext.streak * 5 + 25} this week
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-orange-500" />
+                    <span className="font-semibold text-orange-600">
+                      {userContext.streak} day streak
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Mini achievements */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                    <div className="text-lg mb-1">🎯</div>
+                    <div className="text-xs text-green-800 dark:text-green-200">Smart Buyer</div>
+                  </div>
+                  <div className="text-center p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                    <div className="text-lg mb-1">💰</div>
+                    <div className="text-xs text-blue-800 dark:text-blue-200">Saver</div>
+                  </div>
+                  <div className="text-center p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                    <div className="text-lg mb-1">📈</div>
+                    <div className="text-xs text-purple-800 dark:text-purple-200">Tracker</div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
         </SlideAnimation>
 
         {/* Financial Wellness Score */}
