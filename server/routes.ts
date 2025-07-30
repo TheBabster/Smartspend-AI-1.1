@@ -10,17 +10,37 @@ const openai = new OpenAI({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Helper function to get demo user ID
+  const getDemoUserId = async () => {
+    try {
+      const user = await storage.getUserByUsername("alex");
+      return user?.id || "demo-user-fallback";
+    } catch (error) {
+      return "demo-user-fallback";
+    }
+  };
+
   // Default user endpoint
   app.get("/api/user", async (req, res) => {
-    const user = await storage.getUser("demo-user");
-    res.json(user);
+    try {
+      const userId = await getDemoUserId();
+      const user = await storage.getUser(userId);
+      if (!user) {
+        res.status(404).json({ error: "No user found" });
+        return;
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get user" });
+    }
   });
 
   app.patch("/api/user", async (req, res) => {
     try {
+      const userId = await getDemoUserId();
       const userData = insertUserSchema.partial().parse(req.body);
-      const user = await storage.updateUser("demo-user", userData);
-      res.json(user);
+      const updatedUser = await storage.updateUser(userId, userData);
+      res.json(updatedUser);
     } catch (error) {
       res.status(400).json({ error: "Invalid user data" });
     }
@@ -28,13 +48,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Budget endpoints
   app.get("/api/budgets", async (req, res) => {
-    const budgets = await storage.getBudgetsByUser("demo-user");
+    const userId = await getDemoUserId();
+    const budgets = await storage.getBudgetsByUser(userId);
     res.json(budgets);
   });
 
   app.post("/api/budgets", async (req, res) => {
     try {
-      const budgetData = insertBudgetSchema.parse({ ...req.body, userId: "demo-user" });
+      const userId = await getDemoUserId();
+      const budgetData = insertBudgetSchema.parse({ ...req.body, userId });
       const budget = await storage.createBudget(budgetData);
       res.json(budget);
     } catch (error) {
@@ -44,18 +66,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Expense endpoints
   app.get("/api/expenses", async (req, res) => {
-    const expenses = await storage.getExpensesByUser("demo-user");
+    const userId = await getDemoUserId();
+    const expenses = await storage.getExpensesByUser(userId);
     res.json(expenses);
   });
 
   app.post("/api/expenses", async (req, res) => {
     try {
-      const expenseData = insertExpenseSchema.parse({ ...req.body, userId: "demo-user" });
+      const userId = await getDemoUserId();
+      const expenseData = insertExpenseSchema.parse({ ...req.body, userId });
       const expense = await storage.createExpense(expenseData);
 
       // Update budget spent amount
       const currentMonth = new Date().toISOString().slice(0, 7);
-      const budget = await storage.getBudgetByCategory("demo-user", expenseData.category, currentMonth);
+      const budget = await storage.getBudgetByCategory(userId, expenseData.category, currentMonth);
       if (budget) {
         const newSpent = (parseFloat(budget.spent || "0") + parseFloat(expenseData.amount)).toFixed(2);
         await storage.updateBudget(budget.id, { spent: newSpent });
@@ -69,13 +93,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Goals endpoints
   app.get("/api/goals", async (req, res) => {
-    const goals = await storage.getGoalsByUser("demo-user");
+    const userId = await getDemoUserId();
+    const goals = await storage.getGoalsByUser(userId);
     res.json(goals);
   });
 
   app.post("/api/goals", async (req, res) => {
     try {
-      const goalData = insertGoalSchema.parse({ ...req.body, userId: "demo-user" });
+      const userId = await getDemoUserId();
+      const goalData = insertGoalSchema.parse({ ...req.body, userId });
       const goal = await storage.createGoal(goalData);
       res.json(goal);
     } catch (error) {
@@ -95,17 +121,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Decision endpoints
   app.get("/api/decisions", async (req, res) => {
-    const decisions = await storage.getDecisionsByUser("demo-user");
+    const userId = await getDemoUserId();
+    const decisions = await storage.getDecisionsByUser(userId);
     res.json(decisions);
   });
 
   app.post("/api/decisions", async (req, res) => {
     try {
-      const { itemName, amount, category, desireLevel, urgency } = req.body;
+      const userId = await getDemoUserId();
+      const { itemName, amount, category, desireLevel, urgency, emotion, notes } = req.body;
 
       // Get user's budget for this category
       const currentMonth = new Date().toISOString().slice(0, 7);
-      const budget = await storage.getBudgetByCategory("demo-user", category, currentMonth);
+      const budget = await storage.getBudgetByCategory(userId, category, currentMonth);
       const remainingBudget = budget ? parseFloat(budget.monthlyLimit) - parseFloat(budget.spent || "0") : 0;
 
       let aiResponse;
@@ -166,12 +194,14 @@ Provide a recommendation (yes/think_again/no) and friendly reasoning in JSON for
       }
 
       const decisionData = insertDecisionSchema.parse({
-        userId: "demo-user",
+        userId,
         itemName,
         amount: amount.toString(),
         category,
         desireLevel: parseInt(desireLevel),
         urgency: parseInt(urgency),
+        emotion: emotion || null,
+        notes: notes || null,
         recommendation: aiResponse.recommendation,
         reasoning: aiResponse.reasoning,
       });

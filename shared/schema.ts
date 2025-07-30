@@ -56,6 +56,8 @@ export const decisions = pgTable("decisions", {
   category: text("category").notNull(),
   desireLevel: integer("desire_level").notNull(), // 1-10
   urgency: integer("urgency").notNull(), // 1-10
+  emotion: text("emotion"), // emoji or text describing emotion
+  notes: text("notes"), // optional user notes
   recommendation: text("recommendation").notNull(), // yes, think_again, no
   reasoning: text("reasoning").notNull(),
   followed: boolean("followed"),

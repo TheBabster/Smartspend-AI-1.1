@@ -7,9 +7,9 @@ export async function seedDatabase() {
     const [user] = await db
       .insert(users)
       .values({
-        id: "demo-user",
         username: "alex",
         email: "alex@example.com",
+        password: "demo-password-hash", // In real app, this would be bcrypt hashed
         name: "Alex Johnson",
         currency: "GBP",
         monthlyIncome: "3500.00",
@@ -34,7 +34,7 @@ export async function seedDatabase() {
       await db
         .insert(budgets)
         .values({
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           category: budget.category,
           monthlyLimit: budget.monthlyLimit,
           spent: budget.spent,
@@ -56,7 +56,7 @@ export async function seedDatabase() {
       await db
         .insert(expenses)
         .values({
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           ...expense,
         })
         .onConflictDoNothing();
@@ -67,7 +67,7 @@ export async function seedDatabase() {
       .insert(goals)
       .values([
         {
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           title: "Emergency Fund",
           targetAmount: "5000.00",
           currentAmount: "2340.00",
@@ -76,7 +76,7 @@ export async function seedDatabase() {
           completed: false,
         },
         {
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           title: "Summer Vacation",
           targetAmount: "2000.00",
           currentAmount: "1340.00",
@@ -92,13 +92,13 @@ export async function seedDatabase() {
       .insert(streaks)
       .values([
         {
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           type: "budget",
           currentStreak: 21,
           longestStreak: 21,
         },
         {
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           type: "savings",
           currentStreak: 14,
           longestStreak: 28,
@@ -111,7 +111,7 @@ export async function seedDatabase() {
       .insert(achievements)
       .values([
         {
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           type: "budget",
           title: "Budget Master",
           description: "Stayed under budget for 20 consecutive days!",
@@ -119,7 +119,7 @@ export async function seedDatabase() {
           unlockedAt: new Date(),
         },
         {
-          userId: "demo-user",
+          userId: user?.id || "demo-user-fallback",
           type: "decision",
           title: "Smart Spender",
           description: "Used Smartie's advice 10 times",
