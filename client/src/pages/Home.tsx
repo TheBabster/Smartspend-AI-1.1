@@ -347,31 +347,11 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          {/* SmartSpend Logo Display */}
-          <motion.div 
-            className="flex justify-center mb-8"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
-          >
-            <div className={`p-6 rounded-3xl ${darkMode ? 'bg-slate-800/80' : 'bg-white/20'} backdrop-blur-sm border ${darkMode ? 'border-slate-600/50' : 'border-white/30'} shadow-2xl`}>
-              <img 
-                src="/smartspend-logo.svg" 
-                alt="SmartSpend Logo" 
-                className="w-48 h-auto md:w-56 lg:w-64 xl:w-72 mx-auto filter brightness-110 contrast-110 saturate-110"
-                style={{ 
-                  filter: darkMode 
-                    ? 'brightness(1.1) contrast(1.1) saturate(1.1)' 
-                    : 'brightness(1.05) contrast(1.05) saturate(1.05)'
-                }}
-              />
-            </div>
-          </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
           >
             <h2 className={`text-4xl font-black mb-3 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
               {isFirstVisit ? 'Welcome to SmartSpend!' : `Welcome back! You're on day ${currentStreak} of your streak 🔥`}
