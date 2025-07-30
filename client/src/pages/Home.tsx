@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Globe, Users, Star, Brain, TrendingUp, Target } from "lucide-react";
+import { Shield, Globe, Users, Star, Brain, TrendingUp, Target, Sun, Moon } from "lucide-react";
 
 import ExactSmartieAvatar from "@/components/ExactSmartieAvatar";
 import OnboardingWalkthrough from "@/components/OnboardingWalkthrough";
@@ -20,6 +20,13 @@ export default function Home() {
   const [currentTip, setCurrentTip] = useState(0);
   const [currentInsight, setCurrentInsight] = useState(0);
   const [isFirstVisit, setIsFirstVisit] = useState(true);
+  
+  // Mock user budgets for demo purposes
+  const userBudgets = [
+    { id: '1', category: 'Food', monthlyLimit: 400, spent: 280 },
+    { id: '2', category: 'Entertainment', monthlyLimit: 200, spent: 150 },
+    { id: '3', category: 'Shopping', monthlyLimit: 300, spent: 120 },
+  ];
   
   const smartieTips = [
     "💡 Want to save smarter this month? I analyze your spending patterns to help you make better decisions!",
@@ -205,27 +212,40 @@ export default function Home() {
 
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Enhanced Dark Mode Toggle */}
-        <motion.button
-          onClick={() => setDarkMode(!darkMode)}
-          className="absolute top-4 right-4 z-50 p-4 bg-white/20 backdrop-blur-md rounded-full border border-white/40 text-white hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl"
-          whileHover={{ 
-            scale: 1.15, 
-            rotate: 360,
-            boxShadow: "0 0 25px rgba(255, 255, 255, 0.3)"
-          }}
-          whileTap={{ scale: 0.9 }}
-          initial={{ opacity: 0, scale: 0, rotate: -180 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ delay: 1, duration: 0.6, type: "spring" }}
-        >
-          <motion.span
-            animate={{ rotate: darkMode ? 0 : 180 }}
-            transition={{ duration: 0.5 }}
-            className="text-xl"
+        {/* Enhanced Dark Mode Toggle with Tooltip */}
+        <motion.div className="absolute top-4 right-4 z-50 group">
+          <motion.button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`p-4 rounded-full backdrop-blur-md border transition-all duration-300 shadow-lg hover:shadow-xl ${darkMode ? 'bg-slate-700/80 text-yellow-300 border-slate-600/50' : 'bg-white/20 text-white border-white/40 hover:bg-white/30'}`}
+            whileHover={{ 
+              scale: 1.15, 
+              rotate: 360,
+              boxShadow: "0 0 25px rgba(255, 255, 255, 0.3)"
+            }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0, rotate: -180 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ delay: 1, duration: 0.6, type: "spring" }}
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            {darkMode ? "☀️" : "🌙"}
-          </motion.span>
-        </motion.button>
+            <motion.div
+              animate={{ rotate: darkMode ? 180 : 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="text-xl"
+            >
+              {darkMode ? <Sun size={24} /> : <Moon size={24} />}
+            </motion.div>
+          </motion.button>
+          
+          {/* Tooltip */}
+          <motion.div
+            className={`absolute top-full right-0 mt-2 px-3 py-1 rounded-lg text-sm font-medium pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${darkMode ? 'bg-slate-800 text-white' : 'bg-gray-800 text-white'} shadow-lg whitespace-nowrap`}
+            initial={{ opacity: 0, y: -10 }}
+            whileHover={{ opacity: 1, y: 0 }}
+          >
+            {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          </motion.div>
+        </motion.div>
 
         {/* Enhanced Gamified Progress Bar */}
         <motion.div
@@ -347,20 +367,88 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          {/* Text-Only SmartSpend Branding */}
+          {/* Enhanced Text-Only SmartSpend Branding */}
           <motion.div 
-            className="mb-12"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            className="mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
           >
-            <div className={`inline-block p-8 rounded-3xl ${darkMode ? 'bg-slate-800/80' : 'bg-white/20'} backdrop-blur-sm border ${darkMode ? 'border-slate-600/50' : 'border-white/30'} shadow-2xl`}>
-              <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-3 text-[#1A237E] leading-none tracking-tight">
+            {/* Sparkle background effects */}
+            <div className="relative">
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute text-yellow-300 text-lg"
+                  style={{ 
+                    left: `${10 + i * 15}%`, 
+                    top: `${-10 + (i % 2) * 20}px` 
+                  }}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ 
+                    opacity: [0, 1, 0],
+                    scale: [0, 1, 0],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    delay: i * 0.3,
+                    repeat: Infinity,
+                    repeatDelay: 4
+                  }}
+                >
+                  ✨
+                </motion.div>
+              ))}
+              
+              <motion.h1 
+                className={`text-5xl md:text-6xl lg:text-7xl font-black mb-3 leading-none tracking-tight ${darkMode ? 'text-white' : 'text-white'} drop-shadow-lg`}
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+              >
                 SmartSpend
-              </h1>
-              <p className="text-2xl md:text-3xl lg:text-4xl font-semibold text-[#1A237E] leading-tight">
+              </motion.h1>
+              
+              <motion.p 
+                className={`text-xl md:text-2xl lg:text-3xl font-light italic leading-tight ${darkMode ? 'text-purple-200' : 'text-purple-100'} drop-shadow-md`}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+              >
                 Think Smart. Spend Smarter.
-              </p>
+              </motion.p>
+              
+              {/* Motivational CTA */}
+              <motion.p 
+                className={`text-lg md:text-xl font-semibold mt-4 mb-6 ${darkMode ? 'text-indigo-200' : 'text-white'} drop-shadow-md`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+              >
+                Start mastering your money in 5 minutes a day.
+              </motion.p>
+              
+              {/* Enhanced CTA Button */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1.0, duration: 0.6, ease: "easeOut" }}
+              >
+                <Button 
+                  onClick={() => setShowOnboarding(true)}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold px-8 py-4 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+                >
+                  Get Started Now
+                  <motion.span
+                    className="ml-2 inline-block"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    →
+                  </motion.span>
+                </Button>
+              </motion.div>
             </div>
           </motion.div>
 
@@ -386,12 +474,77 @@ export default function Home() {
 
         {/* Main Content */}
         <main className="flex-1 px-6 relative z-20">
+          {/* Enhanced Progress Summary Cards */}
+          <motion.div 
+            className="grid grid-cols-3 gap-4 mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+          >
+            {/* Savings Progress */}
+            <motion.div className={`${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm p-4 rounded-2xl shadow-lg border ${darkMode ? 'border-slate-600' : 'border-white/30'}`}>
+              <motion.div
+                className="text-2xl mb-2"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                🌳
+              </motion.div>
+              <div className={`text-2xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                £{userBudgets.reduce((acc, b) => acc + (b.monthlyLimit - b.spent), 0).toFixed(0)}
+              </div>
+              <div className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-600'} font-medium`}>Saved</div>
+              <div className={`text-xs mt-1 ${darkMode ? 'text-emerald-300' : 'text-emerald-500'} font-semibold`}>Great progress! 🎉</div>
+            </motion.div>
+
+            {/* Streak Counter */}
+            <motion.div className={`${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm p-4 rounded-2xl shadow-lg border ${darkMode ? 'border-slate-600' : 'border-white/30'}`}>
+              <motion.div
+                className="text-2xl mb-2"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  filter: ["hue-rotate(0deg)", "hue-rotate(20deg)", "hue-rotate(0deg)"]
+                }}
+                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+              >
+                🔥
+              </motion.div>
+              <div className={`text-2xl font-bold ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>
+                {currentStreak}
+              </div>
+              <div className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-600'} font-medium`}>Day Streak</div>
+              <div className={`text-xs mt-1 ${darkMode ? 'text-orange-300' : 'text-orange-500'} font-semibold`}>Keep it up! 💪</div>
+            </motion.div>
+
+            {/* Financial Wellness */}
+            <motion.div className={`${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm p-4 rounded-2xl shadow-lg border ${darkMode ? 'border-slate-600' : 'border-white/30'}`}>
+              <motion.div
+                className="text-2xl mb-2"
+                animate={{ 
+                  scale: [1, 1.1, 1],
+                  y: [0, -2, 0]
+                }}
+                transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 1 }}
+              >
+                🧠
+              </motion.div>
+              <div className={`text-2xl font-bold ${darkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+                {Math.round(((userBudgets.reduce((acc, b) => acc + (b.monthlyLimit - b.spent), 0) / userBudgets.reduce((acc, b) => acc + b.monthlyLimit, 1)) * 100))}%
+              </div>
+              <div className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-600'} font-medium`}>Wellness</div>
+              <div className={`text-xs mt-1 ${darkMode ? 'text-purple-300' : 'text-purple-500'} font-semibold`}>Stay mindful! 🎯</div>
+            </motion.div>
+          </motion.div>
+
           {/* Enhanced Smartie Introduction Card with AI Indicator */}
           <motion.div 
             className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-2xl p-6 mb-8 border relative overflow-hidden`}
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 1.4, ease: "easeOut" }}
             whileHover={{ y: -2, shadow: "0 20px 40px rgba(0,0,0,0.15)" }}
           >
             {/* Pulsing AI indicator */}
@@ -840,18 +993,44 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Authentic Footer */}
+          {/* Enhanced Signature Footer */}
           <motion.div
             className={`text-center text-sm space-y-3 mb-8 ${darkMode ? 'text-slate-400' : 'text-white/70'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.3, duration: 0.6 }}
+            transition={{ delay: 1.8, duration: 0.6 }}
           >
             <motion.div 
-              className={`${darkMode ? 'bg-slate-800/50' : 'bg-white/15'} backdrop-blur-sm rounded-2xl p-4 border ${darkMode ? 'border-slate-600/50' : 'border-white/20'}`}
+              className={`${darkMode ? 'bg-slate-800/50' : 'bg-white/15'} backdrop-blur-sm rounded-2xl p-6 border ${darkMode ? 'border-slate-600/50' : 'border-white/20'}`}
               whileHover={{ y: -2, scale: 1.02 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="flex items-center justify-center gap-3 mb-3">
+              {/* Enhanced signature tagline */}
+              <motion.div 
+                className="text-base font-bold mb-4 flex items-center justify-center gap-2"
+                animate={{ 
+                  textShadow: darkMode ? 
+                    ["0 0 0px #60a5fa", "0 0 8px #60a5fa", "0 0 0px #60a5fa"] : 
+                    ["0 0 0px #fbbf24", "0 0 8px #fbbf24", "0 0 0px #fbbf24"]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <motion.span
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  💸
+                </motion.span>
+                Proudly helping people save over £1,000 this month
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  ✨
+                </motion.span>
+              </motion.div>
+              
+              <div className="flex items-center justify-center gap-4 mb-4 text-xs">
                 <motion.div 
                   className="flex items-center gap-2"
                   whileHover={{ scale: 1.05 }}
@@ -859,7 +1038,24 @@ export default function Home() {
                   <Shield className="w-4 h-4" />
                   <span>Secure & Private</span>
                 </motion.div>
+                <div className={`w-1 h-1 rounded-full ${darkMode ? 'bg-slate-500' : 'bg-white/50'}`}></div>
+                <motion.div 
+                  className="flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Users className="w-4 h-4" />
+                  <span>127+ budgeters</span>
+                </motion.div>
+                <div className={`w-1 h-1 rounded-full ${darkMode ? 'bg-slate-500' : 'bg-white/50'}`}></div>
+                <motion.div 
+                  className="flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Star className="w-4 h-4" />
+                  <span>v0.9 Beta</span>
+                </motion.div>
               </div>
+              
               <motion.div 
                 className="text-xs space-y-1"
                 animate={{ 
@@ -867,9 +1063,8 @@ export default function Home() {
                 }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
-                <p className="font-medium">Built with ❤️ by an independent developer</p>
-                <p className="opacity-70">You're early! This is a beta version of SmartSpend.</p>
-                <p className="opacity-70">Help shape its future with your feedback.</p>
+                <p className="font-medium">Built by Gen Z, for Gen Z | Built with ❤️ by an independent developer</p>
+                <p className="opacity-70">You're early! Help shape SmartSpend's future with your feedback.</p>
               </motion.div>
             </motion.div>
           </motion.div>
