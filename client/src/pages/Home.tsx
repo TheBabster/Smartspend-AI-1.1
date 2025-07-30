@@ -17,14 +17,15 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(5);
   const [savingsLevel, setSavingsLevel] = useState(2);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [currentTip, setCurrentTip] = useState(0);
   const [currentInsight, setCurrentInsight] = useState(0);
   const [isFirstVisit, setIsFirstVisit] = useState(true);
   
-  const testimonials = [
-    { quote: "SmartSpend helped me save £300 in 2 months!", author: "Alex, UK", flag: "🇬🇧" },
-    { quote: "I finally understand my spending patterns!", author: "Priya, India", flag: "🇮🇳" },
-    { quote: "The AI insights are incredibly accurate!", author: "Marcus, Germany", flag: "🇩🇪" }
+  const smartieTips = [
+    "💡 Want to save smarter this month? I analyze your spending patterns to help you make better decisions!",
+    "🎯 Small habits create big wins! Let me help you build lasting financial routines that actually stick.",
+    "🧠 I learn from your choices to give you personalized insights that improve over time.",
+    "⚡ Ready to turn every purchase into progress? Let's make your money work smarter together!"
   ];
 
   const smartInsights = [
@@ -34,17 +35,17 @@ export default function Home() {
     "Your spending patterns reveal your values. Use Smartie to align your purchases with your goals."
   ];
 
-  // Rotate testimonials and insights
+  // Rotate insights and tips
   useEffect(() => {
-    const testimonialInterval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 4000);
+    const tipInterval = setInterval(() => {
+      setCurrentTip((prev) => (prev + 1) % smartieTips.length);
+    }, 5000);
     
     const insightInterval = setInterval(() => {
       setCurrentInsight((prev) => (prev + 1) % smartInsights.length);
     }, 6000);
     
-    // Check if returning user (simulate with localStorage)
+    // Check if returning user
     const hasVisited = localStorage.getItem('smartspend-visited');
     setIsFirstVisit(!hasVisited);
     if (!hasVisited) {
@@ -52,10 +53,10 @@ export default function Home() {
     }
     
     return () => {
-      clearInterval(testimonialInterval);
+      clearInterval(tipInterval);
       clearInterval(insightInterval);
     };
-  }, [testimonials.length, smartInsights.length]);
+  }, [smartieTips.length, smartInsights.length]);
 
   useEffect(() => {
     // Enhanced background styles with dark mode support
@@ -570,6 +571,52 @@ export default function Home() {
             </motion.button>
           </motion.div>
 
+          {/* Static Smartie Welcome Message */}
+          <motion.div
+            className={`${darkMode ? 'bg-slate-800/70 border-slate-600' : 'bg-white/20 border-white/30'} backdrop-blur-sm rounded-3xl p-5 mb-8 border shadow-lg`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.6 }}
+          >
+            <div className="flex items-center gap-4">
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ 
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <ExactSmartieAvatar 
+                  mood="happy" 
+                  size="md" 
+                  animated={true}
+                  animationType="greeting"
+                />
+              </motion.div>
+              <div className="flex-1">
+                <div className={`${darkMode ? 'bg-slate-700/70' : 'bg-white/30'} rounded-2xl p-4 relative`}>
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={currentTip}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.5 }}
+                      className={`${darkMode ? 'text-slate-200' : 'text-gray-700'} text-sm leading-relaxed font-medium`}
+                    >
+                      {smartieTips[currentTip]}
+                    </motion.p>
+                  </AnimatePresence>
+                  <div className={`absolute -left-2 top-4 w-4 h-4 ${darkMode ? 'bg-slate-700/70' : 'bg-white/30'} transform rotate-45`}></div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
           {/* Enhanced Core Features Preview */}
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
@@ -585,8 +632,13 @@ export default function Home() {
               transition={{ delay: 0.7, duration: 0.5 }}
             >
               <motion.div 
-                className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
-                whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                className={`w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg ${darkMode ? 'shadow-blue-500/20' : 'shadow-blue-500/30'}`}
+                whileHover={{ 
+                  rotate: [0, -5, 5, 0], 
+                  scale: 1.1,
+                  y: -3,
+                  boxShadow: darkMode ? "0 20px 40px rgba(59, 130, 246, 0.4)" : "0 20px 40px rgba(59, 130, 246, 0.5)"
+                }}
                 transition={{ duration: 0.5 }}
               >
                 <TrendingUp className="w-8 h-8 text-white" />
@@ -605,8 +657,12 @@ export default function Home() {
               transition={{ delay: 0.8, duration: 0.5 }}
             >
               <motion.div 
-                className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
-                whileHover={{ scale: 1.1 }}
+                className={`w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg ${darkMode ? 'shadow-purple-500/20' : 'shadow-purple-500/30'}`}
+                whileHover={{ 
+                  scale: 1.1,
+                  y: -3,
+                  boxShadow: darkMode ? "0 20px 40px rgba(168, 85, 247, 0.4)" : "0 20px 40px rgba(168, 85, 247, 0.5)"
+                }}
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ 
                   rotate: { duration: 4, repeat: Infinity },
@@ -629,8 +685,13 @@ export default function Home() {
               transition={{ delay: 0.9, duration: 0.5 }}
             >
               <motion.div 
-                className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
-                whileHover={{ scale: 1.1, rotate: 360 }}
+                className={`w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg ${darkMode ? 'shadow-orange-500/20' : 'shadow-orange-500/30'}`}
+                whileHover={{ 
+                  scale: 1.1, 
+                  rotate: 360,
+                  y: -3,
+                  boxShadow: darkMode ? "0 20px 40px rgba(249, 115, 22, 0.4)" : "0 20px 40px rgba(249, 115, 22, 0.5)"
+                }}
                 transition={{ duration: 0.6 }}
               >
                 <Target className="w-8 h-8 text-white" />
@@ -725,134 +786,81 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Testimonials Carousel */}
-          <motion.div
-            className="text-center mb-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.6 }}
-          >
-            <motion.div
-              className={`${darkMode ? 'bg-slate-800/60' : 'bg-white/20'} backdrop-blur-sm rounded-2xl p-6 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg`}
-              animate={{ 
-                background: darkMode ? [
-                  "rgba(30, 41, 59, 0.6)",
-                  "rgba(51, 65, 85, 0.6)",
-                  "rgba(30, 41, 59, 0.6)"
-                ] : [
-                  "rgba(255, 255, 255, 0.2)",
-                  "rgba(255, 255, 255, 0.3)",
-                  "rgba(255, 255, 255, 0.2)"
-                ]
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentTestimonial}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <motion.p 
-                    className={`italic text-lg mb-3 ${darkMode ? 'text-slate-200' : 'text-white'}`}
-                    animate={{ 
-                      opacity: [1, 0.9, 1]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    "{testimonials[currentTestimonial].quote}"
-                  </motion.p>
-                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-white/70'} flex items-center justify-center gap-2`}>
-                    <span>{testimonials[currentTestimonial].flag}</span>
-                    <span>– {testimonials[currentTestimonial].author}</span>
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
 
-          {/* Progress Summary Widget */}
+
+          {/* Enhanced Progress Summary Widget */}
           <motion.div
-            className={`${darkMode ? 'bg-slate-800/70 border-slate-600' : 'bg-white/20 border-white/30'} backdrop-blur-sm rounded-2xl p-4 mb-6 border`}
+            className={`${darkMode ? 'bg-slate-800/80 border-slate-600' : 'bg-white/25 border-white/40'} backdrop-blur-sm rounded-3xl p-6 mb-8 border shadow-2xl`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.6 }}
+            whileHover={{ y: -2, shadow: "0 25px 50px rgba(0,0,0,0.15)" }}
           >
-            <h4 className={`font-bold text-sm mb-3 ${darkMode ? 'text-slate-200' : 'text-white'}`}>
-              💰 Your Progress Summary
+            <h4 className={`font-bold text-base mb-5 ${darkMode ? 'text-slate-200' : 'text-white'} text-center`}>
+              Your Progress Summary
             </h4>
-            <div className="grid grid-cols-3 gap-3 text-xs">
-              <div className="text-center">
-                <div className={`font-bold ${darkMode ? 'text-green-400' : 'text-green-300'}`}>£127</div>
-                <div className={`${darkMode ? 'text-slate-400' : 'text-white/70'}`}>Saved this month</div>
-              </div>
-              <div className="text-center">
-                <div className={`font-bold ${darkMode ? 'text-blue-400' : 'text-blue-300'}`}>83%</div>
-                <div className={`${darkMode ? 'text-slate-400' : 'text-white/70'}`}>Goal progress</div>
-              </div>
-              <div className="text-center">
-                <div className={`font-bold ${darkMode ? 'text-orange-400' : 'text-orange-300'}`}>4x</div>
-                <div className={`${darkMode ? 'text-slate-400' : 'text-white/70'}`}>Mood logs</div>
-              </div>
+            <div className="grid grid-cols-3 gap-4">
+              <motion.div 
+                className="text-center p-3 rounded-2xl bg-white/10 backdrop-blur-sm"
+                whileHover={{ scale: 1.05, y: -2 }}
+              >
+                <div className={`text-2xl font-black mb-1 ${darkMode ? 'text-green-400' : 'text-green-300'} flex items-center justify-center gap-1`}>
+                  🎯 £127
+                </div>
+                <div className={`text-xs ${darkMode ? 'text-slate-400' : 'text-white/70'}`}>saved</div>
+              </motion.div>
+              <motion.div 
+                className="text-center p-3 rounded-2xl bg-white/10 backdrop-blur-sm"
+                whileHover={{ scale: 1.05, y: -2 }}
+              >
+                <div className={`text-2xl font-black mb-1 ${darkMode ? 'text-orange-400' : 'text-orange-300'} flex items-center justify-center gap-1`}>
+                  🔥 {currentStreak}
+                </div>
+                <div className={`text-xs ${darkMode ? 'text-slate-400' : 'text-white/70'}`}>day streak</div>
+              </motion.div>
+              <motion.div 
+                className="text-center p-3 rounded-2xl bg-white/10 backdrop-blur-sm"
+                whileHover={{ scale: 1.05, y: -2 }}
+              >
+                <div className={`text-2xl font-black mb-1 ${darkMode ? 'text-blue-400' : 'text-blue-300'} flex items-center justify-center gap-1`}>
+                  🧠 4
+                </div>
+                <div className={`text-xs ${darkMode ? 'text-slate-400' : 'text-white/70'}`}>moods logged</div>
+              </motion.div>
             </div>
           </motion.div>
 
-          {/* Enhanced Trust Elements */}
+          {/* Authentic Footer */}
           <motion.div
-            className={`text-center text-sm space-y-2 mb-8 ${darkMode ? 'text-slate-400' : 'text-white/70'}`}
+            className={`text-center text-sm space-y-3 mb-8 ${darkMode ? 'text-slate-400' : 'text-white/70'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
+            transition={{ delay: 1.3, duration: 0.6 }}
           >
-            <div className="flex items-center justify-center gap-6 flex-wrap">
-              <motion.div 
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05, y: -1 }}
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ 
-                  scale: { duration: 0.2 },
-                  opacity: { duration: 2, repeat: Infinity }
-                }}
-              >
-                <Shield className="w-4 h-4" />
-                <span>Secure & Private</span>
-              </motion.div>
-              <motion.div 
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05, y: -1 }}
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ 
-                  scale: { duration: 0.2 },
-                  opacity: { duration: 2, repeat: Infinity, delay: 0.5 }
-                }}
-              >
-                <Users className="w-4 h-4" />
-                <span>3,500+ Users</span>
-              </motion.div>
-              <motion.div 
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05, y: -1 }}
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ 
-                  scale: { duration: 0.2 },
-                  opacity: { duration: 2, repeat: Infinity, delay: 1 }
-                }}
-              >
-                <Globe className="w-4 h-4" />
-                <span>17 Countries</span>
-              </motion.div>
-            </div>
             <motion.div 
-              className="text-xs opacity-80 text-center"
-              animate={{ 
-                color: darkMode ? ["#94a3b8", "#e2e8f0", "#94a3b8"] : ["rgba(255,255,255,0.7)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.7)"]
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
+              className={`${darkMode ? 'bg-slate-800/50' : 'bg-white/15'} backdrop-blur-sm rounded-2xl p-4 border ${darkMode ? 'border-slate-600/50' : 'border-white/20'}`}
+              whileHover={{ y: -2, scale: 1.02 }}
             >
-              <p className="mb-1">Built with ❤️ by an independent developer</p>
-              <p className="text-xs opacity-60">Early access: Help shape SmartSpend's future!</p>
+              <div className="flex items-center justify-center gap-3 mb-3">
+                <motion.div 
+                  className="flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Shield className="w-4 h-4" />
+                  <span>Secure & Private</span>
+                </motion.div>
+              </div>
+              <motion.div 
+                className="text-xs space-y-1"
+                animate={{ 
+                  color: darkMode ? ["#94a3b8", "#e2e8f0", "#94a3b8"] : ["rgba(255,255,255,0.7)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.7)"]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <p className="font-medium">Built with ❤️ by an independent developer</p>
+                <p className="opacity-70">You're early! This is a beta version of SmartSpend.</p>
+                <p className="opacity-70">Help shape its future with your feedback.</p>
+              </motion.div>
             </motion.div>
           </motion.div>
         </main>
