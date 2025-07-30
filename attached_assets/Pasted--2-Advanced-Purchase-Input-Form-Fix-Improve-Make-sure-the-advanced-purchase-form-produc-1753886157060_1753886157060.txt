@@ -1,0 +1,77 @@
+🛍️ 2. Advanced Purchase Input Form (Fix & Improve):
+	•	Make sure the advanced purchase form (product name, cost, desire level, emotional state, category) is clearly visible and accessible on the main screen or via an easy-to-locate “Smart Buy” tab.
+	•	Visually polish the input form layout (better spacing, label alignment, smooth transitions).
+	•	Fix any issues where the form doesn’t appear or is unresponsive.
+	•	The desire level slider should update a Smartie face in real-time with a smooth visual/emotional animation.
+
+⸻
+
+👤 3. User Accounts + Financial Profile Setup:
+	•	Add a Sign Up / Log In / Log Out flow (can use Supabase or Firebase).
+	•	When users sign up, ask them key financial info:
+	•	Monthly income
+	•	Rent & fixed costs
+	•	Current savings
+	•	Spending limits or goals
+	•	Save this to their account. Allow them to update this later from a “My Finances” page.
+	•	After logging in, they should see their dashboard with their name and financial summary.
+
+⸻
+
+🧠 4. Smartie’s AI Decision System (Contextual Advice):
+	•	Make Smartie’s analysis consider the user’s financial situation.
+	•	E.g., if the user has £500 savings and is about to buy a £150 luxury item, Smartie should say “Think Again” or “No” depending on emotional state and desire level.
+	•	Keep responses emotionally intelligent and personalised using the user’s saved profile data.
+	•	Smartie should still use emotional data + price + desire level + category, but now add financial status as context.
+
+⸻
+
+📊 5. My Purchases History Section:
+	•	Create a tab or page called “My Purchases”
+	•	Log every Smart Purchase request including:
+	•	Product name
+	•	Price
+	•	Desire level
+	•	Emotional state
+	•	Category
+	•	Smartie’s decision (Yes / Think Again / No)
+	•	Date
+	•	Let users delete or edit items. Let them sort/filter by date or decision type.
+
+⸻
+
+🌱 6. Savings Tree Polish (Gamified Visual):
+	•	Improve the “Savings Tree” by making it animate (grow leaves or get greener as user builds streaks or saves more).
+	•	Tie it to streak count or total saved.
+	•	Optional: Add small Smartie animations near the tree for encouragement (“Looking good!” / “Keep saving!”).
+
+⸻
+
+🧠 7. Smartie’s Corner Improvements:
+	•	Add a rotating set of motivational messages / budgeting facts.
+	•	Let the user tap Smartie to trigger a budgeting tip or encouragement.
+	•	Visually make Smartie look consistent across pages.
+
+⸻
+
+💬 8. Add Smart Alerts / Budget Warnings:
+	•	Smartie should notify the user if they are about to exceed their monthly budget based on cumulative expenses and profile data.
+	•	Show a small animated alert saying something like “⚠️ You’re close to your spending goal this month — think carefully!”
+
+⸻
+
+🎨 9. General Visual Improvements (10/10 Polish):
+	•	Unify fonts, spacing, colors, and alignment across pages.
+	•	Add smooth transitions when switching tabs or submitting purchases.
+	•	Improve layout consistency of the dashboard, decision screen, and purchase log.
+	•	Fix Smartie’s size, border smoothness, and visual consistency on all devices.
+	•	Ensure everything is responsive and mobile-friendly.
+
+⸻
+
+✅ 10. Final Deploy-Ready Polish:
+	•	Test all features and ensure stability
+	•	Eliminate console errors
+	•	Make sure onboarding works (sign up → financial profile → dashboard → Smart Purchase flow → My Purchases)
+
+Let me know when everything’s complete. If anything is unclear, feel free to ask. Thanks so much — aiming for a polished, 10/10 product!
