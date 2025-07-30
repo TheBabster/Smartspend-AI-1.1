@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Plus, Target, MessageCircle, Settings, Sun, Moon, Sparkles, TrendingUp, PiggyBank, Zap, Heart } from "lucide-react";
 
 import CategoryCardEnhanced from "@/components/CategoryCardEnhanced";
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
@@ -35,6 +37,9 @@ export default function Dashboard() {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showSmartieChat, setShowSmartieChat] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
+  const [showScoreModal, setShowScoreModal] = useState(false);
   const [, navigate] = useLocation();
 
   const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
@@ -177,47 +182,356 @@ export default function Dashboard() {
         </div>
       </motion.div>
 
-      {/* Main Content */}
+      {/* Main Content with Background Effects */}
       <main className="px-6 -mt-6 relative z-20">
-        {/* PRIORITY: Main Functions Section - Moved to TOP per user request */}
+        {/* Background Floating Sparkles for High Scores */}
+        {calculateFinancialScore() >= 80 && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-yellow-400/60 text-lg"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                animate={{
+                  y: [0, -30, 0],
+                  opacity: [0, 0.8, 0],
+                  scale: [0, 1.2, 0],
+                  rotate: [0, 360]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.5,
+                  repeatDelay: Math.random() * 3 + 2
+                }}
+              >
+                ✨
+              </motion.div>
+            ))}
+          </div>
+        )}
+        {/* Enhanced Quick Actions - No More Placeholders! */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mb-8"
         >
-          <PriorityQuickActions
-            onPurchaseDecision={() => setShowPurchaseModal(true)}
-            onAddExpense={() => setShowExpenseModal(true)}
-            onViewGoals={() => navigate('/goals')}
-            onViewAnalytics={() => navigate('/analytics')}
-            onChatWithSmartie={() => setShowSmartieChat(true)}
-            userSpendingData={{
-              totalSpent,
-              budgetUsed: budgetPercentage,
-              streak: budgetStreak?.currentStreak || 0
-            }}
-          />
+          <Card className={`shadow-xl border-0 ${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm`}>
+            <CardContent className="p-6">
+              <motion.h3 
+                className={`text-lg font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                Quick Actions
+              </motion.h3>
+              <div className="grid grid-cols-2 gap-4">
+                {/* Log Expense */}
+                <motion.button
+                  onClick={() => setShowExpenseModal(true)}
+                  className={`p-4 rounded-xl text-left transition-all duration-300 ${darkMode ? 'bg-gradient-to-br from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600' : 'bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500'} text-white shadow-lg hover:shadow-xl transform hover:scale-105`}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    >
+                      <Plus size={24} />
+                    </motion.div>
+                    <div>
+                      <h4 className="font-semibold">Log Expense</h4>
+                      <p className="text-sm opacity-90">Track spending</p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                {/* Smart Purchase Decision */}
+                <motion.button
+                  onClick={() => setShowPurchaseModal(true)}
+                  className={`p-4 rounded-xl text-left transition-all duration-300 ${darkMode ? 'bg-gradient-to-br from-purple-600 to-indigo-700 hover:from-purple-500 hover:to-indigo-600' : 'bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500'} text-white shadow-lg hover:shadow-xl transform hover:scale-105`}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                    >
+                      <Zap size={24} />
+                    </motion.div>
+                    <div>
+                      <h4 className="font-semibold">Smart Decision</h4>
+                      <p className="text-sm opacity-90">AI purchase help</p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                {/* Set Goal */}
+                <motion.button
+                  onClick={() => navigate('/goals')}
+                  className={`p-4 rounded-xl text-left transition-all duration-300 ${darkMode ? 'bg-gradient-to-br from-orange-600 to-red-700 hover:from-orange-500 hover:to-red-600' : 'bg-gradient-to-br from-orange-500 to-red-600 hover:from-orange-400 hover:to-red-500'} text-white shadow-lg hover:shadow-xl transform hover:scale-105`}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      animate={{ rotate: [0, 360] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Target size={24} />
+                    </motion.div>
+                    <div>
+                      <h4 className="font-semibold">Set Goal</h4>
+                      <p className="text-sm opacity-90">Plan savings</p>
+                    </div>
+                  </div>
+                </motion.button>
+
+                {/* Ask Smartie */}
+                <motion.button
+                  onClick={() => setShowSmartieChat(true)}
+                  className={`p-4 rounded-xl text-left transition-all duration-300 ${darkMode ? 'bg-gradient-to-br from-pink-600 to-rose-700 hover:from-pink-500 hover:to-rose-600' : 'bg-gradient-to-br from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500'} text-white shadow-lg hover:shadow-xl transform hover:scale-105`}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      animate={{ y: [0, -3, 0] }}
+                      transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }}
+                    >
+                      <MessageCircle size={24} />
+                    </motion.div>
+                    <div>
+                      <h4 className="font-semibold">Ask Smartie</h4>
+                      <p className="text-sm opacity-90">AI coach chat</p>
+                    </div>
+                  </div>
+                </motion.button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
 
-        {/* Enhanced Financial Wellness Score with Smartie */}
+        {/* Enhanced Financial Wellness Score - Clickable for Details */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mb-6"
         >
-          <FinancialWellnessScoreVisual
-            score={75}
-            previousScore={65}
-            breakdown={{
-              budgetAdherence: Math.round(budgetPercentage),
-              savingsProgress: 68,
-              spendingWisdom: 82,
-              streakConsistency: budgetStreak?.currentStreak ? Math.min(budgetStreak.currentStreak * 5, 100) : 45
-            }}
-          />
+          <motion.div
+            onClick={() => setShowScoreModal(true)}
+            className="cursor-pointer"
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Card className={`shadow-lg border-0 ${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm hover:shadow-xl transition-all duration-300`}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                    >
+                      <ModernSmartieAvatar mood="happy" size="lg" />
+                    </motion.div>
+                    <div>
+                      <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                        Financial Wellness Score
+                      </h3>
+                      <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Click to see breakdown
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <motion.div 
+                      className={`text-3xl font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      {calculateFinancialScore()}
+                    </motion.div>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {calculateFinancialScore() >= 80 ? "Excellent!" : 
+                       calculateFinancialScore() >= 60 ? "Good work!" : "Keep improving!"}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Sparkle effects for high scores */}
+                {calculateFinancialScore() >= 80 && (
+                  <motion.div
+                    className="absolute top-4 right-4 text-yellow-400 text-lg"
+                    animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
+                  >
+                    ✨
+                  </motion.div>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         </motion.div>
+
+        {/* Score Breakdown Modal */}
+        {showScoreModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowScoreModal(false)}
+          >
+            <motion.div
+              className={`max-w-md w-full rounded-2xl p-6 ${darkMode ? 'bg-slate-800' : 'bg-white'} shadow-2xl`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                Your Financial Wellness Breakdown
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Budget Control</span>
+                  <span className={`font-semibold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                    {Math.round(budgetPercentage)}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Streak Consistency</span>
+                  <span className={`font-semibold ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                    {Math.min((budgetStreak?.currentStreak || 0) * 10, 100)}%
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Achievement Progress</span>
+                  <span className={`font-semibold ${darkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+                    {Math.min(achievements.length * 15, 100)}%
+                  </span>
+                </div>
+              </div>
+              <Button 
+                onClick={() => setShowScoreModal(false)}
+                className="w-full mt-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              >
+                Got it!
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Enhanced Mood Tracker - Prominently Placed */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mb-6"
+        >
+          <Card className={`shadow-lg border-0 ${darkMode ? 'bg-gradient-to-r from-indigo-800/90 to-purple-800/90' : 'bg-gradient-to-r from-indigo-100 to-purple-100'} backdrop-blur-sm`}>
+            <CardContent className="p-6">
+              <h3 className={`text-lg font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                How are you feeling today?
+              </h3>
+              <div className="flex justify-between items-center">
+                {['😢', '😐', '😊', '😄', '🤩'].map((emoji, index) => (
+                  <motion.button
+                    key={index}
+                    className={`w-12 h-12 rounded-full text-2xl transition-all duration-300 ${darkMode ? 'hover:bg-white/20' : 'hover:bg-white/50'} flex items-center justify-center`}
+                    whileHover={{ scale: 1.2, y: -5 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {emoji}
+                  </motion.button>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center gap-3">
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <ModernSmartieAvatar mood="happy" size="sm" />
+                </motion.div>
+                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Tracking your mood helps Smartie give better advice!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Daily Smart Tip with Animation */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mb-6"
+        >
+          <Card className={`shadow-lg border-0 ${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm overflow-hidden relative`}>
+            <motion.div
+              className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-orange-500"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            />
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <motion.div
+                  animate={{ x: [0, 10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                  className="mt-1"
+                >
+                  <ModernSmartieAvatar mood="thinking" size="sm" />
+                </motion.div>
+                <div className="flex-1">
+                  <h3 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                    💡 Daily Smart Tip
+                  </h3>
+                  <motion.p 
+                    className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    Try the "24-hour rule" - wait a full day before making any purchase over £50. 
+                    You'll be surprised how many impulse buys you avoid!
+                  </motion.p>
+                  <motion.div 
+                    className="mt-3 flex gap-2"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    <motion.button
+                      className={`px-3 py-1 rounded-full text-xs ${darkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-100 hover:bg-green-200 text-green-800'} transition-colors`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      👍 Helpful
+                    </motion.button>
+                    <motion.button
+                      className={`px-3 py-1 rounded-full text-xs ${darkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-100 hover:bg-blue-200 text-blue-800'} transition-colors`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      📚 Save Tip
+                    </motion.button>
+                  </motion.div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Smartie Introduction */}
         {recentAchievement && (
           <motion.div
@@ -319,32 +633,67 @@ export default function Dashboard() {
           />
         </motion.div>
 
-        {/* Stats Cards */}
+        {/* Enhanced Stats Cards with Feedback Button */}
         <motion.div 
           className="grid grid-cols-2 gap-4 mb-6"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.0 }}
         >
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">🎯</div>
-              <div className="text-lg font-semibold text-high-contrast">
-                {budgetStreak?.currentStreak || 0}
-              </div>
-              <div className="text-sm text-medium-contrast">Day Streak</div>
-            </CardContent>
-          </Card>
+          <motion.div whileHover={{ scale: 1.02, y: -2 }}>
+            <Card className={`shadow-lg border-0 ${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm`}>
+              <CardContent className="p-4 text-center">
+                <motion.div 
+                  className="text-2xl mb-2"
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  🎯
+                </motion.div>
+                <div className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  {budgetStreak?.currentStreak || 0}
+                </div>
+                <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Day Streak</div>
+              </CardContent>
+            </Card>
+          </motion.div>
           
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl mb-2">💰</div>
-              <div className="text-lg font-semibold text-high-contrast">
-                £{(totalBudget - totalSpent).toFixed(0)}
-              </div>
-              <div className="text-sm text-medium-contrast">Saved</div>
-            </CardContent>
-          </Card>
+          <motion.div whileHover={{ scale: 1.02, y: -2 }}>
+            <Card className={`shadow-lg border-0 ${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm`}>
+              <CardContent className="p-4 text-center">
+                <motion.div 
+                  className="text-2xl mb-2"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  💰
+                </motion.div>
+                <div className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  £{(totalBudget - totalSpent).toFixed(0)}
+                </div>
+                <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Saved</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+
+        {/* App Store Polish: Feedback Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.2 }}
+          className="mb-6 text-center"
+        >
+          <motion.button
+            className={`px-6 py-3 rounded-2xl text-sm font-medium transition-all duration-300 ${darkMode ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500' : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'} text-white shadow-lg hover:shadow-xl`}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <div className="flex items-center gap-2">
+              <Heart size={16} />
+              <span>Suggest a Feature</span>
+            </div>
+          </motion.button>
         </motion.div>
       </main>
 
@@ -357,16 +706,9 @@ export default function Dashboard() {
         open={showExpenseModal} 
         onOpenChange={setShowExpenseModal} 
       />
-      <SmartieIntelligentChat
-        isOpen={showSmartieChat}
-        onClose={() => setShowSmartieChat(false)}
-        userSpendingData={{
-          totalSpent,
-          budgetUsed: budgetPercentage,
-          streak: budgetStreak?.currentStreak || 0,
-          recentCategory: "general"
-        }}
-      />
+      {showSmartieChat && (
+        <SmartieIntelligentChat onClose={() => setShowSmartieChat(false)} />
+      )}
 
       {/* Enhanced Smartie Personality */}
       <EnhancedSmartiePersonality
