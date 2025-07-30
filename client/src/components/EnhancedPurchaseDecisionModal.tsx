@@ -6,13 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Card } from "@/components/ui/card";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import SmartieAnimated from "./SmartieAnimated";
-import SmartieDecisionCard from "./SmartieDecisionCard";
-import AnimatedButton from "./AnimatedButton";
-import { Brain, ShoppingCart, Clock, DollarSign, Target, Lightbulb } from "lucide-react";
+import ModernSmartieAvatar from "./ModernSmartieAvatar";
+import { Brain, ShoppingCart, Clock, DollarSign, Target, Lightbulb, ChevronDown, ChevronUp, BarChart3, Award, Eye, MessageSquare, Sparkles, TrendingDown, TrendingUp, AlertTriangle } from "lucide-react";
+import { type Budget } from "@shared/schema";
 
 interface EnhancedPurchaseDecisionModalProps {
   open: boolean;
@@ -26,6 +26,17 @@ interface DecisionResponse {
   emotional_insight: string;
   financial_impact: string;
   alternatives?: string[];
+  budget_impact: {
+    category_percentage: number;
+    total_budget_impact: number;
+    remaining_budget: number;
+  };
+  simulated_effects: {
+    wellness_score_change: number;
+    streak_risk: boolean;
+    goal_impact: string;
+  };
+  badge_eligible?: string;
 }
 
 export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: EnhancedPurchaseDecisionModalProps) {
@@ -37,9 +48,17 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
   const [reasoning, setReasoning] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [decision, setDecision] = useState<DecisionResponse | null>(null);
+  const [showReasoningDetails, setShowReasoningDetails] = useState(false);
+  const [showSimulation, setShowSimulation] = useState(false);
+  const [followedDecision, setFollowedDecision] = useState<boolean | null>(null);
+  const [showReflectionPrompt, setShowReflectionPrompt] = useState(false);
+  const [reflectionReason, setReflectionReason] = useState("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Fetch current budgets for impact simulation
+  const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
 
   const createDecisionMutation = useMutation({
     mutationFn: async (decisionData: any) => {
@@ -105,7 +124,10 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
         reasoning: getReasoningText(recommendation, amountNum, desire, urgencyLevel),
         emotional_insight: getEmotionalInsight(recommendation, desire),
         financial_impact: getFinancialImpact(recommendation, amountNum),
-        alternatives: recommendation !== 'yes' ? getAlternatives(itemName, category) : undefined
+        alternatives: recommendation !== 'yes' ? getAlternatives(itemName, category) : undefined,
+        budget_impact: getBudgetImpact(amountNum, category),
+        simulated_effects: getSimulatedEffects(recommendation, amountNum),
+        badge_eligible: getBadgeEligibility(recommendation, desire, urgencyLevel)
       };
 
       setDecision(mockDecision);
@@ -146,15 +168,74 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
     return `Skipping this £${amount} purchase means you can put that money toward your emergency fund or debt reduction!`;
   };
 
-  const getAlternatives = (item: string, cat: string) => {
-    const alternatives = {
-      'Food & Dining': ['Cook a special meal at home', 'Try a new recipe instead', 'Have a picnic'],
-      'Shopping': ['Check if you already own something similar', 'Browse free alternatives online', 'Wait for a sale'],
-      'Entertainment': ['Find free events in your area', 'Try a free trial instead', 'Enjoy nature or exercise'],
-      'Transport': ['Walk or cycle if possible', 'Use public transport', 'Combine errands into one trip'],
-      'Other': ['Find a DIY solution', 'Borrow from a friend', 'Look for free alternatives']
+  const getBudgetImpact = (amount: number, cat: string) => {
+    const categoryBudget = budgets.find(b => b.category === cat);
+    const categorySpent = parseFloat(categoryBudget?.spent || "0");
+    const categoryLimit = parseFloat(categoryBudget?.monthlyLimit || "500");
+    
+    return {
+      category_percentage: ((categorySpent + amount) / categoryLimit) * 100,
+      total_budget_impact: (amount / 2000) * 100, // Assuming £2000 total budget
+      remaining_budget: categoryLimit - categorySpent - amount
     };
-    return alternatives[cat as keyof typeof alternatives] || alternatives['Other'];
+  };
+
+  const getSimulatedEffects = (rec: string, amount: number) => {
+    return {
+      wellness_score_change: rec === 'yes' ? 2 : rec === 'think_again' ? -1 : -5,
+      streak_risk: rec === 'no' && amount > 100,
+      goal_impact: rec === 'yes' ? "minimal impact" : rec === 'think_again' ? "moderate delay" : "significant setback"
+    };
+  };
+
+  const getBadgeEligibility = (rec: string, desire: number, urgency: number) => {
+    if (rec === 'think_again' && desire > 7) return "Impulse Control Master";
+    if (rec === 'yes' && urgency > 8) return "Strategic Spender";
+    if (rec === 'no' && desire > 8) return "Budget Guardian";
+    return undefined;
+  };
+
+  const getAlternatives = (item: string, cat: string) => {
+    const categoryAlternatives = {
+      'Food & Dining': [
+        'Cook a special meal at home for half the cost',
+        'Try a new recipe with ingredients you have',
+        'Organize a potluck with friends',
+        'Look for restaurant deals and coupons'
+      ],
+      'Shopping': [
+        'Check if you already own something similar',
+        'Browse second-hand marketplaces first',
+        'Set a price alert for sales notifications',
+        'Compare prices across 3+ retailers'
+      ],
+      'Entertainment': [
+        'Find free events and activities nearby',
+        'Host a game or movie night at home',
+        'Try a new hobby using free resources',
+        'Visit free museums or galleries'
+      ],
+      'Transport': [
+        'Walk or cycle for better health',
+        'Use public transport with a day pass',
+        'Combine multiple errands into one trip',
+        'Consider carpooling with friends'
+      ],
+      'Utilities': [
+        'Review and switch to cheaper providers',
+        'Reduce usage with energy-saving habits',
+        'Look into government energy assistance',
+        'Negotiate a better rate with current provider'
+      ],
+      'Other': [
+        'Search for quality second-hand options',
+        'Ask friends if they have one to borrow',
+        'Check library or community resources',
+        'Wait for seasonal sales and discounts'
+      ]
+    };
+    
+    return categoryAlternatives[cat as keyof typeof categoryAlternatives] || categoryAlternatives['Other'];
   };
 
   const handleSubmit = () => {
@@ -231,10 +312,9 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
           {/* Smartie Assistant */}
           <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700">
             <div className="flex items-start gap-4">
-              <SmartieAnimated 
-                {...getSmartieProps()}
-                size="md"
-                isIdle={!isAnalyzing}
+              <ModernSmartieAvatar 
+                mood={isAnalyzing ? 'thinking' : decision ? (decision.recommendation === 'yes' ? 'celebrating' : decision.recommendation === 'think_again' ? 'thinking' : 'concerned') : 'happy'}
+                size="lg"
               />
               <div className="flex-1">
                 <AnimatePresence mode="wait">
@@ -387,44 +467,178 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
             </div>
           </div>
 
-          {/* Enhanced Decision Results with Smartie Decision Card */}
+          {/* Enhanced Decision Results */}
           <AnimatePresence>
             {decision && (
-              <SmartieDecisionCard
-                recommendation={decision.recommendation}
-                score={decision.confidence}
-                reasoning={decision.reasoning}
-                emotionalInsight={decision.emotional_insight}
-                financialImpact={decision.financial_impact}
-                confidenceLevel={decision.confidence}
-                savingsImpact={decision.recommendation === 'no' ? parseFloat(amount) : decision.recommendation === 'yes' ? -parseFloat(amount) * 0.1 : 0}
-                streakImpact={decision.recommendation === 'yes' ? 1 : decision.recommendation === 'no' ? 1 : 0}
-              />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-4"
+              >
+                {/* AI Reasoning Transparency */}
+                <Card className="p-4 border-l-4 border-blue-500">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-blue-700 dark:text-blue-300">
+                      Why this recommendation?
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowReasoningDetails(!showReasoningDetails)}
+                      className="h-8 px-2"
+                    >
+                      {showReasoningDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </Button>
+                  </div>
+                  
+                  <AnimatePresence>
+                    {showReasoningDetails && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="space-y-2 text-sm text-gray-600 dark:text-gray-400"
+                      >
+                        <p>• Your desire level: {desireLevel[0]}/10 - {desireLevel[0] > 7 ? "High impulse risk" : "Reasonable want"}</p>
+                        <p>• Urgency: {urgency[0]}/10 - {urgency[0] > 6 ? "Time-sensitive" : "Can wait"}</p>
+                        <p>• Budget impact: {decision.budget_impact.category_percentage.toFixed(1)}% of {category} budget</p>
+                        <p>• Remaining after purchase: £{decision.budget_impact.remaining_budget.toFixed(2)}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Card>
+
+                {/* Simulate Purchase Impact */}
+                <Card className="p-4 border-l-4 border-orange-500">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-semibold text-orange-700 dark:text-orange-300 flex items-center gap-2">
+                      <Eye size={16} />
+                      Preview Impact
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowSimulation(!showSimulation)}
+                      className="h-8 px-2"
+                    >
+                      {showSimulation ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </Button>
+                  </div>
+                  
+                  <AnimatePresence>
+                    {showSimulation && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="space-y-3"
+                      >
+                        <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                          <span className="text-sm">Financial Wellness Score</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">75</span>
+                            <motion.span
+                              className={`text-sm ${decision.simulated_effects.wellness_score_change > 0 ? 'text-green-500' : 'text-red-500'}`}
+                              animate={{ scale: [1, 1.2, 1] }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              {decision.simulated_effects.wellness_score_change > 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                              {decision.simulated_effects.wellness_score_change > 0 ? '+' : ''}{decision.simulated_effects.wellness_score_change}
+                            </motion.span>
+                          </div>
+                        </div>
+                        
+                        {decision.simulated_effects.streak_risk && (
+                          <div className="flex items-center gap-2 p-2 bg-red-50 dark:bg-red-900/20 rounded">
+                            <AlertTriangle size={16} className="text-red-500" />
+                            <span className="text-sm text-red-700 dark:text-red-300">This could break your budget streak!</span>
+                          </div>
+                        )}
+                        
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Goal impact: {decision.simulated_effects.goal_impact}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Card>
+
+                {/* Badge Eligibility */}
+                {decision.badge_eligible && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="text-center p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700"
+                  >
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Award size={20} className="text-yellow-600" />
+                      <span className="font-semibold text-yellow-800 dark:text-yellow-200">Badge Eligible!</span>
+                    </div>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">{decision.badge_eligible}</p>
+                  </motion.div>
+                )}
+              </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Smart Alternatives */}
+          {/* Better Alternatives & Smart Suggestions */}
           <AnimatePresence>
             {decision?.alternatives && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="mt-4"
+                className="space-y-4"
               >
+                {/* Better Alternative Suggestions */}
+                {decision.recommendation === 'think_again' && (
+                  <Card className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-700">
+                    <div className="flex items-start gap-3">
+                      <Sparkles className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">Better Approach</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 p-2 bg-yellow-100 dark:bg-yellow-800/30 rounded-lg">
+                            <Clock size={16} className="text-yellow-600" />
+                            <span className="text-sm text-yellow-800 dark:text-yellow-200">
+                              Wait 10 days and revisit this item
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 bg-yellow-100 dark:bg-yellow-800/30 rounded-lg">
+                            <BarChart3 size={16} className="text-yellow-600" />
+                            <span className="text-sm text-yellow-800 dark:text-yellow-200">
+                              Set a price alert for better deals
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                )}
+
+                {/* Smart Alternatives */}
                 <Card className="p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700">
                   <div className="flex items-start gap-3">
                     <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">Smart Alternatives</h4>
-                      <ul className="text-sm text-purple-700 dark:text-purple-300 space-y-1">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">
+                        {decision.recommendation === 'think_again' ? 'Consider These Instead' : 'Smart Alternatives'}
+                      </h4>
+                      <div className="space-y-2">
                         {decision.alternatives.map((alt, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="flex items-center gap-2 p-2 bg-purple-100 dark:bg-purple-800/30 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-700/40 transition-colors cursor-pointer"
+                          >
                             <span className="w-1.5 h-1.5 bg-purple-400 rounded-full"></span>
-                            {alt}
-                          </li>
+                            <span className="text-sm text-purple-700 dark:text-purple-300">{alt}</span>
+                          </motion.div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   </div>
                 </Card>
@@ -435,12 +649,10 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
           {/* Enhanced Action Buttons */}
           <div className="flex gap-3 pt-4">
             {!decision ? (
-              <AnimatedButton 
+              <Button 
                 onClick={analyzeDecision} 
                 disabled={isAnalyzing || !itemName || !amount || !category}
-                className="flex-1 gradient-bg text-white"
-                glowOnHover
-                shimmer
+                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
               >
                 {isAnalyzing ? (
                   <>
@@ -453,24 +665,115 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
                     Get Smartie's Advice
                   </>
                 )}
-              </AnimatedButton>
+              </Button>
             ) : (
               <>
-                <AnimatedButton variant="outline" onClick={() => setDecision(null)} className="flex-1">
+                <Button variant="outline" onClick={() => setDecision(null)} className="flex-1">
                   Ask Again
-                </AnimatedButton>
-                <AnimatedButton 
-                  onClick={handleSubmit} 
-                  className="flex-1 gradient-bg text-white"
-                  glowOnHover
+                </Button>
+                <Button 
+                  onClick={() => setShowReflectionPrompt(true)} 
+                  className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
                 >
-                  Save Decision
-                </AnimatedButton>
+                  I Followed This
+                </Button>
               </>
             )}
           </div>
+
+          {/* Post-Decision Reflection Prompt */}
+          <AnimatePresence>
+            {showReflectionPrompt && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                onClick={() => setShowReflectionPrompt(false)}
+              >
+                <motion.div
+                  className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md mx-4"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                >
+                  <div className="text-center mb-4">
+                    <ModernSmartieAvatar mood="happy" size="md" />
+                    <h3 className="font-semibold text-lg mt-2">What made you follow this advice?</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {[
+                      { emoji: "😇", text: "I want to save", reason: "saving_focused" },
+                      { emoji: "😬", text: "Budget is tight", reason: "budget_constraint" },
+                      { emoji: "🤷", text: "I'll wait for better deal", reason: "timing_strategy" },
+                      { emoji: "🧠", text: "Smartie convinced me", reason: "ai_guidance" }
+                    ].map((option) => (
+                      <motion.button
+                        key={option.reason}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          setReflectionReason(option.reason);
+                          handleReflectionSubmit(option.reason);
+                        }}
+                        className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                      >
+                        <div className="text-lg mb-1">{option.emoji}</div>
+                        <div>{option.text}</div>
+                      </motion.button>
+                    ))}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setShowReflectionPrompt(false)} className="flex-1">
+                      Skip
+                    </Button>
+                    <Button 
+                      onClick={() => handleReflectionSubmit("other")}
+                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                    >
+                      <MessageSquare size={16} className="mr-2" />
+                      Tell More
+                    </Button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </DialogContent>
     </Dialog>
   );
+
+  const handleReflectionSubmit = async (reason: string) => {
+    try {
+      await createDecisionMutation.mutateAsync({
+        itemName,
+        amount: parseFloat(amount),
+        category,
+        desireLevel: desireLevel[0],
+        urgency: urgency[0],
+        reasoning,
+        recommendation: decision?.recommendation,
+        followed: true,
+        reflection_reason: reason,
+        createdAt: new Date().toISOString()
+      });
+      
+      setShowReflectionPrompt(false);
+      onOpenChange(false);
+      
+      toast({
+        title: "Decision recorded!",
+        description: "Your purchase decision and reflection have been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save decision. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 }
