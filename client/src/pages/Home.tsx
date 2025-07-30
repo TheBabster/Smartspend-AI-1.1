@@ -18,6 +18,8 @@ export default function Home() {
   const [currentStreak, setCurrentStreak] = useState(5);
   const [savingsLevel, setSavingsLevel] = useState(2);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [currentInsight, setCurrentInsight] = useState(0);
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
   
   const testimonials = [
     { quote: "SmartSpend helped me save £300 in 2 months!", author: "Alex, UK", flag: "🇬🇧" },
@@ -25,13 +27,35 @@ export default function Home() {
     { quote: "The AI insights are incredibly accurate!", author: "Marcus, Germany", flag: "🇩🇪" }
   ];
 
-  // Rotate testimonials every 4 seconds
+  const smartInsights = [
+    "Track your emotional spending triggers! Users who log their mood before purchases save 23% more on average.",
+    "Small wins matter! Setting micro-goals helps build lasting financial habits that compound over time.",
+    "The 24-hour rule: Wait a day before non-essential purchases to reduce impulse buying by 40%.",
+    "Your spending patterns reveal your values. Use Smartie to align your purchases with your goals."
+  ];
+
+  // Rotate testimonials and insights
   useEffect(() => {
-    const interval = setInterval(() => {
+    const testimonialInterval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 4000);
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
+    
+    const insightInterval = setInterval(() => {
+      setCurrentInsight((prev) => (prev + 1) % smartInsights.length);
+    }, 6000);
+    
+    // Check if returning user (simulate with localStorage)
+    const hasVisited = localStorage.getItem('smartspend-visited');
+    setIsFirstVisit(!hasVisited);
+    if (!hasVisited) {
+      localStorage.setItem('smartspend-visited', 'true');
+    }
+    
+    return () => {
+      clearInterval(testimonialInterval);
+      clearInterval(insightInterval);
+    };
+  }, [testimonials.length, smartInsights.length]);
 
   useEffect(() => {
     // Enhanced background styles with dark mode support
@@ -216,11 +240,28 @@ export default function Home() {
           >
             <div className="flex items-center gap-2 text-sm font-bold">
               <motion.span 
-                className="text-orange-500 text-lg"
+                className="text-orange-500 text-lg relative"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1, repeat: Infinity }}
               >
                 🔥
+                {/* Fireworks on high streaks */}
+                {currentStreak >= 5 && (
+                  <motion.span
+                    className="absolute -top-2 -right-2 text-xs"
+                    animate={{ 
+                      scale: [0, 1.5, 0],
+                      opacity: [0, 1, 0]
+                    }}
+                    transition={{ 
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: 0.5
+                    }}
+                  >
+                    🎆
+                  </motion.span>
+                )}
               </motion.span>
               <span className={darkMode ? 'text-white' : 'text-gray-800'}>Streak: {currentStreak} days</span>
             </div>
@@ -240,14 +281,29 @@ export default function Home() {
           >
             <div className="flex items-center gap-2 text-sm font-bold">
               <motion.span 
-                className="text-green-500 text-lg"
+                className="text-green-500 text-lg relative"
                 animate={{ 
                   rotate: [0, 5, -5, 0],
                   scale: [1, 1.1, 1]
                 }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
-                🌱
+                🌳
+                {/* Growing leaves animation */}
+                <motion.span
+                  className="absolute -top-1 -right-1 text-xs"
+                  animate={{ 
+                    scale: [0, 1, 0],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: 1
+                  }}
+                >
+                  🍃
+                </motion.span>
               </motion.span>
               <span className={darkMode ? 'text-white' : 'text-gray-800'}>Savings Tree Level {savingsLevel}</span>
             </div>
@@ -303,7 +359,7 @@ export default function Home() {
             transition={{ delay: 0.5, duration: 0.6 }}
           >
             <h2 className={`text-4xl font-black mb-3 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
-              Welcome back! You're on day {currentStreak} of your streak 🔥
+              {isFirstVisit ? 'Welcome to SmartSpend!' : `Welcome back! You're on day ${currentStreak} of your streak 🔥`}
             </h2>
             <p className={`text-lg ${darkMode ? 'opacity-90' : 'opacity-95'} font-semibold mb-3 ${darkMode ? 'text-indigo-200' : 'text-purple-100'}`}>
               Track your emotions. Build habits. Spend smarter.
@@ -352,9 +408,20 @@ export default function Home() {
                 whileTap={{ scale: 0.95 }}
                 className="cursor-pointer relative"
                 onClick={() => {
-                  setSmartieMessage("Hey! Need help? Click the chat button to talk to me anytime! 💬");
+                  const messages = [
+                    "Hey! Need help? Click the chat button to talk to me anytime! 💬",
+                    "Awesome streak! You're building great financial habits! 🔥",
+                    "I'm here to help you make smarter spending decisions! 🧠",
+                    "Your savings progress is looking fantastic! Keep it up! 🌳"
+                  ];
+                  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                  setSmartieMessage(randomMessage);
                   setIsTyping(true);
-                  setTimeout(() => setIsTyping(false), 1000);
+                  setShowConfetti(true);
+                  setTimeout(() => {
+                    setIsTyping(false);
+                    setShowConfetti(false);
+                  }, 1500);
                 }}
               >
                 {/* Smartie interaction sparkles */}
@@ -468,15 +535,22 @@ export default function Home() {
                 Today's Smart Insight
               </motion.h3>
             </div>
-            <motion.p 
-              className={`leading-relaxed font-medium mb-4 ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}
-              animate={{ 
-                color: darkMode ? ["#cbd5e1", "#a78bfa", "#cbd5e1"] : ["#374151", "#6366f1", "#374151"] 
-              }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
-              "Track your emotional spending triggers! Users who log their mood before purchases save 23% more on average."
-            </motion.p>
+            <AnimatePresence mode="wait">
+              <motion.p 
+                key={currentInsight}
+                className={`leading-relaxed font-medium mb-4 ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  color: darkMode ? ["#cbd5e1", "#a78bfa", "#cbd5e1"] : ["#374151", "#6366f1", "#374151"] 
+                }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, color: { duration: 4, repeat: Infinity, ease: "easeInOut" } }}
+              >
+                "{smartInsights[currentInsight]}"
+              </motion.p>
+            </AnimatePresence>
             <motion.button
               className={`text-sm font-bold px-6 py-3 rounded-xl transition-all duration-300 ${darkMode ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg'}`}
               whileHover={{ scale: 1.05, y: -1 }}
@@ -770,18 +844,51 @@ export default function Home() {
                 <span>17 Countries</span>
               </motion.div>
             </div>
-            <motion.p 
-              className="text-xs opacity-80"
+            <motion.div 
+              className="text-xs opacity-80 text-center"
               animate={{ 
                 color: darkMode ? ["#94a3b8", "#e2e8f0", "#94a3b8"] : ["rgba(255,255,255,0.7)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.7)"]
               }}
               transition={{ duration: 3, repeat: Infinity }}
             >
-              Trusted by users worldwide • Backed by advanced AI
-            </motion.p>
+              <p className="mb-1">Built with ❤️ by an independent developer</p>
+              <p className="text-xs opacity-60">Early access: Help shape SmartSpend's future!</p>
+            </motion.div>
           </motion.div>
         </main>
       </div>
+
+      {/* Confetti Effect */}
+      {showConfetti && (
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`
+              }}
+              animate={{
+                y: [-20, window.innerHeight + 50],
+                x: [0, (Math.random() - 0.5) * 200],
+                rotate: [0, 360],
+                scale: [1, 0]
+              }}
+              transition={{
+                duration: 3,
+                delay: Math.random() * 0.5,
+                ease: "easeOut"
+              }}
+            />
+          ))}
+        </motion.div>
+      )}
 
       {/* Onboarding Walkthrough */}
       <OnboardingWalkthrough
