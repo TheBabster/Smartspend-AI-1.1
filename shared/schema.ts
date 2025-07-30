@@ -7,10 +7,12 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
+  password: text("password").notNull(),
   name: text("name").notNull(),
   currency: text("currency").notNull().default("GBP"),
   monthlyIncome: decimal("monthly_income", { precision: 10, scale: 2 }),
   onboardingCompleted: boolean("onboarding_completed").default(false),
+  financialProfile: json("financial_profile"), // Store onboarding questionnaire data
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertBudgetSchema, insertExpenseSchema, insertGoalSchema, insertDecisionSchema } from "@shared/schema";
+import { hashPassword, verifyPassword, generateToken, authenticateToken, optionalAuth, type AuthRequest } from "./auth";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ 

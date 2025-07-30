@@ -1,349 +1,537 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
-import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
-import SmartieAvatarSystem from "@/components/SmartieAvatarSystem";
-import BrandNewSmartSpendLogo from "@/components/BrandNewSmartSpendLogo";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'wouter';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/components/AuthContext';
+import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
+import ResponsiveLayout from '@/components/ResponsiveLayout';
+import { ArrowRight, ArrowLeft, Check, PoundSterling, Target, TrendingUp, CreditCard } from 'lucide-react';
 
-interface OnboardingData {
-  name: string;
-  email: string;
-  currency: string;
+interface FinancialProfile {
   monthlyIncome: string;
-  budgets: Record<string, string>;
+  currency: string;
+  recurringExpenses: {
+    rent: string;
+    utilities: string;
+    transport: string;
+    insurance: string;
+    subscriptions: string;
+    other: string;
+  };
+  savingsGoals: {
+    emergency: string;
+    shortTerm: string;
+    longTerm: string;
+    targetDate: string;
+  };
+  debt: {
+    creditCards: string;
+    loans: string;
+    mortgage: string;
+    other: string;
+  };
+  financialPriorities: string[];
+  riskTolerance: string;
+  spendingHabits: string;
 }
 
-const currencies = [
-  { code: "GBP", symbol: "£", name: "British Pound" },
-  { code: "USD", symbol: "$", name: "US Dollar" },
-  { code: "EUR", symbol: "€", name: "Euro" },
-];
-
-const categories = [
-  { name: "Food & Dining", icon: "🍽️" },
-  { name: "Shopping", icon: "🛍️" },
-  { name: "Entertainment", icon: "🎬" },
-  { name: "Transport", icon: "🚗" },
-  { name: "Utilities", icon: "💡" },
-  { name: "Other", icon: "📦" },
+const steps = [
+  { id: 'income', title: 'Monthly Income', icon: PoundSterling },
+  { id: 'expenses', title: 'Regular Expenses', icon: CreditCard },
+  { id: 'goals', title: 'Savings Goals', icon: Target },
+  { id: 'debt', title: 'Debt & Obligations', icon: TrendingUp },
+  { id: 'preferences', title: 'Financial Preferences', icon: Check }
 ];
 
 export default function Onboarding() {
-  const [step, setStep] = useState(1);
-  const [data, setData] = useState<OnboardingData>({
-    name: "",
-    email: "",
-    currency: "GBP",
-    monthlyIncome: "",
-    budgets: {},
-  });
   const [, navigate] = useLocation();
+  const { updateUser, user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const totalSteps = 4;
-  const progress = (step / totalSteps) * 100;
-
-  const completeMutation = useMutation({
-    mutationFn: async (userData: OnboardingData) => {
-      // Update user profile
-      await apiRequest("PATCH", "/api/user", {
-        name: userData.name,
-        email: userData.email,
-        currency: userData.currency,
-        monthlyIncome: userData.monthlyIncome,
-        onboardingCompleted: true,
-      });
-
-      // Create budgets
-      const currentMonth = new Date().toISOString().slice(0, 7);
-      for (const [category, limit] of Object.entries(userData.budgets)) {
-        if (limit && parseFloat(limit) > 0) {
-          await apiRequest("POST", "/api/budgets", {
-            category,
-            monthlyLimit: limit,
-            month: currentMonth,
-          });
-        }
-      }
+  
+  const [currentStep, setCurrentStep] = useState(0);
+  const [profile, setProfile] = useState<FinancialProfile>({
+    monthlyIncome: '',
+    currency: 'GBP',
+    recurringExpenses: {
+      rent: '',
+      utilities: '',
+      transport: '',
+      insurance: '',
+      subscriptions: '',
+      other: ''
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/budgets"] });
-      toast({
-        title: "Welcome to SmartSpend! 🎉",
-        description: "Your account has been set up successfully.",
-      });
-      navigate("/dashboard");
+    savingsGoals: {
+      emergency: '',
+      shortTerm: '',
+      longTerm: '',
+      targetDate: ''
     },
-    onError: () => {
-      toast({
-        title: "Setup Error",
-        description: "There was an issue setting up your account.",
-        variant: "destructive",
-      });
+    debt: {
+      creditCards: '',
+      loans: '',
+      mortgage: '',
+      other: ''
     },
+    financialPriorities: [],
+    riskTolerance: '',
+    spendingHabits: ''
   });
+
+  const smartieMessages = [
+    "Hi there! I'm Smartie, your AI financial buddy. Let's set up your profile so I can give you personalized advice! 🧠✨",
+    "Great! Now let's talk about your regular monthly expenses. This helps me understand your spending patterns.",
+    "Awesome! What are your savings goals? I'll help you stay on track and make smart spending decisions.",
+    "Let's discuss any debts or financial obligations. Don't worry - I'm here to help you manage everything!",
+    "Almost done! These preferences help me tailor my advice to your unique financial personality."
+  ];
+
+  const updateProfile = (field: string, value: any) => {
+    setProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const updateNestedProfile = (section: string, field: string, value: string) => {
+    setProfile(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section as keyof FinancialProfile],
+        [field]: value
+      }
+    }));
+  };
 
   const nextStep = () => {
-    if (step < totalSteps) setStep(step + 1);
-  };
-
-  const prevStep = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-  const handleComplete = () => {
-    completeMutation.mutate(data);
-  };
-
-  const canProceed = () => {
-    switch (step) {
-      case 1:
-        return data.name.trim() && data.email.trim();
-      case 2:
-        return data.currency && data.monthlyIncome && parseFloat(data.monthlyIncome) > 0;
-      case 3:
-        return Object.values(data.budgets).some(v => v && parseFloat(v) > 0);
-      case 4:
-        return true;
-      default:
-        return false;
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleFinish = async () => {
+    try {
+      await updateUser({
+        monthlyIncome: profile.monthlyIncome,
+        currency: profile.currency,
+        financialProfile: profile,
+        onboardingCompleted: true
+      });
+
+      toast({
+        title: "Profile Complete!",
+        description: "Welcome to SmartSpend! Smartie is ready to help you achieve your financial goals.",
+      });
+
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Setup Failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const togglePriority = (priority: string) => {
+    setProfile(prev => ({
+      ...prev,
+      financialPriorities: prev.financialPriorities.includes(priority)
+        ? prev.financialPriorities.filter(p => p !== priority)
+        : [...prev.financialPriorities, priority]
+    }));
+  };
+
+  const currentStepData = steps[currentStep];
+  const StepIcon = currentStepData.icon;
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-md mx-auto">
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Step {step} of {totalSteps}
-            </span>
-            <span className="text-sm font-medium text-purple-600">
-              {Math.round(progress)}%
-            </span>
+    <ResponsiveLayout>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              {steps.map((step, index) => {
+                const IconComponent = step.icon;
+                return (
+                  <div
+                    key={step.id}
+                    className={`flex flex-col items-center ${
+                      index <= currentStep ? 'text-purple-600' : 'text-gray-400'
+                    }`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                        index <= currentStep
+                          ? 'bg-purple-100 text-purple-600'
+                          : 'bg-gray-100 text-gray-400'
+                      }`}
+                    >
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-medium hidden sm:block">{step.title}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+              />
+            </div>
           </div>
-          <Progress value={progress} className="h-2" />
-        </div>
 
-        <Card className="shadow-lg">
-          <CardContent className="p-6">
-            {step === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200/50 dark:border-purple-800/30">
-                  <EnhancedSmartieReactions 
-                    mood="celebrating"
-                    size="lg"
-                    message="Welcome aboard! Let's get you set up with a personalized budget. First, tell me a bit about yourself!"
-                    animated={true}
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-purple-700 dark:text-purple-300 mb-1">Hi there! I'm Smartie 🧠</h3>
-                    <p className="text-sm text-purple-600 dark:text-purple-400">Your AI financial companion ready to help you build great money habits!</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">What's your name?</label>
-                    <Input
-                      value={data.name}
-                      onChange={(e) => setData({ ...data, name: e.target.value })}
-                      placeholder="Your full name"
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+                <CardHeader className="text-center">
+                  <div className="flex justify-center mb-4">
+                    <ExactSmartieAvatar 
+                      mood={currentStep === steps.length - 1 ? "celebrating" : "thinking"} 
+                      size="lg" 
+                      animated={true} 
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Email address</label>
-                    <Input
-                      type="email"
-                      value={data.email}
-                      onChange={(e) => setData({ ...data, email: e.target.value })}
-                      placeholder="your@email.com"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                  <CardTitle className="text-2xl font-bold text-gray-800 flex items-center justify-center gap-2">
+                    <StepIcon className="w-6 h-6 text-purple-600" />
+                    {currentStepData.title}
+                  </CardTitle>
+                  <p className="text-gray-600 mt-2 bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
+                    {smartieMessages[currentStep]}
+                  </p>
+                </CardHeader>
 
-            {step === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg border border-blue-200/50 dark:border-blue-800/30">
-                  <EnhancedSmartieReactions 
-                    mood="thinking"
-                    size="lg"
-                    message="Great! Now let's talk money. What's your monthly income? This helps me create realistic budgets for you!"
-                    animated={true}
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-blue-700 dark:text-blue-300 mb-1">Financial Planning 💰</h3>
-                    <p className="text-sm text-blue-600 dark:text-blue-400">Don't worry - your information is secure and helps me create personalized recommendations.</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Currency</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {currencies.map((currency) => (
-                        <Button
-                          key={currency.code}
-                          variant={data.currency === currency.code ? "default" : "outline"}
-                          onClick={() => setData({ ...data, currency: currency.code })}
-                          className="h-12"
-                        >
-                          <div className="text-center">
-                            <div className="text-lg">{currency.symbol}</div>
-                            <div className="text-xs">{currency.code}</div>
-                          </div>
-                        </Button>
-                      ))}
+                <CardContent className="space-y-6">
+                  {/* Step 0: Income */}
+                  {currentStep === 0 && (
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="currency">Currency</Label>
+                        <Select value={profile.currency} onValueChange={(value) => updateProfile('currency', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="GBP">£ British Pound</SelectItem>
+                            <SelectItem value="USD">$ US Dollar</SelectItem>
+                            <SelectItem value="EUR">€ Euro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="income">Monthly Income (after tax)</Label>
+                        <Input
+                          id="income"
+                          type="number"
+                          value={profile.monthlyIncome}
+                          onChange={(e) => updateProfile('monthlyIncome', e.target.value)}
+                          placeholder="3500"
+                          className="mt-1"
+                        />
+                        <p className="text-sm text-gray-500 mt-1">
+                          Your take-home pay each month
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Monthly Income</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                        {currencies.find(c => c.code === data.currency)?.symbol}
-                      </span>
-                      <Input
-                        type="number"
-                        value={data.monthlyIncome}
-                        onChange={(e) => setData({ ...data, monthlyIncome: e.target.value })}
-                        placeholder="3000"
-                        className="pl-8"
-                      />
-                    </div>
-                    <p className="text-xs text-muted-contrast mt-1">
-                      Include salary, freelance income, and any regular earnings
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                  )}
 
-            {step === 3 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200/50 dark:border-green-800/30">
-                  <EnhancedSmartieReactions 
-                    mood="lifting_weights"
-                    size="lg"
-                    message="Perfect! Now let's set up your spending categories. How much would you like to budget for each area monthly?"
-                    animated={true}
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-green-700 dark:text-green-300 mb-1">Budget Categories 📊</h3>
-                    <p className="text-sm text-green-600 dark:text-green-400">Set realistic amounts - you can always adjust these later as you learn your patterns!</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {categories.map((category) => (
-                    <div key={category.name} className="flex items-center gap-3">
-                      <span className="text-2xl">{category.icon}</span>
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium">{category.name}</label>
-                        <div className="relative mt-1">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-contrast">
-                            {currencies.find(c => c.code === data.currency)?.symbol}
-                          </span>
+                  {/* Step 1: Expenses */}
+                  {currentStep === 1 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="rent">Rent/Mortgage</Label>
                           <Input
+                            id="rent"
                             type="number"
-                            value={data.budgets[category.name] || ""}
-                            onChange={(e) => setData({
-                              ...data,
-                              budgets: { ...data.budgets, [category.name]: e.target.value }
-                            })}
+                            value={profile.recurringExpenses.rent}
+                            onChange={(e) => updateNestedProfile('recurringExpenses', 'rent', e.target.value)}
+                            placeholder="1200"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="utilities">Utilities & Bills</Label>
+                          <Input
+                            id="utilities"
+                            type="number"
+                            value={profile.recurringExpenses.utilities}
+                            onChange={(e) => updateNestedProfile('recurringExpenses', 'utilities', e.target.value)}
+                            placeholder="150"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="transport">Transport</Label>
+                          <Input
+                            id="transport"
+                            type="number"
+                            value={profile.recurringExpenses.transport}
+                            onChange={(e) => updateNestedProfile('recurringExpenses', 'transport', e.target.value)}
                             placeholder="200"
-                            className="pl-8"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="insurance">Insurance</Label>
+                          <Input
+                            id="insurance"
+                            type="number"
+                            value={profile.recurringExpenses.insurance}
+                            onChange={(e) => updateNestedProfile('recurringExpenses', 'insurance', e.target.value)}
+                            placeholder="80"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="subscriptions">Subscriptions</Label>
+                          <Input
+                            id="subscriptions"
+                            type="number"
+                            value={profile.recurringExpenses.subscriptions}
+                            onChange={(e) => updateNestedProfile('recurringExpenses', 'subscriptions', e.target.value)}
+                            placeholder="50"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="other-expenses">Other Fixed Costs</Label>
+                          <Input
+                            id="other-expenses"
+                            type="number"
+                            value={profile.recurringExpenses.other}
+                            onChange={(e) => updateNestedProfile('recurringExpenses', 'other', e.target.value)}
+                            placeholder="100"
+                            className="mt-1"
                           />
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+                  )}
 
-            {step === 4 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center gap-4 mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200/50 dark:border-yellow-800/30">
-                  <EnhancedSmartieReactions 
-                    mood="flying"
-                    size="lg"
-                    message="Awesome! You're all set! I'll be here to help you make smart spending decisions and reach your financial goals. Ready to start your journey?"
-                    animated={true}
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-yellow-700 dark:text-yellow-300 mb-1">Setup Complete! 🎉</h3>
-                    <p className="text-sm text-yellow-600 dark:text-yellow-400">I'm excited to be your financial companion. Let's build some great money habits together!</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                    <h3 className="font-semibold mb-2">Your Setup Summary:</h3>
-                    <div className="space-y-1 text-sm">
-                      <p><strong>Name:</strong> {data.name}</p>
-                      <p><strong>Monthly Income:</strong> {currencies.find(c => c.code === data.currency)?.symbol}{data.monthlyIncome}</p>
-                      <p><strong>Total Budget:</strong> {currencies.find(c => c.code === data.currency)?.symbol}{Object.values(data.budgets).reduce((sum, val) => sum + (parseFloat(val) || 0), 0)}</p>
+                  {/* Step 2: Goals */}
+                  {currentStep === 2 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="emergency">Emergency Fund Target</Label>
+                          <Input
+                            id="emergency"
+                            type="number"
+                            value={profile.savingsGoals.emergency}
+                            onChange={(e) => updateNestedProfile('savingsGoals', 'emergency', e.target.value)}
+                            placeholder="5000"
+                            className="mt-1"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">3-6 months of expenses</p>
+                        </div>
+                        <div>
+                          <Label htmlFor="shortTerm">Short-term Savings</Label>
+                          <Input
+                            id="shortTerm"
+                            type="number"
+                            value={profile.savingsGoals.shortTerm}
+                            onChange={(e) => updateNestedProfile('savingsGoals', 'shortTerm', e.target.value)}
+                            placeholder="2000"
+                            className="mt-1"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">Holiday, gadgets, etc.</p>
+                        </div>
+                        <div>
+                          <Label htmlFor="longTerm">Long-term Savings</Label>
+                          <Input
+                            id="longTerm"
+                            type="number"
+                            value={profile.savingsGoals.longTerm}
+                            onChange={(e) => updateNestedProfile('savingsGoals', 'longTerm', e.target.value)}
+                            placeholder="10000"
+                            className="mt-1"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">House deposit, pension, etc.</p>
+                        </div>
+                        <div>
+                          <Label htmlFor="targetDate">Target Achievement Date</Label>
+                          <Input
+                            id="targetDate"
+                            type="date"
+                            value={profile.savingsGoals.targetDate}
+                            onChange={(e) => updateNestedProfile('savingsGoals', 'targetDate', e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                  )}
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={step === 1}
-              >
-                Back
-              </Button>
-              
-              {step < totalSteps ? (
-                <Button
-                  onClick={nextStep}
-                  disabled={!canProceed()}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
-                >
-                  Continue
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleComplete}
-                  disabled={!canProceed() || completeMutation.isPending}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
-                >
-                  {completeMutation.isPending ? "Setting up..." : "Complete Setup"}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  {/* Step 3: Debt */}
+                  {currentStep === 3 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="creditCards">Credit Card Debt</Label>
+                          <Input
+                            id="creditCards"
+                            type="number"
+                            value={profile.debt.creditCards}
+                            onChange={(e) => updateNestedProfile('debt', 'creditCards', e.target.value)}
+                            placeholder="0"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="loans">Personal Loans</Label>
+                          <Input
+                            id="loans"
+                            type="number"
+                            value={profile.debt.loans}
+                            onChange={(e) => updateNestedProfile('debt', 'loans', e.target.value)}
+                            placeholder="0"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="mortgage">Mortgage Remaining</Label>
+                          <Input
+                            id="mortgage"
+                            type="number"
+                            value={profile.debt.mortgage}
+                            onChange={(e) => updateNestedProfile('debt', 'mortgage', e.target.value)}
+                            placeholder="0"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="other-debt">Other Debt</Label>
+                          <Input
+                            id="other-debt"
+                            type="number"
+                            value={profile.debt.other}
+                            onChange={(e) => updateNestedProfile('debt', 'other', e.target.value)}
+                            placeholder="0"
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Preferences */}
+                  {currentStep === 4 && (
+                    <div className="space-y-6">
+                      <div>
+                        <Label>Financial Priorities (select all that apply)</Label>
+                        <div className="grid grid-cols-2 gap-3 mt-2">
+                          {[
+                            'Build Emergency Fund',
+                            'Pay Off Debt',
+                            'Save for Holiday',
+                            'Buy a House',
+                            'Invest for Future',
+                            'Improve Credit Score'
+                          ].map((priority) => (
+                            <Button
+                              key={priority}
+                              type="button"
+                              variant={profile.financialPriorities.includes(priority) ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => togglePriority(priority)}
+                              className={profile.financialPriorities.includes(priority) 
+                                ? 'bg-purple-600 hover:bg-purple-700' 
+                                : ''
+                              }
+                            >
+                              {priority}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="riskTolerance">Risk Tolerance</Label>
+                        <Select value={profile.riskTolerance} onValueChange={(value) => updateProfile('riskTolerance', value)}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="How do you feel about financial risk?" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="conservative">Conservative - Safety first</SelectItem>
+                            <SelectItem value="moderate">Moderate - Balanced approach</SelectItem>
+                            <SelectItem value="aggressive">Aggressive - Higher risk for rewards</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="spendingHabits">Spending Habits</Label>
+                        <Textarea
+                          id="spendingHabits"
+                          value={profile.spendingHabits}
+                          onChange={(e) => updateProfile('spendingHabits', e.target.value)}
+                          placeholder="Tell Smartie about your typical spending patterns, what triggers impulse purchases, or any financial habits you'd like to improve..."
+                          className="mt-1"
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Navigation */}
+                  <div className="flex justify-between pt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={prevStep}
+                      disabled={currentStep === 0}
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Previous
+                    </Button>
+
+                    {currentStep < steps.length - 1 ? (
+                      <Button
+                        type="button"
+                        onClick={nextStep}
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white flex items-center gap-2"
+                      >
+                        Next
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={handleFinish}
+                        className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white flex items-center gap-2"
+                      >
+                        Complete Setup
+                        <Check className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </ResponsiveLayout>
   );
 }
