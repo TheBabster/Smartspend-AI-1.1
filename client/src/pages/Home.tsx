@@ -38,18 +38,42 @@ export default function Home() {
     <div className="min-h-screen relative overflow-hidden">
       {/* Enhanced Background Pattern with subtle animations */}
       <div className="absolute inset-0">
-        {/* Animated background shimmer */}
+        {/* Enhanced animated background shimmer */}
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-violet-600/20 via-fuchsia-500/20 to-pink-500/20"
           animate={{ 
             background: [
-              "radial-gradient(ellipse at top left, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%)",
-              "radial-gradient(ellipse at top right, rgba(236, 72, 153, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%)",
-              "radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%)"
+              "radial-gradient(ellipse at top left, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.15) 100%)",
+              "radial-gradient(ellipse at top right, rgba(236, 72, 153, 0.3) 0%, rgba(139, 92, 246, 0.15) 100%)",
+              "radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.15) 100%)",
+              "radial-gradient(ellipse at center, rgba(168, 85, 247, 0.25) 0%, rgba(219, 39, 119, 0.2) 100%)"
             ]
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
+        
+        {/* Floating particle effects */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white/30 rounded-full"
+            style={{
+              left: `${20 + (i * 15)}%`,
+              top: `${30 + (i * 10)}%`
+            }}
+            animate={{
+              y: [-20, -100, -20],
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0]
+            }}
+            transition={{
+              duration: 4 + i,
+              repeat: Infinity,
+              delay: i * 0.8,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
         
         {/* Floating currency icons */}
         <motion.div 
@@ -120,17 +144,27 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Dark Mode Toggle */}
+        {/* Enhanced Dark Mode Toggle */}
         <motion.button
           onClick={() => setDarkMode(!darkMode)}
-          className="absolute top-4 right-4 z-50 p-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-white hover:bg-white/30 transition-all duration-300"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1, duration: 0.5 }}
+          className="absolute top-4 right-4 z-50 p-4 bg-white/20 backdrop-blur-md rounded-full border border-white/40 text-white hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl"
+          whileHover={{ 
+            scale: 1.15, 
+            rotate: 360,
+            boxShadow: "0 0 25px rgba(255, 255, 255, 0.3)"
+          }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0, rotate: -180 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ delay: 1, duration: 0.6, type: "spring" }}
         >
-          {darkMode ? "☀️" : "🌙"}
+          <motion.span
+            animate={{ rotate: darkMode ? 0 : 180 }}
+            transition={{ duration: 0.5 }}
+            className="text-xl"
+          >
+            {darkMode ? "☀️" : "🌙"}
+          </motion.span>
         </motion.button>
 
         {/* Professional Header with Real Logo */}
@@ -176,9 +210,15 @@ export default function Home() {
             <div className="flex items-start gap-4">
               <motion.div
                 initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
-                whileHover={{ scale: 1.1 }}
+                animate={{ 
+                  scale: 1,
+                  y: [0, -3, 0]
+                }}
+                transition={{ 
+                  scale: { delay: 0.5, duration: 0.5, type: "spring" },
+                  y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+                }}
+                whileHover={{ scale: 1.15, rotate: [0, -5, 5, 0] }}
                 className="cursor-pointer"
               >
                 <ExactSmartieAvatar 
@@ -249,14 +289,38 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.5 }}
           >
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <motion.div 
+                className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center"
+                animate={{ 
+                  rotate: [0, 360],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ 
+                  rotate: { duration: 8, repeat: Infinity, ease: "linear" },
+                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                }}
+              >
                 <Star className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-bold text-gray-800 text-lg">Today's Smart Insight</h3>
+              </motion.div>
+              <motion.h3 
+                className="font-bold text-gray-800 text-lg"
+                animate={{ 
+                  color: ["#1f2937", "#3730a3", "#1f2937"] 
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                Today's Smart Insight
+              </motion.h3>
             </div>
-            <p className="text-gray-700 leading-relaxed font-medium">
+            <motion.p 
+              className="text-gray-700 leading-relaxed font-medium"
+              animate={{ 
+                color: ["#374151", "#6366f1", "#374151"] 
+              }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            >
               "Track your emotional spending triggers! Users who log their mood before purchases save 23% more on average."
-            </p>
+            </motion.p>
           </motion.div>
 
           {/* Enhanced Core Features Preview */}
@@ -328,19 +392,30 @@ export default function Home() {
             >
               <Button 
                 onClick={() => setShowOnboarding(true)}
-                className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-6 px-14 rounded-2xl shadow-2xl hover:shadow-purple-500/50 hover:shadow-2xl transition-all duration-300 w-full md:w-auto text-lg relative overflow-hidden group border-2 border-purple-400/50"
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-6 px-16 rounded-2xl shadow-2xl hover:shadow-purple-500/60 transition-all duration-300 w-full md:w-auto text-xl relative overflow-hidden group border-2 border-purple-300/40"
                 style={{
-                  boxShadow: "0 0 30px rgba(168, 85, 247, 0.4), 0 20px 40px rgba(0, 0, 0, 0.2)"
+                  boxShadow: "0 0 40px rgba(168, 85, 247, 0.5), 0 25px 50px rgba(147, 51, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
                 }}
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  Get Started 🚀
+                <span className="relative z-10 flex items-center gap-3 font-black tracking-wide">
+                  🚀 Get Started Now
                 </span>
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/10 to-transparent"
                   initial={{ x: '-100%' }}
                   whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 0.7, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute inset-0 rounded-2xl"
+                  animate={{
+                    boxShadow: [
+                      "0 0 40px rgba(168, 85, 247, 0.5)",
+                      "0 0 60px rgba(168, 85, 247, 0.7)",
+                      "0 0 40px rgba(168, 85, 247, 0.5)"
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 />
               </Button>
             </motion.div>
