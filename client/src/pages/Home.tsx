@@ -187,25 +187,85 @@ export default function Home() {
           </motion.span>
         </motion.button>
 
-        {/* Gamified Progress Bar */}
+        {/* Enhanced Gamified Progress Bar */}
         <motion.div
           className="absolute top-20 left-6 z-40 flex items-center gap-4"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 1.5, duration: 0.6 }}
         >
-          <div className={`${darkMode ? 'bg-slate-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-full px-4 py-2 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg`}>
+          {/* Streak Counter with Fire Animation */}
+          <motion.div 
+            className={`${darkMode ? 'bg-slate-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-full px-4 py-2 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg relative overflow-hidden`}
+            whileHover={{ scale: 1.05, y: -2 }}
+          >
             <div className="flex items-center gap-2 text-sm font-bold">
-              <span className="text-orange-500">🔥</span>
+              <motion.span 
+                className="text-orange-500 text-lg"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                🔥
+              </motion.span>
               <span className={darkMode ? 'text-white' : 'text-gray-800'}>Streak: {currentStreak} days</span>
             </div>
-          </div>
-          <div className={`${darkMode ? 'bg-slate-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-full px-4 py-2 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg`}>
+            {/* Progress bar */}
+            <motion.div
+              className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-orange-400 to-red-500 rounded-full"
+              initial={{ width: "0%" }}
+              animate={{ width: `${(currentStreak % 7) * 14.28}%` }}
+              transition={{ duration: 1, delay: 2 }}
+            />
+          </motion.div>
+          
+          {/* Savings Tree with Growth Animation */}
+          <motion.div 
+            className={`${darkMode ? 'bg-slate-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-full px-4 py-2 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg relative overflow-hidden`}
+            whileHover={{ scale: 1.05, y: -2 }}
+          >
             <div className="flex items-center gap-2 text-sm font-bold">
-              <span className="text-green-500">🌱</span>
+              <motion.span 
+                className="text-green-500 text-lg"
+                animate={{ 
+                  rotate: [0, 5, -5, 0],
+                  scale: [1, 1.1, 1]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                🌱
+              </motion.span>
               <span className={darkMode ? 'text-white' : 'text-gray-800'}>Savings Tree Level {savingsLevel}</span>
             </div>
-          </div>
+            {/* Growth leaves effect */}
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute top-1 right-2 text-xs"
+                style={{ left: `${60 + i * 8}%` }}
+                initial={{ opacity: 0, y: 5, scale: 0 }}
+                animate={{ 
+                  opacity: [0, 1, 0],
+                  y: [5, -10, -20],
+                  scale: [0, 1, 0]
+                }}
+                transition={{ 
+                  duration: 2,
+                  delay: i * 0.3,
+                  repeat: Infinity,
+                  repeatDelay: 3
+                }}
+              >
+                🍃
+              </motion.div>
+            ))}
+            {/* Level progress bar */}
+            <motion.div
+              className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"
+              initial={{ width: "0%" }}
+              animate={{ width: `${savingsLevel * 33}%` }}
+              transition={{ duration: 1.5, delay: 2.5 }}
+            />
+          </motion.div>
         </motion.div>
 
         {/* Professional Header with Real Logo */}
@@ -227,9 +287,12 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
+            <h2 className={`text-4xl font-black mb-3 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
               Welcome to SmartSpend
             </h2>
+            <p className={`text-lg ${darkMode ? 'opacity-90' : 'opacity-95'} font-semibold mb-3 ${darkMode ? 'text-indigo-200' : 'text-purple-100'}`}>
+              Track your emotions. Build habits. Spend smarter.
+            </p>
             <p className={`text-xl ${darkMode ? 'opacity-90' : 'opacity-95'} font-semibold mb-2`}>
               Master your money with AI, habits, and fun
             </p>
@@ -241,13 +304,20 @@ export default function Home() {
 
         {/* Main Content */}
         <main className="flex-1 px-6 relative z-20">
-          {/* Enhanced Smartie Introduction Card */}
+          {/* Enhanced Smartie Introduction Card with AI Indicator */}
           <motion.div 
-            className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 mb-6 border border-white/20"
+            className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-2xl p-6 mb-8 border relative overflow-hidden`}
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            whileHover={{ y: -2, shadow: "0 20px 40px rgba(0,0,0,0.15)" }}
           >
+            {/* Pulsing AI indicator */}
+            <motion.div
+              className="absolute top-4 right-4 w-3 h-3 bg-green-400 rounded-full"
+              animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
             <div className="flex items-start gap-4">
               <motion.div
                 initial={{ scale: 0 }}
@@ -272,12 +342,16 @@ export default function Home() {
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-bold text-lg text-gray-800">Smartie</h3>
-                  <span className="text-sm text-purple-600">• AI Assistant</span>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <h3 className={`font-bold text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>Smartie</h3>
+                  <span className={`text-sm ${darkMode ? 'text-indigo-400' : 'text-purple-600'}`}>• AI Assistant</span>
+                  <motion.div 
+                    className="w-2 h-2 bg-green-500 rounded-full"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
                 </div>
                 
-                <div className="bg-gray-50 rounded-2xl p-4 relative">
+                <div className={`${darkMode ? 'bg-slate-700/50' : 'bg-gray-50'} rounded-2xl p-4 relative`}>
                   <AnimatePresence mode="wait">
                     {isTyping ? (
                       <motion.div
@@ -364,12 +438,20 @@ export default function Home() {
               "Track your emotional spending triggers! Users who log their mood before purchases save 23% more on average."
             </motion.p>
             <motion.button
-              className={`text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-300 ${darkMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-purple-100 hover:bg-purple-200 text-purple-700'}`}
-              whileHover={{ scale: 1.05 }}
+              className={`text-sm font-bold px-6 py-3 rounded-xl transition-all duration-300 ${darkMode ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg' : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg'}`}
+              whileHover={{ scale: 1.05, y: -1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/decisions")}
             >
-              Log Your Mood Now →
+              <span className="flex items-center gap-2">
+                <span>Log Your Mood Now</span>
+                <motion.span
+                  animate={{ x: [0, 3, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  →
+                </motion.span>
+              </span>
             </motion.button>
           </motion.div>
 
@@ -381,15 +463,19 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <motion.div 
-              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300`}
-              whileHover={{ y: -5, scale: 1.02 }}
+              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300 group`}
+              whileHover={{ y: -8, scale: 1.03 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.5 }}
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                <TrendingUp className="w-7 h-7 text-white" />
-              </div>
+              <motion.div 
+                className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+                whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <TrendingUp className="w-8 h-8 text-white" />
+              </motion.div>
               <h3 className={`font-bold mb-3 text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>Smart Budgeting</h3>
               <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
                 AI-powered budget allocation based on your spending patterns and goals
@@ -397,15 +483,23 @@ export default function Home() {
             </motion.div>
             
             <motion.div 
-              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300`}
-              whileHover={{ y: -5, scale: 1.02 }}
+              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300 group`}
+              whileHover={{ y: -8, scale: 1.03 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.5 }}
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                <Brain className="w-7 h-7 text-white" />
-              </div>
+              <motion.div 
+                className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+                whileHover={{ scale: 1.1 }}
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ 
+                  rotate: { duration: 4, repeat: Infinity },
+                  scale: { duration: 0.3 }
+                }}
+              >
+                <Brain className="w-8 h-8 text-white" />
+              </motion.div>
               <h3 className={`font-bold mb-3 text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>AI Insights</h3>
               <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
                 Get personalized recommendations and spending insights from Smartie
@@ -413,15 +507,19 @@ export default function Home() {
             </motion.div>
             
             <motion.div 
-              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300`}
-              whileHover={{ y: -5, scale: 1.02 }}
+              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300 group`}
+              whileHover={{ y: -8, scale: 1.03 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.5 }}
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                <Target className="w-7 h-7 text-white" />
-              </div>
+              <motion.div 
+                className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+                whileHover={{ scale: 1.1, rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
+                <Target className="w-8 h-8 text-white" />
+              </motion.div>
               <h3 className={`font-bold mb-3 text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>Goal Tracking</h3>
               <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
                 Set and achieve financial goals with gamified progress tracking
@@ -512,7 +610,44 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Trust Elements */}
+          {/* Testimonials Carousel */}
+          <motion.div
+            className="text-center mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.6 }}
+          >
+            <motion.div
+              className={`${darkMode ? 'bg-slate-800/60' : 'bg-white/20'} backdrop-blur-sm rounded-2xl p-6 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg`}
+              animate={{ 
+                background: darkMode ? [
+                  "rgba(30, 41, 59, 0.6)",
+                  "rgba(51, 65, 85, 0.6)",
+                  "rgba(30, 41, 59, 0.6)"
+                ] : [
+                  "rgba(255, 255, 255, 0.2)",
+                  "rgba(255, 255, 255, 0.3)",
+                  "rgba(255, 255, 255, 0.2)"
+                ]
+              }}
+              transition={{ duration: 4, repeat: Infinity }}
+            >
+              <motion.p 
+                className={`italic text-lg mb-3 ${darkMode ? 'text-slate-200' : 'text-white'}`}
+                animate={{ 
+                  opacity: [1, 0.8, 1]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                "SmartSpend helped me save £300 in 2 months!"
+              </motion.p>
+              <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-white/70'}`}>
+                – Alex, UK
+              </p>
+            </motion.div>
+          </motion.div>
+
+          {/* Enhanced Trust Elements */}
           <motion.div
             className={`text-center text-sm space-y-2 mb-8 ${darkMode ? 'text-slate-400' : 'text-white/70'}`}
             initial={{ opacity: 0 }}
@@ -520,22 +655,52 @@ export default function Home() {
             transition={{ delay: 1.2, duration: 0.6 }}
           >
             <div className="flex items-center justify-center gap-6 flex-wrap">
-              <div className="flex items-center gap-2">
+              <motion.div 
+                className="flex items-center gap-2"
+                whileHover={{ scale: 1.05, y: -1 }}
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ 
+                  scale: { duration: 0.2 },
+                  opacity: { duration: 2, repeat: Infinity }
+                }}
+              >
                 <Shield className="w-4 h-4" />
                 <span>Secure & Private</span>
-              </div>
-              <div className="flex items-center gap-2">
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-2"
+                whileHover={{ scale: 1.05, y: -1 }}
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ 
+                  scale: { duration: 0.2 },
+                  opacity: { duration: 2, repeat: Infinity, delay: 0.5 }
+                }}
+              >
                 <Users className="w-4 h-4" />
                 <span>3,500+ Users</span>
-              </div>
-              <div className="flex items-center gap-2">
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-2"
+                whileHover={{ scale: 1.05, y: -1 }}
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{ 
+                  scale: { duration: 0.2 },
+                  opacity: { duration: 2, repeat: Infinity, delay: 1 }
+                }}
+              >
                 <Globe className="w-4 h-4" />
                 <span>17 Countries</span>
-              </div>
+              </motion.div>
             </div>
-            <p className="text-xs opacity-80">
+            <motion.p 
+              className="text-xs opacity-80"
+              animate={{ 
+                color: darkMode ? ["#94a3b8", "#e2e8f0", "#94a3b8"] : ["rgba(255,255,255,0.7)", "rgba(255,255,255,0.9)", "rgba(255,255,255,0.7)"]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
               Trusted by users worldwide • Backed by advanced AI
-            </p>
+            </motion.p>
           </motion.div>
         </main>
       </div>
