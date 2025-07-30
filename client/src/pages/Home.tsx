@@ -17,6 +17,21 @@ export default function Home() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentStreak, setCurrentStreak] = useState(5);
   const [savingsLevel, setSavingsLevel] = useState(2);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  
+  const testimonials = [
+    { quote: "SmartSpend helped me save £300 in 2 months!", author: "Alex, UK", flag: "🇬🇧" },
+    { quote: "I finally understand my spending patterns!", author: "Priya, India", flag: "🇮🇳" },
+    { quote: "The AI insights are incredibly accurate!", author: "Marcus, Germany", flag: "🇩🇪" }
+  ];
+
+  // Rotate testimonials every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
 
   useEffect(() => {
     // Enhanced background styles with dark mode support
@@ -288,7 +303,7 @@ export default function Home() {
             transition={{ delay: 0.5, duration: 0.6 }}
           >
             <h2 className={`text-4xl font-black mb-3 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
-              Welcome to SmartSpend
+              Welcome back! You're on day {currentStreak} of your streak 🔥
             </h2>
             <p className={`text-lg ${darkMode ? 'opacity-90' : 'opacity-95'} font-semibold mb-3 ${darkMode ? 'text-indigo-200' : 'text-purple-100'}`}>
               Track your emotions. Build habits. Spend smarter.
@@ -329,9 +344,34 @@ export default function Home() {
                   scale: { delay: 0.5, duration: 0.5, type: "spring" },
                   y: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                 }}
-                whileHover={{ scale: 1.15, rotate: [0, -5, 5, 0] }}
-                className="cursor-pointer"
+                whileHover={{ 
+                  scale: 1.15, 
+                  rotate: [0, -5, 5, 0],
+                  y: [0, -5, 0]
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer relative"
+                onClick={() => {
+                  setSmartieMessage("Hey! Need help? Click the chat button to talk to me anytime! 💬");
+                  setIsTyping(true);
+                  setTimeout(() => setIsTyping(false), 1000);
+                }}
               >
+                {/* Smartie interaction sparkles */}
+                <motion.div
+                  className="absolute -top-1 -right-1 text-yellow-400 text-xs"
+                  animate={{ 
+                    scale: [0, 1, 0],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: 2
+                  }}
+                >
+                  ✨
+                </motion.div>
                 <ExactSmartieAvatar 
                   mood="happy" 
                   size="lg" 
@@ -351,7 +391,7 @@ export default function Home() {
                   />
                 </div>
                 
-                <div className={`${darkMode ? 'bg-slate-700/50' : 'bg-gray-50'} rounded-2xl p-4 relative`}>
+                <div className={`${darkMode ? 'bg-slate-700/70 border border-slate-600/50' : 'bg-gray-50 border border-gray-200'} rounded-2xl p-4 relative shadow-inner`}>
                   <AnimatePresence mode="wait">
                     {isTyping ? (
                       <motion.div
@@ -359,7 +399,7 @@ export default function Home() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="flex items-center gap-2 text-gray-600"
+                        className={`flex items-center gap-2 ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}
                       >
                         <div className="flex gap-1">
                           <motion.div
@@ -444,6 +484,7 @@ export default function Home() {
               onClick={() => navigate("/decisions")}
             >
               <span className="flex items-center gap-2">
+                <span>😊 😐 😟</span>
                 <span>Log Your Mood Now</span>
                 <motion.span
                   animate={{ x: [0, 3, 0] }}
@@ -632,19 +673,56 @@ export default function Home() {
               }}
               transition={{ duration: 4, repeat: Infinity }}
             >
-              <motion.p 
-                className={`italic text-lg mb-3 ${darkMode ? 'text-slate-200' : 'text-white'}`}
-                animate={{ 
-                  opacity: [1, 0.8, 1]
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                "SmartSpend helped me save £300 in 2 months!"
-              </motion.p>
-              <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-white/70'}`}>
-                – Alex, UK
-              </p>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentTestimonial}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.p 
+                    className={`italic text-lg mb-3 ${darkMode ? 'text-slate-200' : 'text-white'}`}
+                    animate={{ 
+                      opacity: [1, 0.9, 1]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    "{testimonials[currentTestimonial].quote}"
+                  </motion.p>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-white/70'} flex items-center justify-center gap-2`}>
+                    <span>{testimonials[currentTestimonial].flag}</span>
+                    <span>– {testimonials[currentTestimonial].author}</span>
+                  </p>
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
+          </motion.div>
+
+          {/* Progress Summary Widget */}
+          <motion.div
+            className={`${darkMode ? 'bg-slate-800/70 border-slate-600' : 'bg-white/20 border-white/30'} backdrop-blur-sm rounded-2xl p-4 mb-6 border`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.6 }}
+          >
+            <h4 className={`font-bold text-sm mb-3 ${darkMode ? 'text-slate-200' : 'text-white'}`}>
+              💰 Your Progress Summary
+            </h4>
+            <div className="grid grid-cols-3 gap-3 text-xs">
+              <div className="text-center">
+                <div className={`font-bold ${darkMode ? 'text-green-400' : 'text-green-300'}`}>£127</div>
+                <div className={`${darkMode ? 'text-slate-400' : 'text-white/70'}`}>Saved this month</div>
+              </div>
+              <div className="text-center">
+                <div className={`font-bold ${darkMode ? 'text-blue-400' : 'text-blue-300'}`}>83%</div>
+                <div className={`${darkMode ? 'text-slate-400' : 'text-white/70'}`}>Goal progress</div>
+              </div>
+              <div className="text-center">
+                <div className={`font-bold ${darkMode ? 'text-orange-400' : 'text-orange-300'}`}>4x</div>
+                <div className={`${darkMode ? 'text-slate-400' : 'text-white/70'}`}>Mood logs</div>
+              </div>
+            </div>
           </motion.div>
 
           {/* Enhanced Trust Elements */}
