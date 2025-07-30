@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <!-- Background (transparent) -->
+  <rect width="400" height="200" fill="transparent"/>
+  
+  <!-- Logo Symbol Group -->
+  <g transform="translate(200, 60)">
+    
+    <!-- Sparkle (star) - top left of head -->
+    <g transform="translate(-45, -25)">
+      <path d="M0,-8 L2,-2 L8,0 L2,2 L0,8 L-2,2 L-8,0 L-2,-2 Z" 
+            fill="#FFB84D" stroke="#FFA500" stroke-width="0.5"/>
+      <circle cx="0" cy="0" r="1" fill="#FFF" opacity="0.8"/>
+    </g>
+    
+    <!-- Head Profile (side view) -->
+    <path d="M-30,15 
+             C-30,5 -25,-5 -15,-12
+             C-5,-18 5,-20 15,-18
+             C25,-16 30,-10 32,-2
+             C34,6 32,14 28,20
+             C25,25 20,28 15,30
+             C10,32 5,32 0,30
+             L0,35
+             C-5,37 -10,35 -12,32
+             C-15,28 -18,24 -20,20
+             C-25,18 -28,16 -30,15 Z" 
+          fill="#FF6B9D" stroke="#FF5A8A" stroke-width="1"/>
+    
+    <!-- Brain inside head -->
+    <g transform="translate(5, 5)">
+      <!-- Brain outline -->
+      <path d="M-12,-8
+               C-15,-10 -15,-12 -12,-14
+               C-8,-16 -4,-16 0,-14
+               C4,-16 8,-16 12,-14
+               C15,-12 15,-10 12,-8
+               C15,-6 15,-4 12,-2
+               C15,0 15,2 12,4
+               C8,6 4,6 0,4
+               C-4,6 -8,6 -12,4
+               C-15,2 -15,0 -12,-2
+               C-15,-4 -15,-6 -12,-8 Z" 
+            fill="#E91E63" stroke="#D81B60" stroke-width="0.8"/>
+      
+      <!-- Brain folds/texture -->
+      <path d="M-8,-6 C-6,-8 -2,-8 0,-6 C2,-8 6,-8 8,-6" 
+            fill="none" stroke="#C2185B" stroke-width="1"/>
+      <path d="M-8,0 C-6,-2 -2,-2 0,0 C2,-2 6,-2 8,0" 
+            fill="none" stroke="#C2185B" stroke-width="1"/>
+      <path d="M-6,2 C-4,0 0,0 2,2 C4,0 6,0 6,2" 
+            fill="none" stroke="#C2185B" stroke-width="1"/>
+      
+      <!-- £ Symbol in center of brain -->
+      <g transform="translate(0, -2)">
+        <text x="0" y="4" font-family="Arial, sans-serif" font-size="14" font-weight="bold" 
+              fill="#FFD700" text-anchor="middle" dominant-baseline="central">£</text>
+      </g>
+    </g>
+    
+    <!-- Navy blue orbital ring -->
+    <ellipse cx="0" cy="0" rx="40" ry="25" 
+             fill="none" stroke="#1A237E" stroke-width="4"
+             transform="rotate(25)"/>
+  </g>
+  
+  <!-- Text Group -->
+  <g transform="translate(200, 130)">
+    <!-- SmartSpend main text -->
+    <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="bold" 
+          fill="#1A237E" text-anchor="middle" dominant-baseline="central">SmartSpend</text>
+    
+    <!-- Slogan -->
+    <text x="0" y="25" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" 
+          fill="#1A237E" text-anchor="middle" dominant-baseline="central">Think Smart. Spend Smarter.</text>
+  </g>
+</svg>

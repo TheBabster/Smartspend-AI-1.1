@@ -16,6 +16,7 @@ import SmartieCorner from "@/pages/SmartieCorner";
 import Growth from "@/pages/Growth";
 import TrackExpense from "@/pages/TrackExpense";
 import SmartPurchase from "@/pages/SmartPurchase";
+import { LogoDemo } from "./pages/LogoDemo";
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/purchase" component={SmartPurchase} />
       <Route path="/track-expense" component={TrackExpense} />
       <Route path="/expenses" component={TrackExpense} />
+      <Route path="/logo" component={LogoDemo} />
       <Route component={NotFound} />
     </Switch>
   );
