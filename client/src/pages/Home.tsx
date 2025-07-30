@@ -14,11 +14,19 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(5);
+  const [savingsLevel, setSavingsLevel] = useState(2);
 
   useEffect(() => {
-    // Enhanced background styles with floating animations
-    document.body.style.background = "radial-gradient(ellipse at top, #667eea 0%, #764ba2 100%)";
-    document.body.classList.toggle('dark', darkMode);
+    // Enhanced background styles with dark mode support
+    if (darkMode) {
+      document.body.style.background = "radial-gradient(ellipse at top, #1a1a2e 0%, #16213e 100%)";
+      document.body.classList.add('dark');
+    } else {
+      document.body.style.background = "radial-gradient(ellipse at top, #667eea 0%, #764ba2 100%)";
+      document.body.classList.remove('dark');
+    }
     
     // Animate Smartie's greeting with improved message
     setTimeout(() => {
@@ -32,17 +40,29 @@ export default function Home() {
     return () => {
       document.body.style.background = "";
     };
-  }, []);
+  }, [darkMode]);
+
+  const handleGetStarted = () => {
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowOnboarding(true);
+      setShowConfetti(false);
+    }, 1000);
+  };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className={`min-h-screen relative overflow-hidden transition-all duration-500 ${darkMode ? 'dark' : ''}`}>
       {/* Enhanced Background Pattern with subtle animations */}
       <div className="absolute inset-0">
-        {/* Enhanced animated background shimmer */}
+        {/* Enhanced animated background shimmer with dark mode support */}
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-br from-violet-600/20 via-fuchsia-500/20 to-pink-500/20"
+          className={`absolute inset-0 ${darkMode ? 'bg-gradient-to-br from-slate-800/30 via-indigo-900/30 to-purple-900/30' : 'bg-gradient-to-br from-violet-600/20 via-fuchsia-500/20 to-pink-500/20'}`}
           animate={{ 
-            background: [
+            background: darkMode ? [
+              "radial-gradient(ellipse at top left, rgba(51, 65, 85, 0.4) 0%, rgba(67, 56, 202, 0.2) 100%)",
+              "radial-gradient(ellipse at top right, rgba(67, 56, 202, 0.4) 0%, rgba(51, 65, 85, 0.2) 100%)",
+              "radial-gradient(ellipse at bottom, rgba(88, 28, 135, 0.3) 0%, rgba(30, 41, 59, 0.2) 100%)"
+            ] : [
               "radial-gradient(ellipse at top left, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.15) 100%)",
               "radial-gradient(ellipse at top right, rgba(236, 72, 153, 0.3) 0%, rgba(139, 92, 246, 0.15) 100%)",
               "radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.15) 100%)",
@@ -167,9 +187,30 @@ export default function Home() {
           </motion.span>
         </motion.button>
 
+        {/* Gamified Progress Bar */}
+        <motion.div
+          className="absolute top-20 left-6 z-40 flex items-center gap-4"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+        >
+          <div className={`${darkMode ? 'bg-slate-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-full px-4 py-2 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg`}>
+            <div className="flex items-center gap-2 text-sm font-bold">
+              <span className="text-orange-500">🔥</span>
+              <span className={darkMode ? 'text-white' : 'text-gray-800'}>Streak: {currentStreak} days</span>
+            </div>
+          </div>
+          <div className={`${darkMode ? 'bg-slate-800/80' : 'bg-white/80'} backdrop-blur-sm rounded-full px-4 py-2 border ${darkMode ? 'border-slate-600' : 'border-white/30'} shadow-lg`}>
+            <div className="flex items-center gap-2 text-sm font-bold">
+              <span className="text-green-500">🌱</span>
+              <span className={darkMode ? 'text-white' : 'text-gray-800'}>Savings Tree Level {savingsLevel}</span>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Professional Header with Real Logo */}
         <motion.header 
-          className="text-white px-6 py-6 text-center"
+          className={`${darkMode ? 'text-slate-100' : 'text-white'} px-6 py-6 text-center`}
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -186,13 +227,13 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent">
+            <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'bg-gradient-to-r from-slate-100 to-indigo-200 bg-clip-text text-transparent' : 'bg-gradient-to-r from-white to-purple-100 bg-clip-text text-transparent'}`}>
               Welcome to SmartSpend
             </h2>
-            <p className="text-xl opacity-95 font-semibold mb-2">
+            <p className={`text-xl ${darkMode ? 'opacity-90' : 'opacity-95'} font-semibold mb-2`}>
               Master your money with AI, habits, and fun
             </p>
-            <p className="text-base opacity-80 font-medium">
+            <p className={`text-base ${darkMode ? 'opacity-75' : 'opacity-80'} font-medium`}>
               Your personal AI coach makes every financial decision smarter
             </p>
           </motion.div>
@@ -281,12 +322,13 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Daily AI Tip Card */}
+          {/* Interactive Daily AI Tip Card */}
           <motion.div 
-            className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-xl p-6 mb-6 border border-blue-200"
+            className={`${darkMode ? 'bg-gradient-to-r from-slate-800/90 to-indigo-900/90 border border-slate-600' : 'bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200'} rounded-3xl shadow-xl p-6 mb-6 backdrop-blur-sm`}
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
+            whileHover={{ scale: 1.02, y: -2 }}
           >
             <div className="flex items-center gap-3 mb-3">
               <motion.div 
@@ -303,9 +345,9 @@ export default function Home() {
                 <Star className="w-5 h-5 text-white" />
               </motion.div>
               <motion.h3 
-                className="font-bold text-gray-800 text-lg"
+                className={`font-bold text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}
                 animate={{ 
-                  color: ["#1f2937", "#3730a3", "#1f2937"] 
+                  color: darkMode ? ["#f1f5f9", "#a5b4fc", "#f1f5f9"] : ["#1f2937", "#3730a3", "#1f2937"] 
                 }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
@@ -313,14 +355,22 @@ export default function Home() {
               </motion.h3>
             </div>
             <motion.p 
-              className="text-gray-700 leading-relaxed font-medium"
+              className={`leading-relaxed font-medium mb-4 ${darkMode ? 'text-slate-300' : 'text-gray-700'}`}
               animate={{ 
-                color: ["#374151", "#6366f1", "#374151"] 
+                color: darkMode ? ["#cbd5e1", "#a78bfa", "#cbd5e1"] : ["#374151", "#6366f1", "#374151"] 
               }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
               "Track your emotional spending triggers! Users who log their mood before purchases save 23% more on average."
             </motion.p>
+            <motion.button
+              className={`text-sm font-semibold px-4 py-2 rounded-xl transition-all duration-300 ${darkMode ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-purple-100 hover:bg-purple-200 text-purple-700'}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/decisions")}
+            >
+              Log Your Mood Now →
+            </motion.button>
           </motion.div>
 
           {/* Enhanced Core Features Preview */}
@@ -331,7 +381,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-7 border border-white/20 hover:shadow-2xl transition-all duration-300"
+              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300`}
               whileHover={{ y: -5, scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -340,14 +390,14 @@ export default function Home() {
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
                 <TrendingUp className="w-7 h-7 text-white" />
               </div>
-              <h3 className="font-bold text-gray-800 mb-3 text-lg">Smart Budgeting</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <h3 className={`font-bold mb-3 text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>Smart Budgeting</h3>
+              <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
                 AI-powered budget allocation based on your spending patterns and goals
               </p>
             </motion.div>
             
             <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-7 border border-white/20 hover:shadow-2xl transition-all duration-300"
+              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300`}
               whileHover={{ y: -5, scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -356,14 +406,14 @@ export default function Home() {
               <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
                 <Brain className="w-7 h-7 text-white" />
               </div>
-              <h3 className="font-bold text-gray-800 mb-3 text-lg">AI Insights</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <h3 className={`font-bold mb-3 text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>AI Insights</h3>
+              <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
                 Get personalized recommendations and spending insights from Smartie
               </p>
             </motion.div>
             
             <motion.div 
-              className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-7 border border-white/20 hover:shadow-2xl transition-all duration-300"
+              className={`${darkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-white/20'} backdrop-blur-sm rounded-3xl shadow-xl p-7 border hover:shadow-2xl transition-all duration-300`}
               whileHover={{ y: -5, scale: 1.02 }}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -372,8 +422,8 @@ export default function Home() {
               <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
                 <Target className="w-7 h-7 text-white" />
               </div>
-              <h3 className="font-bold text-gray-800 mb-3 text-lg">Goal Tracking</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <h3 className={`font-bold mb-3 text-lg ${darkMode ? 'text-slate-100' : 'text-gray-800'}`}>Goal Tracking</h3>
+              <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
                 Set and achieve financial goals with gamified progress tracking
               </p>
             </motion.div>
@@ -391,7 +441,7 @@ export default function Home() {
               whileTap={{ scale: 0.98 }}
             >
               <Button 
-                onClick={() => setShowOnboarding(true)}
+                onClick={handleGetStarted}
                 className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold py-6 px-16 rounded-2xl shadow-2xl hover:shadow-purple-500/60 transition-all duration-300 w-full md:w-auto text-xl relative overflow-hidden group border-2 border-purple-300/40"
                 style={{
                   boxShadow: "0 0 40px rgba(168, 85, 247, 0.5), 0 25px 50px rgba(147, 51, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)"
@@ -417,13 +467,45 @@ export default function Home() {
                   }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 />
+                {/* Confetti Animation */}
+                {showConfetti && (
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {[...Array(20)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b'][i % 6],
+                          left: `${50 + (Math.random() - 0.5) * 100}%`,
+                          top: `${50 + (Math.random() - 0.5) * 100}%`
+                        }}
+                        animate={{
+                          y: [-20, -100, 100],
+                          x: [(Math.random() - 0.5) * 100, (Math.random() - 0.5) * 200],
+                          rotate: [0, 360],
+                          scale: [0, 1, 0]
+                        }}
+                        transition={{
+                          duration: 1,
+                          delay: i * 0.05,
+                          ease: "easeOut"
+                        }}
+                      />
+                    ))}
+                  </motion.div>
+                )}
               </Button>
             </motion.div>
             
-            <p className="text-white/80 text-sm mt-4">
+            <p className={`text-sm mt-4 ${darkMode ? 'text-slate-300' : 'text-white/80'}`}>
               <button 
                 onClick={() => navigate("/dashboard")}
-                className="hover:underline hover:text-white transition-colors"
+                className={`transition-colors ${darkMode ? 'hover:underline hover:text-slate-100' : 'hover:underline hover:text-white'}`}
               >
                 I already have an account
               </button>
@@ -432,7 +514,7 @@ export default function Home() {
 
           {/* Trust Elements */}
           <motion.div
-            className="text-center text-white/70 text-sm space-y-2 mb-8"
+            className={`text-center text-sm space-y-2 mb-8 ${darkMode ? 'text-slate-400' : 'text-white/70'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.6 }}
