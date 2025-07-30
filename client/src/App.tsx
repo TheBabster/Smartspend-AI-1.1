@@ -14,6 +14,7 @@ import Analytics from "@/pages/Analytics";
 import EnhancedAnalytics from "@/pages/EnhancedAnalytics";
 import SmartieCorner from "@/pages/SmartieCorner";
 import Growth from "@/pages/Growth";
+import TrackExpense from "@/pages/TrackExpense";
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -53,6 +54,8 @@ function Router() {
       <Route path="/analytics-old" component={Analytics} />
       <Route path="/smartie" component={SmartieCorner} />
       <Route path="/growth" component={Growth} />
+      <Route path="/track-expense" component={TrackExpense} />
+      <Route path="/expenses" component={TrackExpense} />
       <Route component={NotFound} />
     </Switch>
   );

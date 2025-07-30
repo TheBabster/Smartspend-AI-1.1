@@ -1,352 +1,420 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send, MessageCircle, Sparkles } from "lucide-react";
-import SmartieAvatarSystem from "./SmartieAvatarSystem";
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
+import { 
+  Send, 
+  Mic, 
+  Sparkles, 
+  TrendingUp, 
+  Target, 
+  DollarSign, 
+  Brain,
+  MessageSquare,
+  Lightbulb,
+  Heart,
+  Shield,
+  Zap
+} from 'lucide-react';
+import { type Budget, type Expense, type Goal } from '@shared/schema';
 
-interface Message {
+interface ChatMessage {
   id: string;
-  text: string;
-  sender: "user" | "smartie";
+  type: 'user' | 'smartie';
+  content: string;
   timestamp: Date;
-  mood?: "happy" | "thinking" | "celebrating" | "concerned" | "proud" | "warning" | "excited" | "relaxed";
+  mood?: 'happy' | 'thinking' | 'concerned' | 'celebrating' | 'encouraging';
+  suggestions?: string[];
 }
 
 interface SmartieIntelligentChatProps {
-  userSpendingData?: {
-    totalSpent: number;
-    budgetUsed: number;
-    streak: number;
-    recentCategory?: string;
-  };
+  className?: string;
   onClose?: () => void;
-  isOpen?: boolean;
+  initialContext?: 'budget' | 'expense' | 'goal' | 'general';
 }
 
 const SmartieIntelligentChat: React.FC<SmartieIntelligentChatProps> = ({
-  userSpendingData,
+  className = "",
   onClose,
-  isOpen = false
+  initialContext = 'general'
 }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      type: 'smartie',
+      content: getInitialMessage(initialContext),
+      timestamp: new Date(),
+      mood: 'happy',
+      suggestions: getInitialSuggestions(initialContext)
+    }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [smartieMood, setSmartieMood] = useState<"happy" | "thinking" | "celebrating" | "concerned" | "proud" | "warning" | "excited" | "relaxed">("happy");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  // Fetch user data for context
+  const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ['/api/budgets'] });
+  const { data: expenses = [] } = useQuery<Expense[]>({ queryKey: ['/api/expenses'] });
+  const { data: goals = [] } = useQuery<Goal[]>({ queryKey: ['/api/goals'] });
+
+  // AI Chat mutation (simulated for now - would use OpenAI API)
+  const chatMutation = useMutation({
+    mutationFn: async (message: string) => {
+      // Simulate AI thinking time
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      return generateSmartieResponse(message, { budgets, expenses, goals });
+    },
+    onSuccess: (response) => {
+      setIsTyping(false);
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'smartie',
+        content: response.content,
+        timestamp: new Date(),
+        mood: response.mood,
+        suggestions: response.suggestions
+      };
+      setMessages(prev => [...prev, newMessage]);
+    }
+  });
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      // Welcome message when chat opens
-      const welcomeMessage: Message = {
-        id: "welcome",
-        text: getWelcomeMessage(),
-        sender: "smartie",
-        timestamp: new Date(),
-        mood: "excited"
-      };
-      setMessages([welcomeMessage]);
-      setSmartieMood("excited");
-    }
-  }, [isOpen]);
-
-  const getWelcomeMessage = () => {
-    const { budgetUsed = 0, streak = 0 } = userSpendingData || {};
-    
-    if (streak > 5) {
-      return "🎉 Amazing streak! You've been smart with money for " + streak + " days! What financial wisdom can I help you with today?";
-    } else if (budgetUsed > 80) {
-      return "Hey there! I noticed you're close to your budget limit. Let's chat about smart spending strategies! 💡";
-    } else if (budgetUsed < 50) {
-      return "You're doing fantastic with your budget! 🌟 I'm here to help you make even smarter financial decisions. What's on your mind?";
-    } else {
-      return "Hi! I'm Smartie, your AI financial companion! 🧠💰 Ask me anything about budgeting, saving, or making smart purchase decisions!";
-    }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const generateSmartieResponse = (userMessage: string): { text: string; mood: typeof smartieMood } => {
-    const lowerMessage = userMessage.toLowerCase();
-    const { totalSpent = 0, budgetUsed = 0, streak = 0, recentCategory = "" } = userSpendingData || {};
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
 
-    // Budget-related questions
-    if (lowerMessage.includes("budget") || lowerMessage.includes("spending")) {
-      if (budgetUsed > 90) {
-        return {
-          text: "🚨 You're at " + budgetUsed.toFixed(0) + "% of your budget! Here's my advice: pause on non-essentials, look for cheaper alternatives, and remember - every small saving counts! Want me to suggest some specific strategies?",
-          mood: "warning"
-        };
-      } else if (budgetUsed > 70) {
-        return {
-          text: "⚠️ You're at " + budgetUsed.toFixed(0) + "% of your budget. Good time to be extra mindful! Consider the 24-hour rule before any purchase above £20. You're doing well though! 💪",
-          mood: "concerned"
-        };
-      } else {
-        return {
-          text: "✨ Great job! You're only at " + budgetUsed.toFixed(0) + "% of your budget. You have room for some fun purchases, but remember to prioritize your goals! What's your next savings target?",
-          mood: "proud"
-        };
-      }
-    }
-
-    // Saving advice
-    if (lowerMessage.includes("save") || lowerMessage.includes("saving")) {
-      return {
-        text: "💡 Smart saving tips: 1) Try the 50/30/20 rule (needs/wants/savings), 2) Set up automatic transfers to savings, 3) Use the envelope method for discretionary spending. Your current streak of " + streak + " days shows you're already building good habits! 🌟",
-        mood: "thinking"
-      };
-    }
-
-    // Purchase decisions
-    if (lowerMessage.includes("buy") || lowerMessage.includes("purchase") || lowerMessage.includes("should i")) {
-      return {
-        text: "🤔 Before buying, ask yourself: 1) Do I need it or want it? 2) Will I use it regularly? 3) Can I wait 24 hours to decide? 4) Does it align with my goals? Use the purchase decision tool for detailed analysis! What are you thinking of buying?",
-        mood: "thinking"
-      };
-    }
-
-    // Goals and motivation
-    if (lowerMessage.includes("goal") || lowerMessage.includes("motivation") || lowerMessage.includes("help")) {
-      return {
-        text: "🎯 Goals are dreams with deadlines! Break big goals into smaller milestones, celebrate small wins, and remember why you started. Your " + streak + "-day streak proves you can do this! What goal are you working toward?",
-        mood: "excited"
-      };
-    }
-
-    // Stress or emotional spending
-    if (lowerMessage.includes("stress") || lowerMessage.includes("emotional") || lowerMessage.includes("feeling")) {
-      return {
-        text: "💙 I understand - emotions and money are deeply connected. Try this: pause, take 3 deep breaths, ask 'what am I really feeling?' Often a walk, call to a friend, or free activity can help more than spending. You've got this! 🤗",
-        mood: "relaxed"
-      };
-    }
-
-    // Compliments or positive messages
-    if (lowerMessage.includes("thank") || lowerMessage.includes("good") || lowerMessage.includes("great")) {
-      return {
-        text: "🌟 You're so welcome! It makes me happy to help you build better money habits. Remember, every smart decision is a step toward your dreams. Keep up the amazing work! 🎉",
-        mood: "celebrating"
-      };
-    }
-
-    // Default encouraging response
-    const encouragingResponses = [
-      "That's a great question! 🧠 Financial wisdom grows with every smart decision you make. Your " + streak + "-day streak shows you're on the right track!",
-      "💰 Remember, being smart with money isn't about restriction - it's about making your money work toward your dreams! What matters most to you right now?",
-      "🌟 Every financial decision is a chance to choose your future self! I believe in your ability to make smart choices. What's your biggest financial priority?",
-      "💡 Smart spending is like a muscle - the more you practice, the stronger it gets! Your progress so far has been impressive. What else can I help with?"
-    ];
-
-    return {
-      text: encouragingResponses[Math.floor(Math.random() * encouragingResponses.length)],
-      mood: "happy"
-    };
-  };
-
-  const handleSendMessage = async () => {
-    if (!inputText.trim()) return;
-
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       id: Date.now().toString(),
-      text: inputText,
-      sender: "user",
+      type: 'user',
+      content: inputMessage,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputText("");
+    setInputMessage('');
     setIsTyping(true);
-    setSmartieMood("thinking");
+    chatMutation.mutate(inputMessage);
+  };
 
-    // Simulate thinking delay
-    setTimeout(() => {
-      const response = generateSmartieResponse(inputText);
-      const smartieMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: response.text,
-        sender: "smartie",
-        timestamp: new Date(),
-        mood: response.mood
-      };
-
-      setMessages(prev => [...prev, smartieMessage]);
-      setSmartieMood(response.mood);
-      setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+  const handleSuggestionClick = (suggestion: string) => {
+    setInputMessage(suggestion);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <motion.div
-      ref={chatRef}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.div
-        className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-purple-900 rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col"
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-purple-200 dark:border-purple-700">
+    <div className={`h-full flex flex-col ${className}`}>
+      {/* Chat Header */}
+      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 text-white p-4 rounded-t-2xl">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <SmartieAvatarSystem 
-              mood={smartieMood} 
-              size="md" 
-              animated={true} 
-            />
+            <ExactSmartieAvatar mood="happy" size="md" animated={true} />
             <div>
-              <h3 className="font-bold text-high-contrast flex items-center gap-2">
-                Chat with Smartie <Sparkles className="w-4 h-4 text-purple-500" />
-              </h3>
-              <p className="text-xs text-medium-contrast">Your AI Financial Companion</p>
+              <h2 className="text-lg font-bold">Chat with Smartie</h2>
+              <p className="text-sm opacity-90">Your AI Financial Assistant</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="text-medium-contrast hover:text-high-contrast"
-          >
-            ✕
-          </Button>
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-white hover:bg-white/20"
+            >
+              ✕
+            </Button>
+          )}
         </div>
+      </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-          <AnimatePresence>
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <div className={`max-w-[80%] ${message.sender === "user" ? "order-2" : "order-1"}`}>
-                  {message.sender === "smartie" && (
-                    <div className="flex items-center gap-2 mb-1">
-                      <SmartieAvatarSystem 
-                        mood={message.mood || "happy"} 
-                        size="sm" 
-                        animated={true} 
-                      />
-                      <span className="text-xs font-medium text-purple-600 dark:text-purple-400">
-                        Smartie
-                      </span>
-                    </div>
-                  )}
-                  <Card className={`${
-                    message.sender === "user" 
-                      ? "bg-purple-500 text-white border-purple-500" 
-                      : "bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700"
-                  }`}>
-                    <CardContent className="p-3">
-                      <p className={`text-sm leading-relaxed ${
-                        message.sender === "user" 
-                          ? "text-white" 
-                          : "text-high-contrast"
-                      }`}>
-                        {message.text}
-                      </p>
-                      <p className={`text-xs mt-1 opacity-70`}>
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-
-          {/* Typing indicator */}
-          <AnimatePresence>
-            {isTyping && (
-              <motion.div
-                className="flex justify-start"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <div className="flex items-center gap-2">
-                  <SmartieAvatarSystem 
-                    mood="thinking" 
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-purple-50/50 to-pink-50/50">
+        <AnimatePresence>
+          {messages.map((message) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`flex items-start gap-3 max-w-[80%] ${
+                message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
+              }`}>
+                {message.type === 'smartie' && (
+                  <ExactSmartieAvatar 
+                    mood={message.mood || 'happy'} 
                     size="sm" 
                     animated={true} 
                   />
-                  <Card className="bg-white dark:bg-gray-800 border-purple-200 dark:border-purple-700">
-                    <CardContent className="p-3">
-                      <div className="flex gap-1">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            className="w-2 h-2 bg-purple-500 rounded-full"
-                            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                            transition={{
-                              duration: 1,
-                              repeat: Infinity,
-                              delay: i * 0.2
-                            }}
-                          />
+                )}
+                
+                <div className={`p-4 rounded-2xl ${
+                  message.type === 'user'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                    : 'bg-white border shadow-sm'
+                }`}>
+                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  
+                  {message.suggestions && message.suggestions.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs opacity-70">Quick suggestions:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {message.suggestions.map((suggestion, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleSuggestionClick(suggestion)}
+                            className="text-xs"
+                          >
+                            {suggestion}
+                          </Button>
                         ))}
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  )}
+                  
+                  <div className="text-xs opacity-50 mt-2">
+                    {message.timestamp.toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <div ref={messagesEndRef} />
-        </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
-        {/* Input */}
-        <div className="p-4 border-t border-purple-200 dark:border-purple-700">
-          <div className="flex gap-2">
+        {/* Typing Indicator */}
+        {isTyping && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-start gap-3"
+          >
+            <ExactSmartieAvatar mood="thinking" size="sm" animated={true} />
+            <div className="bg-white border rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                </div>
+                <span className="text-sm text-gray-500">Smartie is thinking...</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Area */}
+      <div className="border-t bg-white p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 relative">
             <Input
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask Smartie about budgeting, saving, or spending decisions..."
-              className="flex-1 border-purple-200 dark:border-purple-700 focus:border-purple-500"
-              disabled={isTyping}
+              placeholder="Ask Smartie about your finances..."
+              className="pr-12 rounded-full border-gray-300 focus:border-purple-400"
             />
             <Button
-              onClick={handleSendMessage}
-              disabled={!inputText.trim() || isTyping}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-3"
+              variant="ghost"
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-500"
             >
-              <Send className="w-4 h-4" />
+              <Mic className="w-4 h-4" />
             </Button>
           </div>
-          <p className="text-xs text-medium-contrast mt-2 text-center">
-            Press Enter to send • Smartie learns from your spending patterns
-          </p>
+          
+          <Button
+            onClick={handleSendMessage}
+            disabled={!inputMessage.trim() || isTyping}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full p-3"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
         </div>
-      </motion.div>
-    </motion.div>
+
+        {/* Quick Actions */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {getQuickActions().map((action, index) => (
+            <Button
+              key={index}
+              variant="outline"
+              size="sm"
+              onClick={() => handleSuggestionClick(action.text)}
+              className="text-xs flex items-center gap-1"
+            >
+              <action.icon className="w-3 h-3" />
+              {action.text}
+            </Button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
+
+// Helper functions
+function getInitialMessage(context: string): string {
+  switch (context) {
+    case 'budget':
+      return "Hi there! I'm here to help you with your budget planning. I can analyze your spending patterns, suggest optimizations, and help you stay on track with your financial goals. What would you like to know?";
+    case 'expense':
+      return "Let's talk about your expenses! I can help you categorize spending, identify patterns, and find ways to save money. What specific expense questions do you have?";
+    case 'goal':
+      return "Great to see you working on your financial goals! I can help you create achievable targets, track progress, and adjust strategies. Which goal would you like to discuss?";
+    default:
+      return "Hello! I'm Smartie, your AI financial assistant. I'm here to help you make smarter financial decisions, understand your spending patterns, and achieve your money goals. How can I help you today?";
+  }
+}
+
+function getInitialSuggestions(context: string): string[] {
+  switch (context) {
+    case 'budget':
+      return [
+        "How's my budget looking this month?",
+        "Where can I cut expenses?",
+        "Help me set up a new budget"
+      ];
+    case 'expense':
+      return [
+        "Analyze my spending patterns",
+        "What's my biggest expense category?",
+        "Track my recent purchases"
+      ];
+    case 'goal':
+      return [
+        "Help me set a savings goal",
+        "Am I on track with my goals?",
+        "Create a debt payoff plan"
+      ];
+    default:
+      return [
+        "How much have I spent this month?",
+        "What's my financial health score?",
+        "Give me money-saving tips"
+      ];
+  }
+}
+
+function getQuickActions() {
+  return [
+    { text: "Budget overview", icon: TrendingUp },
+    { text: "Spending tips", icon: Lightbulb },
+    { text: "Goal progress", icon: Target },
+    { text: "Money insights", icon: Brain }
+  ];
+}
+
+function generateSmartieResponse(
+  message: string, 
+  context: { budgets: Budget[], expenses: Expense[], goals: Goal[] }
+): { content: string, mood: 'happy' | 'thinking' | 'concerned' | 'celebrating' | 'encouraging', suggestions: string[] } {
+  const lowercaseMessage = message.toLowerCase();
+  
+  // Calculate some basic stats for responses
+  const totalSpent = context.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+  const totalBudget = context.budgets.reduce((sum, budget) => sum + parseFloat(budget.monthlyLimit), 0);
+  const remainingBudget = totalBudget - totalSpent;
+  
+  // Budget-related queries
+  if (lowercaseMessage.includes('budget') || lowercaseMessage.includes('spending')) {
+    if (remainingBudget > 0) {
+      return {
+        content: `Great news! You have £${remainingBudget.toFixed(2)} remaining in your budget this month. You've spent £${totalSpent.toFixed(2)} out of £${totalBudget.toFixed(2)}. You're doing well staying on track! 💰`,
+        mood: 'happy',
+        suggestions: ["Show me spending breakdown", "Tips to save more", "Set up new budget"]
+      };
+    } else {
+      return {
+        content: `I notice you've exceeded your budget by £${Math.abs(remainingBudget).toFixed(2)} this month. Don't worry, this happens! Let's look at ways to get back on track. Would you like some money-saving suggestions?`,
+        mood: 'concerned',
+        suggestions: ["Money-saving tips", "Adjust my budget", "Track overspending"]
+      };
+    }
+  }
+  
+  // Goal-related queries
+  if (lowercaseMessage.includes('goal') || lowercaseMessage.includes('save')) {
+    const completedGoals = context.goals.filter(g => g.completed).length;
+    const totalGoals = context.goals.length;
+    
+    return {
+      content: `You're making great progress! You've completed ${completedGoals} out of ${totalGoals} financial goals. ${totalGoals > 0 ? "Your dedication is paying off! 🎯" : "Ready to set some exciting financial goals? I can help you create achievable targets!"}`,
+      mood: completedGoals > 0 ? 'celebrating' : 'encouraging',
+      suggestions: ["Create new goal", "Review progress", "Goal strategies"]
+    };
+  }
+  
+  // Expense analysis
+  if (lowercaseMessage.includes('spent') || lowercaseMessage.includes('expense')) {
+    const topCategory = getTopSpendingCategory(context.expenses);
+    return {
+      content: `This month you've spent £${totalSpent.toFixed(2)} across ${context.expenses.length} transactions. Your biggest spending category is ${topCategory.name} at £${topCategory.amount.toFixed(2)}. This represents ${((topCategory.amount / totalSpent) * 100).toFixed(1)}% of your total spending.`,
+      mood: 'thinking',
+      suggestions: ["Category breakdown", "Spending trends", "Reduce expenses"]
+    };
+  }
+  
+  // Tips and advice
+  if (lowercaseMessage.includes('tip') || lowercaseMessage.includes('advice') || lowercaseMessage.includes('help')) {
+    const tips = [
+      "Try the 50/30/20 rule: 50% needs, 30% wants, 20% savings!",
+      "Set up automatic transfers to your savings account - pay yourself first!",
+      "Use the 24-hour rule for non-essential purchases over £50.",
+      "Track your emotional triggers for spending - awareness is the first step!",
+      "Consider the 'cost per use' for purchases - is it worth it long-term?"
+    ];
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    
+    return {
+      content: `Here's a smart tip for you: ${randomTip} 💡 Would you like more personalized advice based on your spending patterns?`,
+      mood: 'happy',
+      suggestions: ["More tips", "Analyze my habits", "Create action plan"]
+    };
+  }
+  
+  // General friendly responses
+  return {
+    content: "I'm here to help you make the smartest financial decisions! I can analyze your spending, help with budgeting, track your goals, and provide personalized money advice. What specific area would you like to explore? 🤔",
+    mood: 'thinking',
+    suggestions: ["Budget analysis", "Spending insights", "Financial goals", "Money tips"]
+  };
+}
+
+function getTopSpendingCategory(expenses: Expense[]) {
+  const categoryTotals = expenses.reduce((acc, expense) => {
+    acc[expense.category] = (acc[expense.category] || 0) + parseFloat(expense.amount);
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const topCategory = Object.entries(categoryTotals).reduce((max, [category, amount]) => 
+    amount > max.amount ? { name: category, amount } : max
+  , { name: 'Other', amount: 0 });
+  
+  return topCategory;
+}
 
 export default SmartieIntelligentChat;

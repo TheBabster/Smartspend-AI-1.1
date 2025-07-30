@@ -4,8 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Quote, Heart, Lightbulb, Star, Gift, ShoppingBag, Shirt, Glasses, Crown } from "lucide-react";
+import { Quote, Heart, Lightbulb, Star, Gift, ShoppingBag, Shirt, Glasses, Crown, MessageSquare } from "lucide-react";
 import ExactSmartieAvatar from "@/components/ExactSmartieAvatar";
+import SmartieIntelligentChat from "@/components/SmartieIntelligentChat";
 import { BounceButton, bounceVariants, LiftCard, liftVariants, staggerContainer, staggerItem } from "@/components/MicroAnimations";
 import BottomNav from "@/components/BottomNav";
 import ResponsiveLayout from "@/components/ResponsiveLayout";
@@ -38,7 +39,8 @@ interface RegretStory {
 }
 
 export default function SmartieCorner() {
-  const [selectedTab, setSelectedTab] = useState<"quotes" | "shop" | "regrets">("quotes");
+  const [selectedTab, setSelectedTab] = useState<"quotes" | "shop" | "regrets" | "chat">("quotes");
+  const [showChat, setShowChat] = useState(false);
   const [userCoins, setUserCoins] = useState(125);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [showRegretForm, setShowRegretForm] = useState(false);
@@ -216,6 +218,7 @@ export default function SmartieCorner() {
         <div className="flex bg-gray-100 dark:bg-gray-800 rounded-full p-1">
           {[
             { id: "quotes", label: "Quotes", icon: Quote },
+            { id: "chat", label: "Chat", icon: MessageSquare },
             { id: "shop", label: "Shop", icon: ShoppingBag },
             { id: "regrets", label: "Regrets", icon: Heart }
           ].map(({ id, label, icon: Icon }) => (
@@ -245,6 +248,15 @@ export default function SmartieCorner() {
         animate="show"
         className="space-y-6"
       >
+        {/* Chat Tab */}
+        {selectedTab === "chat" && (
+          <motion.div variants={staggerItem}>
+            <Card className="h-[600px]">
+              <SmartieIntelligentChat initialContext="general" />
+            </Card>
+          </motion.div>
+        )}
+
         {/* Quotes Tab */}
         {selectedTab === "quotes" && (
           <>
