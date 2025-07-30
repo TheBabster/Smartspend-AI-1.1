@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Target, MessageCircle, Settings, Sun, Moon, Sparkles, TrendingUp, PiggyBank, Zap, Heart } from "lucide-react";
 
 import CategoryCardEnhanced from "@/components/CategoryCardEnhanced";
+import { EnhancedCategoryCard, MoodSelector, SmartTipCard } from "@/components/VisualEnhancements";
+import { SlideAnimation, StaggerContainer, AnimatedButton } from "@/components/SlideAnimations";
+import { SmartieToast, HoverLift } from "@/components/MicroInteractions";
+
 import EnhancedBudgetRing from "@/components/EnhancedBudgetRing";
 import EnhancedHomeDashboard from "@/components/EnhancedHomeDashboard";
 import { BrandedLayout } from "@/components/BrandIdentitySystem";
@@ -30,6 +34,10 @@ import EnhancedSmartieReactions from "@/components/EnhancedSmartieReactions";
 import EnhancedQuickActions from "@/components/EnhancedQuickActions";
 import SmartieShowcase from "@/components/SmartieShowcase";
 import { BounceButton, bounceVariants, LiftCard, liftVariants } from "@/components/MicroAnimations";
+import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
+import StreakTracker from "@/components/StreakTracker";
+import { CategoryIcon, getCategoryColor } from "@/components/CategoryIcons";
+import SmartieLifeAnimations from "@/components/SmartieLifeAnimations";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
 import { useLocation } from "wouter";
 
@@ -40,6 +48,11 @@ export default function Dashboard() {
   const [darkMode, setDarkMode] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(true);
   const [showScoreModal, setShowScoreModal] = useState(false);
+  const [personalityMode, setPersonalityMode] = useState<'motivational' | 'funny' | 'strict' | 'chill'>('motivational');
+  const [showToast, setShowToast] = useState<{
+    message: string;
+    type: 'success' | 'warning' | 'info' | 'celebration';
+  } | null>(null);
   const [, navigate] = useLocation();
 
   const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
@@ -69,7 +82,8 @@ export default function Dashboard() {
     streak: budgetStreak?.currentStreak || 0,
     totalSaved: remainingBudget > 0 ? remainingBudget : 0,
     budgetHealth: budgetPercentage > 80 ? 'good' as const : 
-                  budgetPercentage > 60 ? 'warning' as const : 'danger' as const
+                  budgetPercentage > 60 ? 'warning' as const : 'danger' as const,
+    mood: 'happy' as const // This would come from user preferences in a real app
   };
 
   function calculateFinancialScore(): number {
@@ -233,7 +247,13 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Log Expense */}
                 <motion.button
-                  onClick={() => setShowExpenseModal(true)}
+                  onClick={() => {
+                    setShowExpenseModal(true);
+                    setShowToast({
+                      message: "Let's track your spending together! I'll help you understand your habits 💙",
+                      type: 'info'
+                    });
+                  }}
                   className={`p-4 rounded-xl text-left transition-all duration-300 ${darkMode ? 'bg-gradient-to-br from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600' : 'bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500'} text-white shadow-lg hover:shadow-xl transform hover:scale-105`}
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
@@ -254,7 +274,13 @@ export default function Dashboard() {
 
                 {/* Smart Purchase Decision */}
                 <motion.button
-                  onClick={() => setShowPurchaseModal(true)}
+                  onClick={() => {
+                    setShowPurchaseModal(true);
+                    setShowToast({
+                      message: "Smart choice asking me first! Let's make sure this purchase aligns with your goals 🎯",
+                      type: 'celebration'
+                    });
+                  }}
                   className={`p-4 rounded-xl text-left transition-all duration-300 ${darkMode ? 'bg-gradient-to-br from-purple-600 to-indigo-700 hover:from-purple-500 hover:to-indigo-600' : 'bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500'} text-white shadow-lg hover:shadow-xl transform hover:scale-105`}
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
@@ -469,68 +495,30 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        {/* Daily Smart Tip with Animation */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mb-6"
-        >
-          <Card className={`shadow-lg border-0 ${darkMode ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-sm overflow-hidden relative`}>
-            <motion.div
-              className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-orange-500"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1, delay: 0.5 }}
-            />
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <motion.div
-                  animate={{ x: [0, 10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                  className="mt-1"
-                >
-                  <ModernSmartieAvatar mood="thinking" size="sm" />
-                </motion.div>
-                <div className="flex-1">
-                  <h3 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                    💡 Daily Smart Tip
-                  </h3>
-                  <motion.p 
-                    className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'} leading-relaxed`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                  >
-                    Try the "24-hour rule" - wait a full day before making any purchase over £50. 
-                    You'll be surprised how many impulse buys you avoid!
-                  </motion.p>
-                  <motion.div 
-                    className="mt-3 flex gap-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8 }}
-                  >
-                    <motion.button
-                      className={`px-3 py-1 rounded-full text-xs ${darkMode ? 'bg-green-600 hover:bg-green-500' : 'bg-green-100 hover:bg-green-200 text-green-800'} transition-colors`}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      👍 Helpful
-                    </motion.button>
-                    <motion.button
-                      className={`px-3 py-1 rounded-full text-xs ${darkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-100 hover:bg-blue-200 text-blue-800'} transition-colors`}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      📚 Save Tip
-                    </motion.button>
-                  </motion.div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Enhanced Smart Tip Card */}
+        <SlideAnimation direction="right" delay={0.4} className="mb-6">
+          <SmartTipCard
+            tip={{
+              title: "Daily Smart Tip",
+              content: "Try the \"24-hour rule\" - wait a full day before making any purchase over £50. You'll be surprised how many impulse buys you avoid!",
+              category: "psychology"
+            }}
+            onMarkHelpful={() => {
+              console.log('Marked as helpful');
+              setShowToast({
+                message: "Thanks for the feedback! This helps me learn what tips are most useful 📚",
+                type: 'success'
+              });
+            }}
+            onSaveTip={() => {
+              console.log('Tip saved');
+              setShowToast({
+                message: "Tip saved to your personal collection! You can review it anytime",
+                type: 'info'
+              });
+            }}
+          />
+        </SlideAnimation>
 
         {/* Smartie Introduction */}
         {recentAchievement && (
@@ -567,21 +555,65 @@ export default function Dashboard() {
           <SmartieCorner />
         </motion.div>
 
-        {/* Category Spending Cards */}
-        <motion.div 
-          className="space-y-4 mb-6"
+        {/* Smartie Coaching Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="mb-6"
+        >
+          <SmartieCoachingSummary
+            weeklySpending={totalSpent}
+            smartPurchases={Math.floor(Math.random() * 8) + 2}
+            streak={userContext.streak}
+            personalityMode={personalityMode}
+            onPersonalityChange={setPersonalityMode}
+          />
+        </motion.div>
+
+        {/* Streak Tracker */}
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
+          className="mb-6"
         >
-          {budgets.map((budget, index) => (
-            <CategoryCardEnhanced 
-              key={budget.id} 
-              budget={budget} 
-              delay={index * 0.1}
-            />
-          ))}
+          <StreakTracker
+            loggingStreak={userContext.streak}
+            smartSpendingScore={userContext.financialScore}
+            budgetAdherence={budgetPercentage}
+            goalProgress={75}
+            showCelebration={userContext.streak >= 3}
+          />
         </motion.div>
+
+        {/* Enhanced Category Spending Cards */}
+        <SlideAnimation direction="bottom" delay={0.6}>
+          <StaggerContainer className="space-y-4 mb-6">
+            {budgets.map((budget, index) => (
+              <HoverLift key={budget.id} lift="medium">
+                <EnhancedCategoryCard 
+                  budget={budget} 
+                  delay={index * 0.1}
+                />
+              </HoverLift>
+            ))}
+          </StaggerContainer>
+        </SlideAnimation>
+
+        {/* Mood Selector */}
+        <SlideAnimation direction="left" delay={0.8} className="mb-6">
+          <MoodSelector
+            selectedMood={userContext.mood || undefined}
+            onMoodSelect={(mood) => {
+              console.log('Selected mood:', mood);
+              setShowToast({
+                message: `Got it! Understanding your ${mood} mood helps me give better spending advice`,
+                type: 'success'
+              });
+            }}
+          />
+        </SlideAnimation>
 
         {/* Financial Wellness Score */}
         <motion.div
@@ -717,6 +749,17 @@ export default function Dashboard() {
         budgetHealth={budgetPercentage > 90 ? "danger" : budgetPercentage > 75 ? "warning" : "good"}
         streak={budgetStreak?.currentStreak || 0}
       />
+
+      {/* Toast Notifications */}
+      <AnimatePresence>
+        {showToast && (
+          <SmartieToast
+            message={showToast.message}
+            type={showToast.type}
+            onClose={() => setShowToast(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Bottom Navigation */}
       <BottomNav currentTab="home" />
