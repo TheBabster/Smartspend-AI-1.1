@@ -357,16 +357,9 @@ export default function Dashboard() {
         open={showExpenseModal} 
         onOpenChange={setShowExpenseModal} 
       />
-      <SmartieIntelligentChat
-        isOpen={showSmartieChat}
-        onClose={() => setShowSmartieChat(false)}
-        userSpendingData={{
-          totalSpent,
-          budgetUsed: budgetPercentage,
-          streak: budgetStreak?.currentStreak || 0,
-          recentCategory: "general"
-        }}
-      />
+      {showSmartieChat && (
+        <SmartieIntelligentChat onClose={() => setShowSmartieChat(false)} />
+      )}
 
       {/* Enhanced Smartie Personality */}
       <EnhancedSmartiePersonality
