@@ -1,76 +1,128 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" width="400" height="280">
+  <defs>
+    <!-- Gradient for sparkle glow -->
+    <radialGradient id="sparkleGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#FFB84D;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
   <!-- Background (transparent) -->
-  <rect width="400" height="200" fill="transparent"/>
+  <rect width="400" height="280" fill="transparent"/>
   
   <!-- Logo Symbol Group -->
-  <g transform="translate(200, 60)">
+  <g transform="translate(200, 80)">
     
-    <!-- Sparkle (star) - top left of head -->
-    <g transform="translate(-45, -25)">
-      <path d="M0,-8 L2,-2 L8,0 L2,2 L0,8 L-2,2 L-8,0 L-2,-2 Z" 
-            fill="#FFB84D" stroke="#FFA500" stroke-width="0.5"/>
-      <circle cx="0" cy="0" r="1" fill="#FFF" opacity="0.8"/>
+    <!-- Sparkle star with glow - positioned top-left -->
+    <g transform="translate(-55, -35)">
+      <!-- Glow effect -->
+      <circle cx="0" cy="0" r="12" fill="url(#sparkleGlow)" opacity="0.4"/>
+      <!-- Main sparkle star -->
+      <path d="M0,-10 L3,-3 L10,0 L3,3 L0,10 L-3,3 L-10,0 L-3,-3 Z" 
+            fill="#FFB84D" 
+            stroke="#FF8C00" 
+            stroke-width="0.5"/>
+      <!-- Inner highlight -->
+      <path d="M0,-6 L1.8,-1.8 L6,0 L1.8,1.8 L0,6 L-1.8,1.8 L-6,0 L-1.8,-1.8 Z" 
+            fill="#FFD700" 
+            opacity="0.9"/>
     </g>
     
-    <!-- Head Profile (side view) -->
-    <path d="M-30,15 
-             C-30,5 -25,-5 -15,-12
-             C-5,-18 5,-20 15,-18
-             C25,-16 30,-10 32,-2
-             C34,6 32,14 28,20
-             C25,25 20,28 15,30
-             C10,32 5,32 0,30
-             L0,35
-             C-5,37 -10,35 -12,32
-             C-15,28 -18,24 -20,20
-             C-25,18 -28,16 -30,15 Z" 
-          fill="#FF6B9D" stroke="#FF5A8A" stroke-width="1"/>
+    <!-- Head Profile - more accurate proportions -->
+    <path d="M-35,20 
+             C-35,8 -30,-8 -18,-18
+             C-8,-25 8,-28 22,-25
+             C32,-22 38,-15 40,-5
+             C42,5 40,16 35,25
+             C30,32 22,37 15,40
+             C8,42 0,42 -5,40
+             L-5,48
+             C-10,50 -18,48 -22,44
+             C-26,38 -30,30 -33,24
+             C-34,22 -35,21 -35,20 Z" 
+          fill="#FF6B9D" 
+          stroke="#E91E63" 
+          stroke-width="1.5"/>
     
-    <!-- Brain inside head -->
-    <g transform="translate(5, 5)">
-      <!-- Brain outline -->
-      <path d="M-12,-8
-               C-15,-10 -15,-12 -12,-14
-               C-8,-16 -4,-16 0,-14
-               C4,-16 8,-16 12,-14
-               C15,-12 15,-10 12,-8
-               C15,-6 15,-4 12,-2
-               C15,0 15,2 12,4
-               C8,6 4,6 0,4
-               C-4,6 -8,6 -12,4
-               C-15,2 -15,0 -12,-2
-               C-15,-4 -15,-6 -12,-8 Z" 
-            fill="#E91E63" stroke="#D81B60" stroke-width="0.8"/>
+    <!-- Brain inside head - more detailed -->
+    <g transform="translate(8, 8)">
+      <!-- Brain main shape -->
+      <path d="M-15,-12
+               C-20,-15 -20,-18 -15,-20
+               C-10,-22 -5,-22 0,-20
+               C5,-22 10,-22 15,-20
+               C20,-18 20,-15 15,-12
+               C20,-9 20,-6 15,-4
+               C20,-1 20,2 15,5
+               C10,8 5,8 0,5
+               C-5,8 -10,8 -15,5
+               C-20,2 -20,-1 -15,-4
+               C-20,-6 -20,-9 -15,-12 Z" 
+            fill="#E91E63" 
+            stroke="#C2185B" 
+            stroke-width="1"/>
       
-      <!-- Brain folds/texture -->
-      <path d="M-8,-6 C-6,-8 -2,-8 0,-6 C2,-8 6,-8 8,-6" 
-            fill="none" stroke="#C2185B" stroke-width="1"/>
-      <path d="M-8,0 C-6,-2 -2,-2 0,0 C2,-2 6,-2 8,0" 
-            fill="none" stroke="#C2185B" stroke-width="1"/>
-      <path d="M-6,2 C-4,0 0,0 2,2 C4,0 6,0 6,2" 
-            fill="none" stroke="#C2185B" stroke-width="1"/>
+      <!-- Detailed brain folds -->
+      <path d="M-12,-8 C-8,-12 -3,-12 0,-8 C3,-12 8,-12 12,-8" 
+            fill="none" stroke="#AD1457" stroke-width="1.2"/>
+      <path d="M-12,-2 C-8,-6 -3,-6 0,-2 C3,-6 8,-6 12,-2" 
+            fill="none" stroke="#AD1457" stroke-width="1.2"/>
+      <path d="M-10,2 C-6,-2 -2,-2 2,2 C6,-2 10,-2 10,2" 
+            fill="none" stroke="#AD1457" stroke-width="1.2"/>
+      <path d="M-8,5 C-4,1 0,1 4,5 C8,1 8,1 8,5" 
+            fill="none" stroke="#AD1457" stroke-width="1"/>
       
-      <!-- £ Symbol in center of brain -->
-      <g transform="translate(0, -2)">
-        <text x="0" y="4" font-family="Arial, sans-serif" font-size="14" font-weight="bold" 
-              fill="#FFD700" text-anchor="middle" dominant-baseline="central">£</text>
+      <!-- Additional brain texture -->
+      <circle cx="-6" cy="-5" r="1.5" fill="#C2185B" opacity="0.6"/>
+      <circle cx="6" cy="-3" r="1.2" fill="#C2185B" opacity="0.6"/>
+      <circle cx="-3" cy="1" r="1" fill="#C2185B" opacity="0.6"/>
+      <circle cx="4" cy="3" r="1.3" fill="#C2185B" opacity="0.6"/>
+      
+      <!-- £ Symbol in center - bold and prominent -->
+      <g transform="translate(0, -3)">
+        <text x="0" y="6" 
+              font-family="Arial Black, Arial, sans-serif" 
+              font-size="18" 
+              font-weight="900" 
+              fill="#FFD700" 
+              stroke="#FF8C00"
+              stroke-width="0.5"
+              text-anchor="middle" 
+              dominant-baseline="central">£</text>
       </g>
     </g>
     
-    <!-- Navy blue orbital ring -->
-    <ellipse cx="0" cy="0" rx="40" ry="25" 
-             fill="none" stroke="#1A237E" stroke-width="4"
-             transform="rotate(25)"/>
+    <!-- Navy blue orbital ring - passing behind head -->
+    <ellipse cx="0" cy="0" 
+             rx="50" ry="32" 
+             fill="none" 
+             stroke="#1A237E" 
+             stroke-width="6"
+             transform="rotate(28)"
+             opacity="0.95"/>
   </g>
   
-  <!-- Text Group -->
-  <g transform="translate(200, 130)">
-    <!-- SmartSpend main text -->
-    <text x="0" y="0" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="bold" 
-          fill="#1A237E" text-anchor="middle" dominant-baseline="central">SmartSpend</text>
+  <!-- Text Group - properly spaced -->
+  <g transform="translate(200, 190)">
+    <!-- SmartSpend main text - exact font match -->
+    <text x="0" y="0" 
+          font-family="Inter, system-ui, -apple-system, sans-serif" 
+          font-size="42" 
+          font-weight="700" 
+          fill="#1A237E" 
+          text-anchor="middle" 
+          dominant-baseline="central"
+          letter-spacing="-0.02em">SmartSpend</text>
     
-    <!-- Slogan -->
-    <text x="0" y="25" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" 
-          fill="#1A237E" text-anchor="middle" dominant-baseline="central">Think Smart. Spend Smarter.</text>
+    <!-- Slogan - proper spacing -->
+    <text x="0" y="32" 
+          font-family="Inter, system-ui, -apple-system, sans-serif" 
+          font-size="18" 
+          font-weight="400" 
+          fill="#1A237E" 
+          text-anchor="middle" 
+          dominant-baseline="central"
+          letter-spacing="-0.01em">Think Smart. Spend Smarter.</text>
   </g>
 </svg>

@@ -19,7 +19,7 @@ export function LogoDemo() {
 
         {/* Logo Display */}
         <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <SmartSpendLogo width={400} height={200} exportPNG={exportPNG} />
+          <SmartSpendLogo width={400} height={280} exportPNG={exportPNG} />
         </div>
 
         {/* Export Controls */}

@@ -8,7 +8,7 @@ interface SmartSpendLogoProps {
 
 export const SmartSpendLogo: React.FC<SmartSpendLogoProps> = ({ 
   width = 400, 
-  height = 200, 
+  height = 280, 
   exportPNG = false 
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -42,133 +42,178 @@ export const SmartSpendLogo: React.FC<SmartSpendLogoProps> = ({
 
   const drawLogo = (ctx: CanvasRenderingContext2D, w: number, h: number) => {
     const centerX = w / 2;
-    const centerY = h * 0.3;
+    const centerY = h * 0.28;
 
-    // Sparkle (star) - top left of head
+    // Sparkle (star) with glow - top left of head
     ctx.save();
-    ctx.translate(centerX - 45, centerY - 25);
+    ctx.translate(centerX - 55, centerY - 35);
+    
+    // Glow effect
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
+    gradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');
+    gradient.addColorStop(0.7, 'rgba(255, 184, 77, 0.6)');
+    gradient.addColorStop(1, 'rgba(255, 140, 0, 0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, 12, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Main sparkle star
     ctx.fillStyle = '#FFB84D';
-    ctx.strokeStyle = '#FFA500';
+    ctx.strokeStyle = '#FF8C00';
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    ctx.moveTo(0, -8);
-    ctx.lineTo(2, -2);
-    ctx.lineTo(8, 0);
-    ctx.lineTo(2, 2);
-    ctx.lineTo(0, 8);
-    ctx.lineTo(-2, 2);
-    ctx.lineTo(-8, 0);
-    ctx.lineTo(-2, -2);
+    ctx.moveTo(0, -10);
+    ctx.lineTo(3, -3);
+    ctx.lineTo(10, 0);
+    ctx.lineTo(3, 3);
+    ctx.lineTo(0, 10);
+    ctx.lineTo(-3, 3);
+    ctx.lineTo(-10, 0);
+    ctx.lineTo(-3, -3);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
     
-    // Sparkle center highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    // Inner highlight
+    ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
     ctx.beginPath();
-    ctx.arc(0, 0, 1, 0, Math.PI * 2);
+    ctx.moveTo(0, -6);
+    ctx.lineTo(1.8, -1.8);
+    ctx.lineTo(6, 0);
+    ctx.lineTo(1.8, 1.8);
+    ctx.lineTo(0, 6);
+    ctx.lineTo(-1.8, 1.8);
+    ctx.lineTo(-6, 0);
+    ctx.lineTo(-1.8, -1.8);
+    ctx.closePath();
     ctx.fill();
     ctx.restore();
 
-    // Head Profile
+    // Head Profile - more accurate proportions
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.fillStyle = '#FF6B9D';
-    ctx.strokeStyle = '#FF5A8A';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#E91E63';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(-30, 15);
-    ctx.bezierCurveTo(-30, 5, -25, -5, -15, -12);
-    ctx.bezierCurveTo(-5, -18, 5, -20, 15, -18);
-    ctx.bezierCurveTo(25, -16, 30, -10, 32, -2);
-    ctx.bezierCurveTo(34, 6, 32, 14, 28, 20);
-    ctx.bezierCurveTo(25, 25, 20, 28, 15, 30);
-    ctx.bezierCurveTo(10, 32, 5, 32, 0, 30);
-    ctx.lineTo(0, 35);
-    ctx.bezierCurveTo(-5, 37, -10, 35, -12, 32);
-    ctx.bezierCurveTo(-15, 28, -18, 24, -20, 20);
-    ctx.bezierCurveTo(-25, 18, -28, 16, -30, 15);
+    ctx.moveTo(-35, 20);
+    ctx.bezierCurveTo(-35, 8, -30, -8, -18, -18);
+    ctx.bezierCurveTo(-8, -25, 8, -28, 22, -25);
+    ctx.bezierCurveTo(32, -22, 38, -15, 40, -5);
+    ctx.bezierCurveTo(42, 5, 40, 16, 35, 25);
+    ctx.bezierCurveTo(30, 32, 22, 37, 15, 40);
+    ctx.bezierCurveTo(8, 42, 0, 42, -5, 40);
+    ctx.lineTo(-5, 48);
+    ctx.bezierCurveTo(-10, 50, -18, 48, -22, 44);
+    ctx.bezierCurveTo(-26, 38, -30, 30, -33, 24);
+    ctx.bezierCurveTo(-34, 22, -35, 21, -35, 20);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Brain inside head
+    // Brain inside head - more detailed
     ctx.save();
-    ctx.translate(5, 5);
+    ctx.translate(8, 8);
     
-    // Brain outline
+    // Brain main shape
     ctx.fillStyle = '#E91E63';
-    ctx.strokeStyle = '#D81B60';
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(-12, -8);
-    ctx.bezierCurveTo(-15, -10, -15, -12, -12, -14);
-    ctx.bezierCurveTo(-8, -16, -4, -16, 0, -14);
-    ctx.bezierCurveTo(4, -16, 8, -16, 12, -14);
-    ctx.bezierCurveTo(15, -12, 15, -10, 12, -8);
-    ctx.bezierCurveTo(15, -6, 15, -4, 12, -2);
-    ctx.bezierCurveTo(15, 0, 15, 2, 12, 4);
-    ctx.bezierCurveTo(8, 6, 4, 6, 0, 4);
-    ctx.bezierCurveTo(-4, 6, -8, 6, -12, 4);
-    ctx.bezierCurveTo(-15, 2, -15, 0, -12, -2);
-    ctx.bezierCurveTo(-15, -4, -15, -6, -12, -8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Brain folds
     ctx.strokeStyle = '#C2185B';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(-8, -6);
-    ctx.bezierCurveTo(-6, -8, -2, -8, 0, -6);
-    ctx.bezierCurveTo(2, -8, 6, -8, 8, -6);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(-8, 0);
-    ctx.bezierCurveTo(-6, -2, -2, -2, 0, 0);
-    ctx.bezierCurveTo(2, -2, 6, -2, 8, 0);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.moveTo(-6, 2);
-    ctx.bezierCurveTo(-4, 0, 0, 0, 2, 2);
-    ctx.bezierCurveTo(4, 0, 6, 0, 6, 2);
+    ctx.moveTo(-15, -12);
+    ctx.bezierCurveTo(-20, -15, -20, -18, -15, -20);
+    ctx.bezierCurveTo(-10, -22, -5, -22, 0, -20);
+    ctx.bezierCurveTo(5, -22, 10, -22, 15, -20);
+    ctx.bezierCurveTo(20, -18, 20, -15, 15, -12);
+    ctx.bezierCurveTo(20, -9, 20, -6, 15, -4);
+    ctx.bezierCurveTo(20, -1, 20, 2, 15, 5);
+    ctx.bezierCurveTo(10, 8, 5, 8, 0, 5);
+    ctx.bezierCurveTo(-5, 8, -10, 8, -15, 5);
+    ctx.bezierCurveTo(-20, 2, -20, -1, -15, -4);
+    ctx.bezierCurveTo(-20, -6, -20, -9, -15, -12);
+    ctx.closePath();
+    ctx.fill();
     ctx.stroke();
 
-    // £ Symbol
+    // Detailed brain folds
+    ctx.strokeStyle = '#AD1457';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-12, -8);
+    ctx.bezierCurveTo(-8, -12, -3, -12, 0, -8);
+    ctx.bezierCurveTo(3, -12, 8, -12, 12, -8);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(-12, -2);
+    ctx.bezierCurveTo(-8, -6, -3, -6, 0, -2);
+    ctx.bezierCurveTo(3, -6, 8, -6, 12, -2);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(-10, 2);
+    ctx.bezierCurveTo(-6, -2, -2, -2, 2, 2);
+    ctx.bezierCurveTo(6, -2, 10, -2, 10, 2);
+    ctx.stroke();
+    
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-8, 5);
+    ctx.bezierCurveTo(-4, 1, 0, 1, 4, 5);
+    ctx.bezierCurveTo(8, 1, 8, 1, 8, 5);
+    ctx.stroke();
+
+    // Additional brain texture
+    ctx.fillStyle = 'rgba(194, 24, 91, 0.6)';
+    ctx.beginPath();
+    ctx.arc(-6, -5, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(6, -3, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-3, 1, 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(4, 3, 1.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // £ Symbol in center - bold and prominent
     ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 14px Arial, sans-serif';
+    ctx.strokeStyle = '#FF8C00';
+    ctx.lineWidth = 0.5;
+    ctx.font = '900 18px Arial Black, Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('£', 0, 2);
+    ctx.strokeText('£', 0, 3);
+    ctx.fillText('£', 0, 3);
     
     ctx.restore(); // Brain transform
 
-    // Navy blue orbital ring
+    // Navy blue orbital ring - passing behind head
     ctx.save();
-    ctx.rotate(Math.PI / 7); // 25 degrees
-    ctx.strokeStyle = '#1A237E';
-    ctx.lineWidth = 4;
+    ctx.rotate(Math.PI / 6.4); // 28 degrees
+    ctx.strokeStyle = 'rgba(26, 35, 126, 0.95)';
+    ctx.lineWidth = 6;
     ctx.beginPath();
-    ctx.ellipse(0, 0, 40, 25, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, 50, 32, 0, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
 
     ctx.restore(); // Head transform
 
-    // Text
+    // Text - properly spaced
     ctx.fillStyle = '#1A237E';
     ctx.textAlign = 'center';
     
-    // SmartSpend main text
-    ctx.font = 'bold 36px Arial, Helvetica, sans-serif';
-    ctx.fillText('SmartSpend', centerX, h * 0.65);
+    // SmartSpend main text - exact font match
+    ctx.font = '700 42px Inter, system-ui, -apple-system, sans-serif';
+    ctx.fillText('SmartSpend', centerX, h * 0.68);
     
-    // Slogan
-    ctx.font = 'normal 16px Arial, Helvetica, sans-serif';
-    ctx.fillText('Think Smart. Spend Smarter.', centerX, h * 0.78);
+    // Slogan - proper spacing
+    ctx.font = '400 18px Inter, system-ui, -apple-system, sans-serif';
+    ctx.fillText('Think Smart. Spend Smarter.', centerX, h * 0.79);
   };
 
   return (
