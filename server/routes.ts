@@ -9,7 +9,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "sk-default_key"
 });
 
+import { initializeDatabase } from "./init-db";
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize database on startup
+  await initializeDatabase();
+
   // Helper function to get demo user ID
   const getDemoUserId = async () => {
     try {
