@@ -37,6 +37,10 @@ interface DecisionResponse {
     goal_impact: string;
   };
   badge_eligible?: string;
+  smart_score: number;
+  smartie_personality_response: string;
+  value_per_use?: number;
+  historical_context?: string;
 }
 
 export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: EnhancedPurchaseDecisionModalProps) {
@@ -53,6 +57,11 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
   const [followedDecision, setFollowedDecision] = useState<boolean | null>(null);
   const [showReflectionPrompt, setShowReflectionPrompt] = useState(false);
   const [reflectionReason, setReflectionReason] = useState("");
+  const [personalReason, setPersonalReason] = useState("");
+  const [expectedUse, setExpectedUse] = useState("weekly");
+  const [purchaseType, setPurchaseType] = useState("need");
+  const [smartScore, setSmartScore] = useState<number | null>(null);
+  const [wisdomStreak, setWisdomStreak] = useState(3); // Mock streak data
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -80,10 +89,10 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
   });
 
   const analyzeDecision = async () => {
-    if (!itemName || !amount || !category) {
+    if (!itemName || !amount || !category || !personalReason) {
       toast({
         title: "Missing information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all fields including why you want this purchase.",
         variant: "destructive",
       });
       return;
@@ -118,6 +127,9 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
         smartieMood = 'concerned';
       }
 
+      const calculatedSmartScore = calculateSmartScore(amountNum, desire, urgencyLevel, category, personalReason);
+      setSmartScore(calculatedSmartScore);
+
       const mockDecision: DecisionResponse = {
         recommendation,
         confidence: Math.round(confidence),
@@ -127,7 +139,11 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
         alternatives: recommendation !== 'yes' ? getAlternatives(itemName, category) : undefined,
         budget_impact: getBudgetImpact(amountNum, category),
         simulated_effects: getSimulatedEffects(recommendation, amountNum),
-        badge_eligible: getBadgeEligibility(recommendation, desire, urgencyLevel)
+        badge_eligible: getBadgeEligibility(recommendation, desire, urgencyLevel),
+        smart_score: calculatedSmartScore,
+        smartie_personality_response: getSmartiePersonalityResponse(calculatedSmartScore, recommendation, personalReason, category),
+        value_per_use: expectedUse === "daily" ? amountNum / 365 : expectedUse === "weekly" ? amountNum / 52 : amountNum / 12,
+        historical_context: getHistoricalContext()
       };
 
       setDecision(mockDecision);
@@ -193,6 +209,82 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
     if (rec === 'yes' && urgency > 8) return "Strategic Spender";
     if (rec === 'no' && desire > 8) return "Budget Guardian";
     return undefined;
+  };
+
+  const calculateSmartScore = (amountNum: number, desire: number, urgency: number, category: string, personalReason: string) => {
+    const categoryBudget = budgets.find(b => b.category === category);
+    const categorySpent = parseFloat(categoryBudget?.spent || "0");
+    const categoryLimit = parseFloat(categoryBudget?.monthlyLimit || "500");
+    
+    // Affordability (30 points)
+    const budgetHealth = Math.max(0, (categoryLimit - categorySpent) / categoryLimit);
+    const affordabilityScore = budgetHealth * 30;
+    
+    // Value-per-use estimation (25 points)
+    const useFrequencyMultiplier = expectedUse === "daily" ? 30 : expectedUse === "weekly" ? 4 : 1;
+    const valuePerUse = amountNum / (useFrequencyMultiplier * 12); // Estimated annual uses
+    const valueScore = Math.min(25, Math.max(0, 25 - (valuePerUse * 2)));
+    
+    // Need vs Want (20 points)
+    const needScore = purchaseType === "need" ? 20 : purchaseType === "hobby" ? 15 : 10;
+    
+    // Emotional wisdom (15 points)
+    const impulsivityPenalty = desire > urgency ? (desire - urgency) * 2 : 0;
+    const emotionalScore = Math.max(0, 15 - impulsivityPenalty);
+    
+    // Personal reason analysis (10 points)
+    const stressKeywords = ["stress", "tired", "bad day", "deserve"];
+    const hasStressTrigger = stressKeywords.some(keyword => personalReason.toLowerCase().includes(keyword));
+    const reasonScore = hasStressTrigger ? 5 : 10;
+    
+    return Math.round(affordabilityScore + valueScore + needScore + emotionalScore + reasonScore);
+  };
+
+  const getSmartiePersonalityResponse = (score: number, recommendation: string, personalReason: string, category: string) => {
+    const personalityResponses = {
+      high_score: [
+        "This looks like a smart choice! Your budget can handle it and it aligns with your goals.",
+        "I'm feeling good about this one! You've thought it through and the numbers work.",
+        "This purchase makes sense - you're being strategic with your money."
+      ],
+      medium_score: [
+        "I see why you want this, but let's think it through together. Your budget is getting tight.",
+        "This is a close call. If you really need it, go for it, but maybe wait a week?",
+        "I'm on the fence about this one. What matters most to you right now?"
+      ],
+      low_score: [
+        "I know you want this, but your budget is telling a different story right now.",
+        "Let's pump the brakes here. Your future self will thank you for waiting.",
+        "I'm getting strong 'impulse buy' vibes. Maybe sleep on it?"
+      ],
+      stress_response: [
+        "I notice you mentioned feeling stressed. Shopping won't fix that feeling, but a walk or calling a friend might help.",
+        "Stress shopping is real, but let's find better ways to treat yourself that don't impact your goals.",
+        "That stress feeling is tough. Let's explore other ways to reward yourself today."
+      ]
+    };
+
+    const stressKeywords = ["stress", "tired", "bad day", "deserve", "treat"];
+    const hasStressTrigger = stressKeywords.some(keyword => personalReason.toLowerCase().includes(keyword));
+    
+    if (hasStressTrigger) {
+      return personalityResponses.stress_response[Math.floor(Math.random() * personalityResponses.stress_response.length)];
+    }
+    
+    if (score >= 70) return personalityResponses.high_score[Math.floor(Math.random() * personalityResponses.high_score.length)];
+    if (score >= 40) return personalityResponses.medium_score[Math.floor(Math.random() * personalityResponses.medium_score.length)];
+    return personalityResponses.low_score[Math.floor(Math.random() * personalityResponses.low_score.length)];
+  };
+
+  const getHistoricalContext = () => {
+    // Mock historical context - in real app, this would come from user's decision history
+    const contexts = [
+      "Last time you ignored my advice on a similar Entertainment purchase, you mentioned regretting it 😅",
+      "You've been following my advice really well this month - your budget is thanking you!",
+      "I notice you tend to overspend on weekends. Let's break that pattern together.",
+      ""
+    ];
+    return contexts[Math.floor(Math.random() * contexts.length)];
   };
 
   const getAlternatives = (item: string, cat: string) => {
@@ -309,6 +401,39 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Wisdom Streak Display */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg"
+          >
+            <div className="flex items-center gap-2">
+              <div className="text-lg">🧠</div>
+              <div>
+                <div className="font-medium text-yellow-800 dark:text-yellow-200">Purchase Wisdom Streak</div>
+                <div className="text-xs text-yellow-600 dark:text-yellow-400">Follow my advice to grow your streak!</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: i * 0.1 }}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                    i < wisdomStreak 
+                      ? 'bg-yellow-400 text-yellow-900' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
+                  }`}
+                >
+                  {i < wisdomStreak ? '✓' : '○'}
+                </motion.div>
+              ))}
+              <span className="ml-2 text-sm font-bold text-yellow-700 dark:text-yellow-300">{wisdomStreak}/5</span>
+            </div>
+          </motion.div>
+
           {/* Smartie Assistant */}
           <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700">
             <div className="flex items-start gap-4">
@@ -351,6 +476,53 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
                           {decision.confidence}% confident
                         </span>
                       </div>
+                      {/* SmartScore Display */}
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium">SmartScore</span>
+                          <div className="flex items-center gap-2">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold ${
+                              decision.smart_score >= 70 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                              decision.smart_score >= 40 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                              'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                            }`}>
+                              {decision.smart_score}
+                            </div>
+                            <span className="text-xs text-gray-500">/100</span>
+                          </div>
+                        </div>
+                        
+                        {/* Value per use */}
+                        {decision.value_per_use && decision.value_per_use < 5 && (
+                          <div className="text-xs text-green-600 dark:text-green-400 mb-2">
+                            Great value: £{decision.value_per_use.toFixed(2)} per use
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Smartie's Personality Response */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg mb-3"
+                      >
+                        <p className="text-sm text-purple-700 dark:text-purple-300 italic">
+                          "{decision.smartie_personality_response}"
+                        </p>
+                      </motion.div>
+
+                      {/* Historical Context */}
+                      {decision.historical_context && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-700 dark:text-blue-300 mb-3"
+                        >
+                          💭 {decision.historical_context}
+                        </motion.div>
+                      )}
+
                       <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
                         {decision.reasoning}
                       </p>
@@ -415,12 +587,45 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
             </div>
 
             <div className="space-y-2">
-              <Label>Why do you want this?</Label>
+              <Label>Why do you want this? (Be honest!)</Label>
               <Input
-                placeholder="e.g., My current ones are broken"
-                value={reasoning}
-                onChange={(e) => setReasoning(e.target.value)}
+                placeholder="e.g., I've been stressed lately and want to treat myself"
+                value={personalReason}
+                onChange={(e) => setPersonalReason(e.target.value)}
               />
+            </div>
+          </div>
+
+          {/* Advanced Purchase Context */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>How often will you use this?</Label>
+              <Select value={expectedUse} onValueChange={setExpectedUse}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">📅 Daily use</SelectItem>
+                  <SelectItem value="weekly">📊 Weekly use</SelectItem>
+                  <SelectItem value="monthly">📆 Monthly use</SelectItem>
+                  <SelectItem value="rarely">💭 Rarely / Special occasions</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>What type of purchase is this?</Label>
+              <Select value={purchaseType} onValueChange={setPurchaseType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="need">🎯 Essential need</SelectItem>
+                  <SelectItem value="hobby">🎨 Hobby/Interest</SelectItem>
+                  <SelectItem value="social">👥 Social/For others</SelectItem>
+                  <SelectItem value="treat">🍰 Treat/Reward</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -564,18 +769,68 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
                   </AnimatePresence>
                 </Card>
 
-                {/* Badge Eligibility */}
+                {/* Badge Eligibility & Gamification */}
                 {decision.badge_eligible && (
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="text-center p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700"
+                    initial={{ scale: 0, rotate: -10 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", duration: 0.6 }}
+                    className="text-center p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700 relative overflow-hidden"
                   >
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Award size={20} className="text-yellow-600" />
+                    {/* Sparkle animation */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {[...Array(6)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="absolute text-yellow-400 text-xs"
+                          style={{
+                            left: `${20 + i * 12}%`,
+                            top: `${20 + (i % 2) * 40}%`,
+                          }}
+                          animate={{
+                            scale: [0, 1, 0],
+                            rotate: [0, 180, 360],
+                            opacity: [0, 1, 0]
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            delay: i * 0.3
+                          }}
+                        >
+                          ✨
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center justify-center gap-2 mb-2 relative z-10">
+                      <motion.div
+                        animate={{ rotate: [0, 10, -10, 0] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      >
+                        <Award size={20} className="text-yellow-600" />
+                      </motion.div>
                       <span className="font-semibold text-yellow-800 dark:text-yellow-200">Badge Eligible!</span>
                     </div>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">{decision.badge_eligible}</p>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300 relative z-10">{decision.badge_eligible}</p>
+                    <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Follow this advice to unlock!</div>
+                  </motion.div>
+                )}
+
+                {/* Streak Bonus Opportunity */}
+                {decision.recommendation === 'think_again' && wisdomStreak >= 2 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-700"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Sparkles size={16} className="text-blue-600" />
+                      <span className="font-medium text-blue-800 dark:text-blue-200">Streak Bonus!</span>
+                    </div>
+                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                      You're on a {wisdomStreak}-decision streak! Following this advice will keep your momentum going.
+                    </p>
                   </motion.div>
                 )}
               </motion.div>
@@ -651,7 +906,7 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
             {!decision ? (
               <Button 
                 onClick={analyzeDecision} 
-                disabled={isAnalyzing || !itemName || !amount || !category}
+                disabled={isAnalyzing || !itemName || !amount || !category || !personalReason}
                 className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
               >
                 {isAnalyzing ? (
@@ -671,12 +926,23 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
                 <Button variant="outline" onClick={() => setDecision(null)} className="flex-1">
                   Ask Again
                 </Button>
-                <Button 
-                  onClick={() => setShowReflectionPrompt(true)} 
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                >
-                  I Followed This
-                </Button>
+                <motion.div className="flex-1">
+                  <Button 
+                    onClick={() => setShowReflectionPrompt(true)} 
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white relative overflow-hidden"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-white/20"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.5 }}
+                    />
+                    <span className="relative z-10 flex items-center gap-2">
+                      <Sparkles size={16} />
+                      I Followed This
+                    </span>
+                  </Button>
+                </motion.div>
               </>
             )}
           </div>

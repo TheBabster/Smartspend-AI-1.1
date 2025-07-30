@@ -1,0 +1,47 @@
+1. 🌟 Visual Polish & Animations (Boost to ~9.2)
+	•	Add slide-in animations for new expenses and transitions between tabs.
+	•	Improve visual padding and layout spacing on Smart Analytics cards — some boxes (e.g. mood selector) feel tight vertically.
+	•	Let Smartie move, blink, or float slightly when idle — subtle micro-motions increase app “life.”
+	•	Add confetti or satisfying animation when users finish a smart streak (e.g. 3 Smart purchases in a row).
+	•	Custom icons per category (like a trolley for groceries, TV for entertainment, etc.).
+
+⸻
+
+2. 🤖 Smartie Coaching Upgrade (Boost to 9.5)
+	•	Let Smartie summarise spending weekly with a motivational quote and emoji-rich badge (e.g. “🧠 SmartSaver | 3 Smart Buys | 💸 -£110.74 this week”).
+	•	Add “Smartie Challenges”, like:
+	•	“Can you go 3 days with no impulse buys?”
+	•	“Try tagging emotions after every purchase for a week.”
+	•	Introduce Smartie personality modes: motivational, funny, strict, chill — change tone of feedback accordingly.
+
+⸻
+
+3. 🔄 Habit Loops & Streak Systems (Boost to 9.7)
+	•	Add a Streak Tracker:
+	•	“You’ve logged expenses 3 days in a row! Keep going! 🔥”
+	•	Add a Smart Spending Score that updates live based on daily habits:
+	•	Smart logging
+	•	Staying within budget
+	•	Not spending impulsively
+	•	Add Goal Reminders or nudges:
+	•	“You’re 20% away from your PS5 goal! Want to skip that Uber?”
+
+⸻
+
+4. 📊 AI Coaching & Emotion Analytics (Boost to 9.9+)
+	•	Add a “Why did you spend?” question — e.g., convenience, boredom, peer pressure, necessity.
+	•	Use this to give psychological pattern insights:
+	•	“You tend to spend impulsively when bored on Sundays.”
+	•	“You make smarter choices after gym days 💪.”
+	•	Suggest micro-behaviour changes based on emotion trends:
+	•	“Next time you feel stressed, try taking a walk instead of shopping online.”
+
+⸻
+
+5. 💡 Suggestions Engine (Final 0.1 to 10/10)
+	•	After every entry, Smartie could suggest:
+	•	“Would this go better under Travel?”
+	•	“Want to add this to a category rule?”
+	•	“Set a limit for Food & Dining?”
+	•	Smartie could also auto-tag entries using AI:
+	•	Recognise ‘Netflix’ and pre-fill category & emotion.
