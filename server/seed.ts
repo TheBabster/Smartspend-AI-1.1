@@ -3,13 +3,13 @@ import { users, budgets, expenses, goals, streaks, achievements } from "@shared/
 
 export async function seedDatabase() {
   try {
-    // Create demo user with password hash
+    // Create demo user
     const [user] = await db
       .insert(users)
       .values({
+        id: "demo-user",
         username: "alex",
         email: "alex@example.com",
-        password: "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeuyW8Y/Kj3/8XOWO", // password: "demo123"
         name: "Alex Johnson",
         currency: "GBP",
         monthlyIncome: "3500.00",
@@ -34,7 +34,7 @@ export async function seedDatabase() {
       await db
         .insert(budgets)
         .values({
-          userId: user.id,
+          userId: "demo-user",
           category: budget.category,
           monthlyLimit: budget.monthlyLimit,
           spent: budget.spent,
@@ -56,7 +56,7 @@ export async function seedDatabase() {
       await db
         .insert(expenses)
         .values({
-          userId: user.id,
+          userId: "demo-user",
           ...expense,
         })
         .onConflictDoNothing();
@@ -67,7 +67,7 @@ export async function seedDatabase() {
       .insert(goals)
       .values([
         {
-          userId: user.id,
+          userId: "demo-user",
           title: "Emergency Fund",
           targetAmount: "5000.00",
           currentAmount: "2340.00",
@@ -76,7 +76,7 @@ export async function seedDatabase() {
           completed: false,
         },
         {
-          userId: user.id,
+          userId: "demo-user",
           title: "Summer Vacation",
           targetAmount: "2000.00",
           currentAmount: "1340.00",
@@ -92,13 +92,13 @@ export async function seedDatabase() {
       .insert(streaks)
       .values([
         {
-          userId: user.id,
+          userId: "demo-user",
           type: "budget",
           currentStreak: 21,
           longestStreak: 21,
         },
         {
-          userId: user.id,
+          userId: "demo-user",
           type: "savings",
           currentStreak: 14,
           longestStreak: 28,
@@ -111,7 +111,7 @@ export async function seedDatabase() {
       .insert(achievements)
       .values([
         {
-          userId: user.id,
+          userId: "demo-user",
           type: "budget",
           title: "Budget Master",
           description: "Stayed under budget for 20 consecutive days!",
@@ -119,7 +119,7 @@ export async function seedDatabase() {
           unlockedAt: new Date(),
         },
         {
-          userId: user.id,
+          userId: "demo-user",
           type: "decision",
           title: "Smart Spender",
           description: "Used Smartie's advice 10 times",
