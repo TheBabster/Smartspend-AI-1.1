@@ -1,6 +1,7 @@
 import Auth from "@/pages/Auth";
 import "./firebase";
 import { useAuth } from "@/hooks/useAuth";
+import { ThemeProvider } from "@/hooks/useTheme";
 
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
@@ -23,27 +24,7 @@ import TrackExpense from "@/pages/TrackExpense";
 import SmartPurchase from "@/pages/SmartPurchase";
 import { LogoDemo } from "./pages/LogoDemo";
 
-function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const initialTheme = savedTheme || systemTheme;
-
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle("dark", initialTheme === "dark");
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-  };
-
-  return <div data-theme={theme}>{children}</div>;
-}
 
 function Router() {
   return (
@@ -76,7 +57,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="light" storageKey="smartspend-theme">
         <TooltipProvider>
           <Toaster />
           <Router />

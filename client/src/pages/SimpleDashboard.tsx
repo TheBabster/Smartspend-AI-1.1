@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 import { LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function SimpleDashboard() {
-  const [userName, setUserName] = useState("SmartSpender");
+  const [userName, setUserName] = useState("");
   const [, navigate] = useLocation();
   const { user: firebaseUser, loading: authLoading } = useAuth();
 
@@ -61,12 +62,12 @@ export default function SimpleDashboard() {
   // Show loading while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
           <div className="mb-4">
             <ModernSmartieAvatar mood="thinking" size="xl" />
           </div>
-          <p className="text-lg font-medium text-gray-600">Loading your financial dashboard...</p>
+          <p className="text-lg font-medium text-gray-600 dark:text-gray-300">Loading your financial dashboard...</p>
         </div>
       </div>
     );
@@ -85,28 +86,31 @@ export default function SimpleDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
             <ModernSmartieAvatar mood="happy" size="lg" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
-                {getGreeting()}, {userName}!
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+                {getGreeting()}, {userName || "SmartSpender"}!
               </h1>
-              <p className="text-gray-600">Welcome to your SmartSpend dashboard</p>
+              <p className="text-gray-600 dark:text-gray-300">Welcome to your SmartSpend dashboard</p>
             </div>
           </div>
           
-          <Button 
-            onClick={handleLogout}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button 
+              onClick={handleLogout}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Quick Actions */}
@@ -150,7 +154,7 @@ export default function SimpleDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Authentication is working perfectly! Your SmartSpend journey starts here with 
                 AI-powered financial coaching from Smartie.
               </p>
@@ -164,16 +168,16 @@ export default function SimpleDashboard() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Name:</span>
-                  <span className="text-sm text-gray-600">{userName}</span>
+                  <span className="text-sm font-medium dark:text-gray-300">Name:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{userName || "Loading..."}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Email:</span>
-                  <span className="text-sm text-gray-600">{firebaseUser.email}</span>
+                  <span className="text-sm font-medium dark:text-gray-300">Email:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{firebaseUser.email}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Status:</span>
-                  <span className="text-sm text-green-600 font-medium">Authenticated</span>
+                  <span className="text-sm font-medium dark:text-gray-300">Status:</span>
+                  <span className="text-sm text-green-600 dark:text-green-400 font-medium">Authenticated</span>
                 </div>
               </div>
             </CardContent>
@@ -187,15 +191,15 @@ export default function SimpleDashboard() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Set up your budget</span>
+                  <span className="text-sm dark:text-gray-300">Set up your budget</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                  <span className="text-sm">Add your first expense</span>
+                  <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                  <span className="text-sm dark:text-gray-300">Add your first expense</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                  <span className="text-sm">Chat with Smartie for advice</span>
+                  <div className="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                  <span className="text-sm dark:text-gray-300">Chat with Smartie for advice</span>
                 </div>
               </div>
             </CardContent>
@@ -203,15 +207,15 @@ export default function SimpleDashboard() {
         </div>
 
         {/* Smartie Corner */}
-        <Card className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+        <Card className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <ModernSmartieAvatar mood="happy" size="lg" />
               <div className="flex-1">
-                <h3 className="font-semibold text-purple-800 mb-2">
-                  Hi {userName}! I'm Smartie, your AI financial coach
+                <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">
+                  Hi {userName || "there"}! I'm Smartie, your AI financial coach
                 </h3>
-                <p className="text-purple-700 mb-4">
+                <p className="text-purple-700 dark:text-purple-400 mb-4">
                   Welcome to SmartSpend! I'm here to help you make smarter financial decisions. 
                   Ready to start your journey to better financial wellness?
                 </p>
