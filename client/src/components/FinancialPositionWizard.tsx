@@ -63,6 +63,29 @@ export default function FinancialPositionWizard({ userId }: FinancialPositionWiz
       return;
     }
 
+    // Validate income is reasonable (not fake numbers)
+    const income = parseFloat(financialData.monthlyIncome);
+    const expenses = parseFloat(financialData.monthlyExpenses || '0');
+    const savings = parseFloat(financialData.currentSavings || '0');
+
+    if (income < 500 || income > 50000) {
+      toast({
+        title: "Please Enter Realistic Income",
+        description: "Monthly income should be between £500 and £50,000 for accurate analysis.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (expenses > income * 2) {
+      toast({
+        title: "Check Your Expenses",
+        description: "Monthly expenses seem unusually high compared to income. Please verify.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     updateFinancialInfoMutation.mutate({
       monthlyIncome: financialData.monthlyIncome,
       jobTitle: financialData.jobTitle,

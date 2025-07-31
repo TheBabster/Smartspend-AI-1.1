@@ -80,6 +80,28 @@ const SavingsTreeVisualization: React.FC<SavingsTreeProps> = ({
           Your Savings Tree
         </CardTitle>
         <p className="text-sm text-gray-600">Watch your financial growth bloom!</p>
+        
+        {/* How It Works Info */}
+        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg text-left">
+          <div className="flex items-center gap-2 text-blue-800 dark:text-blue-200 mb-2">
+            <Target className="w-4 h-4" />
+            <span className="font-semibold text-sm">How Your Tree Grows</span>
+          </div>
+          <div className="text-xs text-blue-700 dark:text-blue-300">
+            <p className="mb-1">Based on <strong>real goal progress</strong>:</p>
+            <div className="grid grid-cols-3 gap-1 text-xs">
+              <span>🌱 £0-99</span>
+              <span>🌿 £100-499</span>
+              <span>🌳 £500-999</span>
+              <span>🌲 £1K-2.5K</span>
+              <span>🌴 £2.5K-5K</span>
+              <span>🌳 £5K+</span>
+            </div>
+            <p className="mt-2 text-xs bg-blue-100 dark:bg-blue-800 p-1 rounded">
+              💡 Only verified savings from completed goals count toward growth!
+            </p>
+          </div>
+        </div>
       </CardHeader>
       
       <CardContent className="relative">

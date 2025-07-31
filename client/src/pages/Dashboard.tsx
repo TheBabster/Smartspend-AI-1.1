@@ -608,14 +608,16 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Goals Preview Card */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="mb-6"
-        >
-          <GoalsPreviewCard goals={goals} />
-        </motion.div>
+        {goals.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="mb-6"
+          >
+            <GoalsPreviewCard goals={goals} />
+          </motion.div>
+        )}
 
         {/* Weekly Smartie Coaching Summary */}
         <SlideAnimation direction="right" delay={0.4} className="mb-6">

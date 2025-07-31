@@ -345,14 +345,7 @@ export default function Goals() {
         </motion.div>
       )}
 
-      {/* Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm mb-4">
-          <strong>Debug Goals:</strong> User ID: {syncedUser?.id}, Goals count: {goals.length}
-          <br />Goals loading: {isLoading ? 'true' : 'false'}
-          <br />Goals data: {JSON.stringify(goals, null, 2)}
-        </div>
-      )}
+
 
       {/* Goals List */}
       <div className="space-y-4">
