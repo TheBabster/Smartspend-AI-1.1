@@ -64,6 +64,12 @@ export default function Dashboard() {
   const [, navigate] = useLocation();
   const { user: firebaseUser, loading: authLoading } = useAuth();
 
+  // ALL HOOKS MUST BE AT THE TOP - Fix for hooks error
+  const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
+  const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
+  const { data: streaks = [] } = useQuery<Streak[]>({ queryKey: ["/api/streaks"] });
+  const { data: achievements = [] } = useQuery<Achievement[]>({ queryKey: ["/api/achievements"] });
+
   // Redirect to auth if not authenticated
   useEffect(() => {
     if (!authLoading && !firebaseUser) {
@@ -127,11 +133,6 @@ export default function Dashboard() {
   if (!firebaseUser) {
     return null;
   }
-
-  const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
-  const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
-  const { data: streaks = [] } = useQuery<Streak[]>({ queryKey: ["/api/streaks"] });
-  const { data: achievements = [] } = useQuery<Achievement[]>({ queryKey: ["/api/achievements"] });
 
   const totalBudget = budgets.reduce((sum, budget) => sum + parseFloat(budget.monthlyLimit), 0);
   const totalSpent = budgets.reduce((sum, budget) => sum + parseFloat(budget.spent || "0"), 0);

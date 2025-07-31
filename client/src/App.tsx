@@ -12,6 +12,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Onboarding from "@/pages/Onboarding";
 import Dashboard from "@/pages/Dashboard";
+import SimpleDashboard from "@/pages/SimpleDashboard";
 import Decisions from "@/pages/Decisions";
 import EnhancedGoals from "@/pages/EnhancedGoals";
 import Analytics from "@/pages/Analytics";
@@ -47,10 +48,11 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={SimpleDashboard} />
       <Route path="/auth" component={Auth} />
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/simple" component={SimpleDashboard} />
       <Route path="/decisions" component={Decisions} />
       <Route path="/goals" component={EnhancedGoals} />
       <Route path="/analytics" component={EnhancedAnalytics} />
