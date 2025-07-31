@@ -73,14 +73,26 @@ export default function Goals() {
 
   // Add goal mutation
   const addGoalMutation = useMutation({
-    mutationFn: (goal: any) => {
-      return fetch('/api/goals', {
+    mutationFn: async (goal: any) => {
+      console.log('🚀 Submitting goal to API:', goal);
+      const response = await fetch('/api/goals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(goal)
-      }).then(res => res.json());
+      });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('❌ API Error:', error);
+        throw new Error(`Failed to create goal: ${error}`);
+      }
+      
+      const result = await response.json();
+      console.log('✅ Goal created successfully:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('✅ Goal creation successful, invalidating cache...');
       queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
       setShowAddGoal(false);
       setNewGoal({
@@ -90,6 +102,9 @@ export default function Goals() {
         targetDate: '',
         category: 'savings'
       });
+    },
+    onError: (error) => {
+      console.error('❌ Goal creation failed:', error);
     }
   });
 
@@ -110,11 +125,20 @@ export default function Goals() {
   const handleAddGoal = () => {
     if (!newGoal.name || !newGoal.targetAmount || !syncedUser?.id) return;
     
+    console.log('🎯 Adding goal:', {
+      userId: syncedUser.id,
+      title: newGoal.name,
+      targetAmount: parseFloat(newGoal.targetAmount),
+      currentAmount: parseFloat(newGoal.currentAmount || '0'),
+      targetDate: newGoal.targetDate || null,
+      icon: newGoal.category
+    });
+    
     addGoalMutation.mutate({
       userId: syncedUser.id,
       title: newGoal.name,
-      targetAmount: newGoal.targetAmount,
-      currentAmount: newGoal.currentAmount || '0',
+      targetAmount: parseFloat(newGoal.targetAmount),
+      currentAmount: parseFloat(newGoal.currentAmount || '0'),
       targetDate: newGoal.targetDate || null,
       icon: newGoal.category
     });
@@ -267,6 +291,15 @@ export default function Goals() {
             </CardContent>
           </Card>
         </motion.div>
+      )}
+
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded p-3 text-sm mb-4">
+          <strong>Debug Goals:</strong> User ID: {syncedUser?.id}, Goals count: {goals.length}
+          <br />Goals loading: {isLoading ? 'true' : 'false'}
+          <br />Goals data: {JSON.stringify(goals, null, 2)}
+        </div>
       )}
 
       {/* Goals List */}

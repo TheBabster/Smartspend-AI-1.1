@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Target, Brain, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/BottomNav";
 import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
 import EmotionalSpendingTracker from "@/components/EmotionalSpendingTracker";
