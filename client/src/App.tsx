@@ -10,9 +10,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import NotFound from "@/pages/not-found";
-import Home from "@/pages/Home";
-import Onboarding from "@/pages/Onboarding";
-import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import OnboardingFlow from "@/pages/OnboardingFlow";
 import Decisions from "@/pages/Decisions";
@@ -31,11 +28,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={SimpleDashboard} />
-      <Route path="/full" component={Dashboard} />
       <Route path="/auth" component={Auth} />
       <Route path="/onboarding" component={OnboardingFlow} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/simple" component={SimpleDashboard} />
       <Route path="/decisions" component={Decisions} />
       <Route path="/goals" component={EnhancedGoals} />
       <Route path="/analytics" component={EnhancedAnalytics} />

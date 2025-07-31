@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-import { db, auth } from "@/firebase";
+import { auth } from "@/firebase";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -9,10 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 import { LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { apiRequest } from "@/lib/queryClient";
+import type { User } from "@shared/schema";
 
 export default function SimpleDashboard() {
-  const [userName, setUserName] = useState("");
-  const [isNewUser, setIsNewUser] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
   const [, navigate] = useLocation();
   const { user: firebaseUser, loading: authLoading } = useAuth();
 
@@ -23,46 +24,69 @@ export default function SimpleDashboard() {
     }
   }, [firebaseUser, authLoading, navigate]);
 
-  // Fetch user data from Firestore
+  // Sync Firebase user with PostgreSQL and fetch user data
   useEffect(() => {
-    const fetchUserName = async () => {
-      if (!firebaseUser) {
+    const syncAndFetchUser = async () => {
+      if (!firebaseUser?.email) {
         console.log("No Firebase user available");
+        setUserLoading(false);
         return;
       }
 
       try {
-        console.log("🔍 Fetching user data for UID:", firebaseUser.uid);
-        console.log("🔍 Firebase user email:", firebaseUser.email);
+        console.log("🚀 Syncing Firebase user with PostgreSQL:", firebaseUser.email);
         
-        const userDoc = doc(db, "users", firebaseUser.uid);
-        const docSnap = await getDoc(userDoc);
+        // First, ensure user exists in PostgreSQL
+        const syncResponse = await fetch("/api/auth/firebase-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName || firebaseUser.email.split('@')[0]
+          })
+        });
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          console.log("✅ Firestore user data found:", data);
-          if (data.name) {
-            setUserName(data.name);
-            console.log("✅ User name successfully set to:", data.name);
-          } else {
-            console.log("❌ No 'name' field found in document");
-            // Use Firebase display name or email as fallback
-            setUserName(firebaseUser.displayName || firebaseUser.email?.split('@')[0] || "User");
-          }
-        } else {
-          console.log("❌ No Firestore document found for this user");
-          console.log("🔍 This is a new user who needs onboarding");
-          // For new users, use Firebase display name or email
-          setUserName(firebaseUser.displayName || firebaseUser.email?.split('@')[0] || "New User");
-          setIsNewUser(true);
+        if (!syncResponse.ok) {
+          throw new Error(`Sync failed: ${syncResponse.statusText}`);
         }
+
+        const userData = await syncResponse.json();
+        console.log("✅ User synced successfully:", userData);
+        setUser(userData);
+        setUserLoading(false);
       } catch (error) {
-        console.error("❌ Error fetching user data:", error);
-        setUserName("User"); // Fallback on error
+        console.error("❌ Error syncing user data:", error);
+        // Fallback: try to fetch existing user
+        try {
+          const fallbackResponse = await fetch(`/api/user/${encodeURIComponent(firebaseUser.email)}`);
+          if (fallbackResponse.ok) {
+            const fallbackUser = await fallbackResponse.json();
+            setUser(fallbackUser);
+          } else {
+            throw new Error('User not found');
+          }
+        } catch (fallbackError) {
+          console.error("❌ Fallback user fetch failed:", fallbackError);
+          // Create basic user object for display
+          setUser({
+            id: 'temp-id',
+            username: firebaseUser.email.split('@')[0],
+            email: firebaseUser.email,
+            password: '',
+            name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+            currency: 'GBP',
+            monthlyIncome: null,
+            onboardingCompleted: false,
+            financialProfile: null,
+            createdAt: new Date()
+          } as User);
+        }
+        setUserLoading(false);
       }
     };
 
-    fetchUserName();
+    syncAndFetchUser();
   }, [firebaseUser]);
 
   const handleLogout = async () => {
@@ -74,22 +98,24 @@ export default function SimpleDashboard() {
     }
   };
 
-  // Show loading while checking authentication
-  if (authLoading) {
+  // Show loading while checking authentication or syncing user
+  if (authLoading || userLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
           <div className="mb-4">
             <ModernSmartieAvatar mood="thinking" size="xl" />
           </div>
-          <p className="text-lg font-medium text-gray-600 dark:text-gray-300">Loading your financial dashboard...</p>
+          <p className="text-lg font-medium text-gray-600 dark:text-gray-300">
+            {authLoading ? "Authenticating..." : "Setting up your dashboard..."}
+          </p>
         </div>
       </div>
     );
   }
 
   // Don't render dashboard if not authenticated
-  if (!firebaseUser) {
+  if (!firebaseUser || !user) {
     return null;
   }
 
@@ -109,7 +135,7 @@ export default function SimpleDashboard() {
             <ModernSmartieAvatar mood="happy" size="lg" />
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-                {getGreeting()}, {userName || "Loading..."}!
+                {getGreeting()}, {user.name}!
               </h1>
               <p className="text-gray-600 dark:text-gray-300">Welcome to your SmartSpend dashboard</p>
             </div>
@@ -175,14 +201,14 @@ export default function SimpleDashboard() {
         </div>
 
         {/* New User Welcome or Dashboard Content */}
-        {isNewUser ? (
+        {!user.onboardingCompleted ? (
           <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-700">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <ModernSmartieAvatar mood="celebrating" size="lg" />
                 <div className="flex-1">
                   <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                    Welcome to SmartSpend, {userName}!
+                    Welcome to SmartSpend, {user.name}!
                   </h3>
                   <p className="text-blue-700 dark:text-blue-400 mb-4">
                     You're starting with a clean slate! Let's set up your budget, goals, and preferences to create your personalized financial experience.
@@ -222,7 +248,7 @@ export default function SimpleDashboard() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium dark:text-gray-300">Name:</span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{userName || "Loading..."}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{user.name}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium dark:text-gray-300">Email:</span>
@@ -267,7 +293,7 @@ export default function SimpleDashboard() {
               <ModernSmartieAvatar mood="happy" size="lg" />
               <div className="flex-1">
                 <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">
-                  Hi {userName || "there"}! I'm Smartie, your AI financial coach
+                  Hi {user.name}! I'm Smartie, your AI financial coach
                 </h3>
                 <p className="text-purple-700 dark:text-purple-400 mb-4">
                   Welcome to SmartSpend! I'm here to help you make smarter financial decisions. 

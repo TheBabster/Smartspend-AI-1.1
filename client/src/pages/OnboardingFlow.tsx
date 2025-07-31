@@ -6,38 +6,80 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 import { useAuth } from "@/hooks/useAuth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase";
 import { motion, AnimatePresence } from "framer-motion";
+import type { User } from "@shared/schema";
 
 export default function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [, navigate] = useLocation();
   const { user: firebaseUser } = useAuth();
   
-  // Form data
+  // Enhanced form data for comprehensive financial onboarding
   const [formData, setFormData] = useState({
+    // Basic Financial Info
     monthlyIncome: "",
+    currency: "GBP",
+    
+    // Budget Categories
     budgetCategories: {
-      food: "",
-      shopping: "",
-      entertainment: "",
-      transport: "",
-      utilities: ""
+      "Food & Dining": "",
+      "Shopping": "",
+      "Entertainment": "",
+      "Transport": "",
+      "Bills & Utilities": "",
+      "Healthcare": "",
+      "Other": ""
     },
-    savingsGoal: "",
+    
+    // Financial Goals
+    primaryGoal: "",
     goalAmount: "",
-    goalDeadline: ""
+    goalDeadline: "",
+    
+    // Financial Situation
+    currentSavings: "",
+    monthlyExpenses: "",
+    debtAmount: "",
+    
+    // Preferences & Habits
+    spendingTriggers: [] as string[],
+    financialPriorities: [] as string[],
+    budgetingExperience: "",
+    notificationPreferences: {
+      dailyTip: true,
+      weeklyReport: true,
+      goalReminder: true,
+      budgetAlert: true
+    }
   });
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated and fetch user data
   useEffect(() => {
     if (!firebaseUser) {
       navigate("/auth");
+      return;
     }
+
+    // Fetch current user data from PostgreSQL
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`/api/user/${encodeURIComponent(firebaseUser.email!)}`);
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUser();
   }, [firebaseUser, navigate]);
 
   const updateFormData = (field: string, value: any) => {
@@ -58,7 +100,7 @@ export default function OnboardingFlow() {
   };
 
   const nextStep = () => {
-    if (step < 4) setStep(step + 1);
+    if (step < 6) setStep(step + 1);
   };
 
   const prevStep = () => {
@@ -66,39 +108,94 @@ export default function OnboardingFlow() {
   };
 
   const completeOnboarding = async () => {
-    if (!firebaseUser) return;
+    if (!firebaseUser || !user) return;
     
     setLoading(true);
     try {
-      // Save user profile and onboarding data
-      await setDoc(doc(db, "userProfiles", firebaseUser.uid), {
-        userId: firebaseUser.uid,
+      // Save comprehensive financial profile to PostgreSQL
+      const financialProfile = {
         monthlyIncome: parseFloat(formData.monthlyIncome) || 0,
         budgetCategories: formData.budgetCategories,
-        savingsGoal: formData.savingsGoal,
+        primaryGoal: formData.primaryGoal,
         goalAmount: parseFloat(formData.goalAmount) || 0,
         goalDeadline: formData.goalDeadline,
-        onboardingCompleted: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        currentSavings: parseFloat(formData.currentSavings) || 0,
+        monthlyExpenses: parseFloat(formData.monthlyExpenses) || 0,
+        debtAmount: parseFloat(formData.debtAmount) || 0,
+        spendingTriggers: formData.spendingTriggers,
+        financialPriorities: formData.financialPriorities,
+        budgetingExperience: formData.budgetingExperience,
+        notificationPreferences: formData.notificationPreferences,
+        completedAt: new Date().toISOString()
+      };
+
+      // Update user in PostgreSQL
+      const response = await fetch(`/api/user/${user.id}/complete-onboarding`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ financialProfile })
       });
 
-      // Initialize empty expense tracking for this user
-      await setDoc(doc(db, "userExpenses", firebaseUser.uid), {
-        userId: firebaseUser.uid,
-        expenses: [],
-        totalSpent: 0,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      });
+      if (!response.ok) {
+        throw new Error("Failed to complete onboarding");
+      }
 
-      console.log("✅ Onboarding data saved successfully");
+      // Create initial budgets based on user input
+      for (const [category, amount] of Object.entries(formData.budgetCategories)) {
+        if (amount && parseFloat(amount) > 0) {
+          await fetch("/api/budgets", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: user.id,
+              category,
+              monthlyLimit: amount,
+              month: new Date().toISOString().slice(0, 7)
+            })
+          });
+        }
+      }
+
+      // Create initial savings goal if specified
+      if (formData.primaryGoal && formData.goalAmount) {
+        await fetch("/api/goals", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.id,
+            title: formData.primaryGoal,
+            targetAmount: formData.goalAmount,
+            targetDate: formData.goalDeadline ? new Date(formData.goalDeadline).toISOString() : null
+          })
+        });
+      }
+
+      console.log("✅ Onboarding completed successfully!");
       navigate("/");
     } catch (error) {
-      console.error("❌ Error saving onboarding data:", error);
+      console.error("❌ Error completing onboarding:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper functions for form updates
+  const updateSpendingTriggers = (trigger: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      spendingTriggers: checked 
+        ? [...prev.spendingTriggers, trigger]
+        : prev.spendingTriggers.filter(t => t !== trigger)
+    }));
+  };
+
+  const updateFinancialPriorities = (priority: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      financialPriorities: checked 
+        ? [...prev.financialPriorities, priority]
+        : prev.financialPriorities.filter(p => p !== priority)
+    }));
   };
 
   const renderStep = () => {
