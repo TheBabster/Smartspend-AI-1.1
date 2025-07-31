@@ -24,6 +24,7 @@ const COLORS = {
 export default function EnhancedAnalytics() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
+  const [personalityMode, setPersonalityMode] = useState<'motivational' | 'funny' | 'strict' | 'chill'>('motivational');
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery<Expense[]>({ 
     queryKey: ["/api/expenses"] 
@@ -39,33 +40,13 @@ export default function EnhancedAnalytics() {
 
   const isLoading = expensesLoading || budgetsLoading || analyticsLoading;
 
-  // Mock data for demo purposes - in real app this would come from API
-  const mockPurchases = [
-    { id: "1", name: "Grocery Shopping", amount: 45.20, category: "Food & Dining", utilityScore: 9, timestamp: new Date().toISOString(), mood: "happy" },
-    { id: "2", name: "Netflix Subscription", amount: 12.99, category: "Entertainment", utilityScore: 7, timestamp: new Date(Date.now() - 86400000).toISOString(), mood: "bored" },
-    { id: "3", name: "Impulse Amazon Buy", amount: 67.50, category: "Shopping", utilityScore: 3, timestamp: new Date(Date.now() - 172800000).toISOString(), mood: "stressed" },
-    { id: "4", name: "Coffee & Lunch", amount: 15.80, category: "Food & Dining", utilityScore: 6, timestamp: new Date(Date.now() - 259200000).toISOString(), mood: "happy" },
-    { id: "5", name: "Designer Trainers", amount: 120.00, category: "Shopping", utilityScore: 4, timestamp: new Date(Date.now() - 345600000).toISOString(), mood: "excited" },
-  ];
-
-  const mockMoodData = [
-    { mood: "happy", emoji: "😊", totalSpent: 180.50, averageUtility: 7.2, purchaseCount: 8, categories: ["Food & Dining", "Entertainment"] },
-    { mood: "stressed", emoji: "😰", totalSpent: 245.80, averageUtility: 4.1, purchaseCount: 6, categories: ["Shopping", "Food & Dining"] },
-    { mood: "bored", emoji: "😐", totalSpent: 156.20, averageUtility: 5.8, purchaseCount: 4, categories: ["Entertainment", "Shopping"] },
-    { mood: "excited", emoji: "🤩", totalSpent: 320.75, averageUtility: 6.0, purchaseCount: 5, categories: ["Shopping", "Entertainment"] },
-  ];
-
-  const mockGoals = [
-    { id: "1", name: "PlayStation 5", targetAmount: 500, currentAmount: 187.50, category: "Gaming", emoji: "🕹️", createdAt: new Date().toISOString() },
-    { id: "2", name: "Summer Holiday", targetAmount: 1500, currentAmount: 340.00, category: "Travel", emoji: "✈️", deadline: "2025-06-01", createdAt: new Date().toISOString() },
-  ];
-
+  // Calculate weekly analysis from real expenses data
   const weeklyAnalysis = {
-    smart: mockPurchases.filter(p => p.utilityScore >= 8).length,
-    borderline: mockPurchases.filter(p => p.utilityScore >= 5 && p.utilityScore < 8).length,
-    regret: mockPurchases.filter(p => p.utilityScore < 5).length,
-    totalSpent: mockPurchases.reduce((sum, p) => sum + p.amount, 0),
-    patterns: ["Late night spending increased", "Stress purchases trending up"]
+    smart: 0,
+    borderline: 0,
+    regret: 0,
+    totalSpent: expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0),
+    patterns: []
   };
 
   // Prepare data for charts
@@ -245,26 +226,25 @@ export default function EnhancedAnalytics() {
                 <TabsContent value="coaching" className="mt-6">
                   <SmartieCoachingSummary
                     weeklySpending={weeklyAnalysis?.totalSpent || 0}
-                    smartPurchases={mockPurchases?.filter(p => p.isWise)?.length || 3}
+                    smartPurchases={3}
                     streak={5}
-                    personalityMode="motivational"
-                    onPersonalityChange={(mode) => console.log("Personality changed to:", mode)}
+                    personalityMode={personalityMode}
+                    onPersonalityChange={setPersonalityMode}
                   />
                 </TabsContent>
 
                 <TabsContent value="emotions" className="mt-6">
-                  <EmotionalSpendingTracker
-                    moodData={mockMoodData}
-                    onMoodSelect={setSelectedMood}
-                  />
+                  <div className="text-center py-12 text-gray-500">
+                    <Heart className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    <p>Start tracking your purchases with emotional tags to see patterns here!</p>
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="goals" className="mt-6">
-                  <SavingsGoalEngine
-                    goals={mockGoals}
-                    onCreateGoal={(goal) => console.log("Create goal:", goal)}
-                    onUpdateGoal={(id, amount) => console.log("Update goal:", id, amount)}
-                  />
+                  <div className="text-center py-12 text-gray-500">
+                    <Target className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    <p>Create your first savings goal to get started!</p>
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -275,7 +255,7 @@ export default function EnhancedAnalytics() {
       <BottomNav currentTab="analytics" />
       
       {/* Scroll-based Smartie Comments */}
-      <ScrollSmartieComments purchases={mockPurchases} />
+      {expenses.length > 0 && <ScrollSmartieComments purchases={expenses} />}
     </div>
   );
 }

@@ -303,32 +303,59 @@ const SavingsGoalEngine: React.FC<SavingsGoalEngineProps> = ({
                       </div>
                     </div>
 
-                    {/* Quick Actions */}
-                    <div className="flex gap-2 mt-4">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onUpdateGoal(goal.id, 5)}
-                        className="flex-1"
-                      >
-                        +£5
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onUpdateGoal(goal.id, 10)}
-                        className="flex-1"
-                      >
-                        +£10
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => onUpdateGoal(goal.id, 25)}
-                        className="flex-1"
-                      >
-                        +£25
-                      </Button>
+                    {/* Quick Actions with Custom Amount */}
+                    <div className="space-y-2 mt-4">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onUpdateGoal(goal.id, 5)}
+                          className="flex-1"
+                        >
+                          +£5
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onUpdateGoal(goal.id, 10)}
+                          className="flex-1"
+                        >
+                          +£10
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onUpdateGoal(goal.id, 25)}
+                          className="flex-1"
+                        >
+                          +£25
+                        </Button>
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          placeholder="Custom amount"
+                          className="flex-1"
+                          id={`custom-${goal.id}`}
+                          min="0.01"
+                          step="0.01"
+                        />
+                        <Button
+                          onClick={() => {
+                            const input = document.getElementById(`custom-${goal.id}`) as HTMLInputElement;
+                            const amount = parseFloat(input.value);
+                            if (amount && amount > 0) {
+                              onUpdateGoal(goal.id, amount);
+                              input.value = '';
+                            }
+                          }}
+                          variant="default"
+                          size="sm"
+                          className="bg-green-500 hover:bg-green-600"
+                        >
+                          Add
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

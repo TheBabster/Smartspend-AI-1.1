@@ -20,149 +20,17 @@ export async function seedDatabase() {
 
     const currentMonth = new Date().toISOString().slice(0, 7);
 
-    // Create demo budgets
-    const budgetData = [
-      { category: "Food & Dining", monthlyLimit: "400.00", spent: "267.50" },
-      { category: "Shopping", monthlyLimit: "200.00", spent: "134.20" },
-      { category: "Entertainment", monthlyLimit: "150.00", spent: "89.30" },
-      { category: "Transport", monthlyLimit: "100.00", spent: "67.80" },
-      { category: "Utilities", monthlyLimit: "200.00", spent: "180.00" },
-      { category: "Other", monthlyLimit: "100.00", spent: "45.60" }
-    ];
+    // Don't create demo budgets - let users create their own
 
-    for (const budget of budgetData) {
-      await db
-        .insert(budgets)
-        .values({
-          userId: user?.id || "demo-user-fallback",
-          category: budget.category,
-          monthlyLimit: budget.monthlyLimit,
-          spent: budget.spent,
-          month: currentMonth,
-        })
-        .onConflictDoNothing();
-    }
+    // Don't create demo expenses - let users create their own
 
-    // Create demo expenses
-    const expenseData = [
-      { category: "Food & Dining", amount: "12.50", description: "Lunch - Pret A Manger", emotionalTag: "convenience" },
-      { category: "Shopping", amount: "45.99", description: "New headphones", emotionalTag: "want" },
-      { category: "Entertainment", amount: "15.00", description: "Netflix subscription", emotionalTag: null },
-      { category: "Transport", amount: "8.50", description: "Bus fare", emotionalTag: null },
-      { category: "Food & Dining", amount: "28.75", description: "Grocery shopping - Tesco", emotionalTag: null },
-    ];
+    // Don't create demo goals - let users create their own
 
-    for (const expense of expenseData) {
-      await db
-        .insert(expenses)
-        .values({
-          userId: user?.id || "demo-user-fallback",
-          ...expense,
-        })
-        .onConflictDoNothing();
-    }
+    // Don't create demo streaks - let users build their own
 
-    // Create demo goals
-    await db
-      .insert(goals)
-      .values([
-        {
-          userId: user?.id || "demo-user-fallback",
-          title: "Emergency Fund",
-          targetAmount: "5000.00",
-          currentAmount: "2340.00",
-          targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
-          icon: "🛡️",
-          completed: false,
-        },
-        {
-          userId: user?.id || "demo-user-fallback",
-          title: "Summer Vacation",
-          targetAmount: "2000.00",
-          currentAmount: "1340.00",
-          targetDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
-          icon: "✈️",
-          completed: false,
-        },
-      ])
-      .onConflictDoNothing();
+    // Don't create demo achievements - let users earn their own
 
-    // Create demo streaks
-    await db
-      .insert(streaks)
-      .values([
-        {
-          userId: user?.id || "demo-user-fallback",
-          type: "budget",
-          currentStreak: 21,
-          longestStreak: 21,
-        },
-        {
-          userId: user?.id || "demo-user-fallback",
-          type: "savings",
-          currentStreak: 14,
-          longestStreak: 28,
-        },
-      ])
-      .onConflictDoNothing();
-
-    // Create demo achievements
-    await db
-      .insert(achievements)
-      .values([
-        {
-          userId: user?.id || "demo-user-fallback",
-          type: "budget",
-          title: "Budget Master",
-          description: "Stayed under budget for 20 consecutive days!",
-          icon: "🏆",
-          unlockedAt: new Date(),
-        },
-        {
-          userId: user?.id || "demo-user-fallback",
-          type: "decision",
-          title: "Smart Spender",
-          description: "Used Smartie's advice 10 times",
-          icon: "🧠",
-          unlockedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-        },
-      ])
-      .onConflictDoNothing();
-
-    // Create demo decisions
-    await db
-      .insert(decisions)
-      .values([
-        {
-          userId: user?.id || "demo-user-fallback",
-          itemName: "Gaming Headset",
-          amount: "89.99",
-          category: "Entertainment",
-          desireLevel: 7,
-          urgency: 3,
-          emotion: "excited",
-          notes: "Saw good reviews online",
-          recommendation: "think_again",
-          reasoning: "You already have working headphones. Consider waiting until your current ones break.",
-          followed: true,
-          regretLevel: null,
-        },
-        {
-          userId: user?.id || "demo-user-fallback",
-          itemName: "Coffee Subscription",
-          amount: "25.00",
-          category: "Food & Dining",
-          desireLevel: 6,
-          urgency: 2,
-          emotion: "content",
-          notes: "Monthly subscription",
-          recommendation: "yes",
-          reasoning: "This fits within your food budget and you enjoy good coffee daily.",
-          followed: true,
-          regretLevel: 2,
-        },
-      ])
-      .onConflictDoNothing();
+    // Don't create demo decisions - let users create their own
 
     console.log("Database seeded successfully!");
   } catch (error) {

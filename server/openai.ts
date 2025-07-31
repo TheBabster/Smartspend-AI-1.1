@@ -43,7 +43,7 @@ Respond with the same depth and quality as ChatGPT would. Be thorough, helpful, 
       timestamp: new Date().toISOString(),
       coinsUsed: 0.5 // Each message costs 0.5 coins (5 coins = 10 messages)
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("OpenAI API error:", error);
     
     // Log the error but still try to provide helpful response
@@ -668,4 +668,3 @@ Remember: Saving isn't about depriving yourself - it's about buying freedom and 
 Try asking me about any specific financial topic - I love talking money management and have detailed strategies for almost every situation!
 
 *Connection issues should resolve shortly. Thanks for your patience!* 🔧`;
-}
