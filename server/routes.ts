@@ -187,7 +187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Enhanced Smartie Chat endpoint
+  // Enhanced Smartie Chat endpoint with SmartCoin system
   app.post("/api/smartie/chat", async (req, res) => {
     try {
       const { message, userId } = req.body;
@@ -199,18 +199,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get user profile for personalized responses
       const user = await storage.getUser(userId);
       
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Check if user has enough SmartCoins (0.5 coins per message)
+      const coinsRequired = 0.5;
+      if ((user.smartCoins || 0) < coinsRequired) {
+        return res.status(402).json({ 
+          error: "Insufficient SmartCoins",
+          message: "You need more SmartCoins to chat with Smartie! Earn coins by using the app daily or sharing with friends.",
+          coinsNeeded: coinsRequired - (user.smartCoins || 0)
+        });
+      }
+
       // Import OpenAI service
       const { generateSmartieResponse } = await import("./openai");
       
       const response = await generateSmartieResponse(message, userId, user);
       
-      res.json(response);
+      // Deduct coins from user
+      await storage.updateUser(userId, { 
+        smartCoins: Math.max(0, (user.smartCoins || 0) - coinsRequired)
+      });
+      
+      res.json({
+        ...response,
+        remainingCoins: Math.max(0, (user.smartCoins || 0) - coinsRequired)
+      });
     } catch (error) {
       console.error("Smartie chat error:", error);
       res.status(500).json({ 
         error: "Failed to generate response",
         message: "I'm having trouble connecting right now, but I'm still here to help! Try asking me about budgeting, saving, or financial planning. 💰"
       });
+    }
+  });
+
+  // Daily coin reward endpoint
+  app.post("/api/user/:userId/daily-reward", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const lastActive = user.lastActiveDate;
+      
+      // Check if user already got today's reward
+      if (lastActive === today) {
+        return res.json({ 
+          message: "Already claimed today's reward",
+          coins: user.smartCoins,
+          streak: user.dailyStreak || 0
+        });
+      }
+
+      let newStreak = 1;
+      let coinsToAdd = 2; // Base daily reward
+
+      // Calculate streak
+      if (lastActive) {
+        const lastDate = new Date(lastActive);
+        const todayDate = new Date(today);
+        const daysDiff = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff === 1) {
+          // Consecutive day
+          newStreak = (user.dailyStreak || 0) + 1;
+        } else if (daysDiff > 1) {
+          // Streak broken
+          newStreak = 1;
+        }
+      }
+
+      // Bonus coins for 7+ day streak
+      if (newStreak >= 7) {
+        coinsToAdd = 3;
+      }
+
+      const updatedCoins = (user.smartCoins || 0) + coinsToAdd;
+
+      await storage.updateUser(userId, {
+        smartCoins: updatedCoins,
+        dailyStreak: newStreak,
+        lastActiveDate: today
+      });
+
+      res.json({
+        message: `Earned ${coinsToAdd} SmartCoins!`,
+        coinsEarned: coinsToAdd,
+        totalCoins: updatedCoins,
+        streak: newStreak,
+        streakBonus: newStreak >= 7
+      });
+    } catch (error) {
+      console.error("Daily reward error:", error);
+      res.status(500).json({ error: "Failed to process daily reward" });
+    }
+  });
+
+  // Sharing reward endpoint
+  app.post("/api/user/:userId/sharing-reward", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const sharingReward = 30;
+      const updatedCoins = (user.smartCoins || 0) + sharingReward;
+
+      await storage.updateUser(userId, {
+        smartCoins: updatedCoins
+      });
+
+      res.json({
+        message: `Earned ${sharingReward} SmartCoins for sharing!`,
+        coinsEarned: sharingReward,
+        totalCoins: updatedCoins
+      });
+    } catch (error) {
+      console.error("Sharing reward error:", error);
+      res.status(500).json({ error: "Failed to process sharing reward" });
     }
   });
 

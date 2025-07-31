@@ -24,6 +24,7 @@ export default function EnhancedSmartieChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [smartCoins, setSmartCoins] = useState(25);
+  const [dailyStreak, setDailyStreak] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const { user: firebaseUser } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -39,12 +40,28 @@ export default function EnhancedSmartieChat() {
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
+          setSmartCoins(userData.smartCoins || 25);
+          setDailyStreak(userData.dailyStreak || 0);
+          
+          // Auto-claim daily reward
+          try {
+            const rewardResponse = await fetch(`/api/user/${userData.id}/daily-reward`, {
+              method: 'POST'
+            });
+            if (rewardResponse.ok) {
+              const rewardData = await rewardResponse.json();
+              setSmartCoins(rewardData.totalCoins);
+              setDailyStreak(rewardData.streak);
+            }
+          } catch (error) {
+            console.log("Daily reward already claimed or error:", error);
+          }
           
           // Add welcome message based on user's onboarding status
           const welcomeMessage: ChatMessage = {
             id: "welcome",
             content: userData.onboardingCompleted 
-              ? `Hi ${userData.name}! 👋 I'm Smartie, your AI financial coach. I've got your financial profile loaded and I'm ready to help you make smart money decisions. What would you like to chat about today?`
+              ? `Hi ${userData.name}! 👋 I'm Smartie, your AI financial coach. I've got your financial profile loaded and I'm ready to help you make smart money decisions. Each message costs 0.5 SmartCoins (you have ${userData.smartCoins || 25} coins). What would you like to chat about today?`
               : `Hi ${userData.name}! 👋 I'm Smartie, your AI financial coach. I notice you haven't completed your financial setup yet. Would you like me to help you get started, or do you have other questions about money management?`,
             sender: "smartie",
             timestamp: new Date()
@@ -93,6 +110,11 @@ export default function EnhancedSmartieChat() {
       if (response.ok) {
         const data = await response.json();
         
+        // Update remaining coins
+        if (data.remainingCoins !== undefined) {
+          setSmartCoins(data.remainingCoins);
+        }
+        
         // Simulate typing delay for more natural feel
         setTimeout(() => {
           const smartieMessage: ChatMessage = {
@@ -105,6 +127,17 @@ export default function EnhancedSmartieChat() {
           setMessages(prev => [...prev, smartieMessage]);
           setIsTyping(false);
         }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+      } else if (response.status === 402) {
+        // Insufficient coins
+        const errorData = await response.json();
+        const errorMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          content: `💰 ${errorData.message}\n\nEarn coins by:\n• Using the app daily (2-3 coins)\n• Sharing with friends (30 coins)\n• Maintaining a 7+ day streak for bonus coins!`,
+          sender: "smartie",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+        setIsTyping(false);
       } else {
         throw new Error("Failed to get response from Smartie");
       }
@@ -160,6 +193,11 @@ export default function EnhancedSmartieChat() {
                 <Badge variant="secondary" className="bg-yellow-400 text-yellow-900">
                   ⭐ {smartCoins} SmartCoins
                 </Badge>
+                {dailyStreak > 0 && (
+                  <Badge variant="secondary" className="bg-orange-400 text-orange-900">
+                    🔥 {dailyStreak} day streak
+                  </Badge>
+                )}
               </div>
             </div>
           </CardHeader>

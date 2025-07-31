@@ -7,7 +7,7 @@ export async function generateSmartieResponse(
   userMessage: string,
   userId: string,
   userProfile?: any
-): Promise<{ message: string; timestamp: string }> {
+): Promise<{ message: string; timestamp: string; coinsUsed: number }> {
   try {
     // Create a comprehensive system prompt based on user profile
     const systemPrompt = createSmartieSystemPrompt(userProfile);
@@ -26,7 +26,8 @@ export async function generateSmartieResponse(
 
     return {
       message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      coinsUsed: 0.5 // Each message costs 0.5 coins (5 coins = 10 messages)
     };
   } catch (error) {
     console.error("OpenAI API error:", error);

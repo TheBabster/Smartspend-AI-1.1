@@ -13,6 +13,9 @@ export const users = pgTable("users", {
   monthlyIncome: decimal("monthly_income", { precision: 10, scale: 2 }),
   onboardingCompleted: boolean("onboarding_completed").default(false),
   financialProfile: json("financial_profile"), // Store onboarding questionnaire data
+  smartCoins: integer("smart_coins").default(25), // Starting coins for new users
+  dailyStreak: integer("daily_streak").default(0),
+  lastActiveDate: text("last_active_date"), // Store as YYYY-MM-DD string
   createdAt: timestamp("created_at").defaultNow(),
 });
 

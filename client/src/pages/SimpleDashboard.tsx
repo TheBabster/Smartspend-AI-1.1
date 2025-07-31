@@ -54,6 +54,20 @@ export default function SimpleDashboard() {
         const userData = await syncResponse.json();
         console.log("✅ User synced successfully:", userData);
         setUser(userData);
+        
+        // Auto-claim daily reward and update SmartCoin display
+        try {
+          const rewardResponse = await fetch(`/api/user/${userData.id}/daily-reward`, {
+            method: 'POST'
+          });
+          if (rewardResponse.ok) {
+            const rewardData = await rewardResponse.json();
+            setUser(prev => ({ ...prev, smartCoins: rewardData.totalCoins, dailyStreak: rewardData.streak }));
+          }
+        } catch (error) {
+          console.log("Daily reward already claimed");
+        }
+        
         setUserLoading(false);
       } catch (error) {
         console.error("❌ Error syncing user data:", error);
