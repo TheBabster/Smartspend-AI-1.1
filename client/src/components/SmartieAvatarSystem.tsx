@@ -1,231 +1,186 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 
-interface SmartieAvatarSystemProps {
-  mood: "happy" | "thinking" | "celebrating" | "concerned" | "proud" | "warning" | "excited" | "relaxed";
-  size?: "sm" | "md" | "lg" | "xl";
-  animated?: boolean;
-  showAccessories?: boolean;
-  accessories?: string[];
+interface SmartieAccessory {
+  id: string;
+  name: string;
+  type: "hat" | "glasses" | "clothing" | "accessory";
+  price: number;
+  unlocked: boolean;
+  equipped: boolean;
+  description: string;
 }
 
-const SmartieAvatarSystem: React.FC<SmartieAvatarSystemProps> = ({
-  mood = "happy",
-  size = "md",
-  animated = true,
-  showAccessories = false,
-  accessories = []
-}) => {
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const [isBlinking, setIsBlinking] = useState(false);
+interface SmartieAvatarSystemProps {
+  mood?: "happy" | "thinking" | "calculating" | "concerned" | "celebrating" | "excited" | "worried" | "confident";
+  size?: "sm" | "md" | "lg" | "xl";
+  accessories?: SmartieAccessory[];
+  animate?: boolean;
+}
 
-  // Blinking animation
+export default function SmartieAvatarSystem({ 
+  mood = "happy", 
+  size = "md", 
+  accessories = [],
+  animate = false 
+}: SmartieAvatarSystemProps) {
+  const [currentAccessories, setCurrentAccessories] = useState<SmartieAccessory[]>(accessories);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   useEffect(() => {
-    if (!animated) return;
-    
-    const blinkInterval = setInterval(() => {
-      setIsBlinking(true);
-      setTimeout(() => setIsBlinking(false), 150);
-    }, 3000 + Math.random() * 2000);
+    setCurrentAccessories(accessories);
+  }, [accessories]);
 
-    return () => clearInterval(blinkInterval);
-  }, [animated]);
-
-  // Floating animation
+  // Trigger animation when accessories change
   useEffect(() => {
-    if (!animated) return;
-    
-    const floatInterval = setInterval(() => {
-      setCurrentFrame(prev => (prev + 1) % 60);
-    }, 100);
-
-    return () => clearInterval(floatInterval);
-  }, [animated]);
-
-  const sizeClasses = {
-    sm: "w-12 h-12",
-    md: "w-16 h-16", 
-    lg: "w-24 h-24",
-    xl: "w-32 h-32"
-  };
-
-  const getSmartieFace = () => {
-    const eyeState = isBlinking ? "closed" : "open";
-    
-    switch (mood) {
-      case "happy":
-        return {
-          eyes: eyeState === "open" ? "●●" : "--",
-          mouth: "︶",
-          color: "#FF6B9D",
-          glow: "#FFE0E9"
-        };
-      case "thinking":
-        return {
-          eyes: eyeState === "open" ? "◐◑" : "--", 
-          mouth: "○",
-          color: "#4ECDC4",
-          glow: "#E0F7FA"
-        };
-      case "celebrating":
-        return {
-          eyes: eyeState === "open" ? "★★" : "--",
-          mouth: "︶",
-          color: "#FFD93D",
-          glow: "#FFF9C4"
-        };
-      case "concerned":
-        return {
-          eyes: eyeState === "open" ? "◉◉" : "--",
-          mouth: "︵",
-          color: "#FF8A65",
-          glow: "#FFE0DD"
-        };
-      case "proud":
-        return {
-          eyes: eyeState === "open" ? "◆◆" : "--",
-          mouth: "︶",
-          color: "#9C27B0",
-          glow: "#F3E5F5"
-        };
-      case "warning":
-        return {
-          eyes: eyeState === "open" ? "⚠⚠" : "--",
-          mouth: "—",
-          color: "#FF5722",
-          glow: "#FFEBEE"
-        };
-      case "excited":
-        return {
-          eyes: eyeState === "open" ? "✦✦" : "--",
-          mouth: "︶",
-          color: "#FF4081",
-          glow: "#FCE4EC"
-        };
-      case "relaxed":
-        return {
-          eyes: eyeState === "open" ? "◕◕" : "--",
-          mouth: "︶", 
-          color: "#66BB6A",
-          glow: "#E8F5E8"
-        };
-      default:
-        return {
-          eyes: eyeState === "open" ? "●●" : "--",
-          mouth: "︶",
-          color: "#FF6B9D",
-          glow: "#FFE0E9"
-        };
+    if (animate && accessories.length > 0) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 1000);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [accessories, animate]);
 
-  const face = getSmartieFace();
-  const floatY = animated ? Math.sin(currentFrame * 0.1) * 2 : 0;
+  const equippedAccessories = currentAccessories.filter(acc => acc.equipped);
 
   return (
-    <motion.div
-      className={`relative ${sizeClasses[size]} flex items-center justify-center`}
-      style={{
-        transform: `translateY(${floatY}px)`
-      }}
-      whileHover={animated ? { scale: 1.1 } : {}}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Glow Effect */}
-      <div 
-        className="absolute inset-0 rounded-full blur-lg opacity-30"
-        style={{ backgroundColor: face.glow }}
-      />
+    <div className={`relative inline-block ${isAnimating ? 'animate-bounce' : ''}`}>
+      <ModernSmartieAvatar mood={mood} size={size} />
       
-      {/* Brain Body */}
-      <motion.div
-        className="relative w-full h-full rounded-full flex flex-col items-center justify-center font-bold text-lg shadow-lg border-2"
-        style={{ 
-          backgroundColor: face.color,
-          borderColor: face.color,
-          filter: "brightness(1.1)"
-        }}
-        animate={animated ? {
-          scale: [1, 1.02, 1],
-          rotate: [0, 1, -1, 0]
-        } : {}}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      >
-        {/* Brain Texture */}
-        <div className="absolute inset-1 rounded-full opacity-20">
-          <svg viewBox="0 0 24 24" className="w-full h-full">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.19 0 2.34-.21 3.41-.6.3-.11.59-.24.87-.38.25-.13.49-.27.72-.42.23-.15.45-.31.66-.48.21-.17.41-.35.6-.54.19-.19.37-.39.54-.6.17-.21.33-.43.48-.66.15-.23.29-.47.42-.72.14-.28.27-.57.38-.87.39-1.07.6-2.22.6-3.41 0-5.52-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-              fill="currentColor"
-              opacity="0.3"
-            />
-          </svg>
-        </div>
-        
-        {/* Eyes */}
-        <div className="text-sm font-black text-white drop-shadow-sm mb-1">
-          {face.eyes}
-        </div>
-        
-        {/* Mouth */}
-        <div className="text-sm font-black text-white drop-shadow-sm">
-          {face.mouth}
-        </div>
-        
-        {/* Accessories */}
-        {showAccessories && accessories.map((accessory, index) => (
-          <motion.div
-            key={accessory}
-            className="absolute text-lg"
-            style={{
-              top: accessory.includes("hat") ? "-8px" : "auto",
-              right: accessory.includes("glasses") ? "2px" : "auto",
-              bottom: accessory.includes("shoes") ? "-8px" : "auto"
-            }}
-            animate={animated ? { rotate: [0, 5, -5, 0] } : {}}
-            transition={{ duration: 2, repeat: Infinity, delay: index * 0.5 }}
-          >
-            {accessory}
-          </motion.div>
-        ))}
-      </motion.div>
-      
-      {/* Sparkles for celebration */}
-      <AnimatePresence>
-        {mood === "celebrating" && animated && (
-          <>
-            {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute text-yellow-400 text-xs font-bold"
-                style={{
-                  left: `${20 + i * 12}%`,
-                  top: `${10 + (i % 2) * 60}%`
-                }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ 
-                  opacity: [0, 1, 0],
-                  scale: [0, 1.2, 0],
-                  y: [0, -10, 0]
-                }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  delay: i * 0.2
-                }}
-              >
-                ✨
-              </motion.div>
-            ))}
-          </>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
+      {/* Render equipped accessories */}
+      {equippedAccessories.map((accessory) => (
+        <div
+          key={accessory.id}
+          className={`absolute inset-0 pointer-events-none ${
+            accessory.type === 'hat' ? 'top-0' :
+            accessory.type === 'glasses' ? 'top-1/4' :
+            accessory.type === 'clothing' ? 'top-1/2' :
+            'bottom-0'
+          }`}
+        >
+          {/* Render accessory based on type */}
+          {accessory.type === 'hat' && (
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2">
+              {accessory.name === "Blue Beanie" && (
+                <div className="w-8 h-6 bg-blue-500 rounded-t-full border-2 border-blue-600" />
+              )}
+              {accessory.name === "Graduation Cap" && (
+                <div className="w-8 h-4 bg-black rounded-sm relative">
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-black transform rotate-45" />
+                </div>
+              )}
+              {accessory.name === "Chef Hat" && (
+                <div className="w-6 h-8 bg-white rounded-t-full border border-gray-200" />
+              )}
+            </div>
+          )}
+          
+          {accessory.type === 'glasses' && (
+            <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2">
+              {accessory.name === "Smart Glasses" && (
+                <div className="flex gap-1">
+                  <div className="w-3 h-3 border-2 border-gray-600 rounded-full bg-blue-100/50" />
+                  <div className="w-3 h-3 border-2 border-gray-600 rounded-full bg-blue-100/50" />
+                </div>
+              )}
+              {accessory.name === "Cool Shades" && (
+                <div className="flex gap-1">
+                  <div className="w-3 h-3 border-2 border-black rounded-sm bg-black" />
+                  <div className="w-3 h-3 border-2 border-black rounded-sm bg-black" />
+                </div>
+              )}
+            </div>
+          )}
 
-export default SmartieAvatarSystem;
+          {accessory.type === 'clothing' && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2">
+              {accessory.name === "Superhero Cape" && (
+                <div className="w-4 h-6 bg-red-500 rounded-b-lg border-red-600 border-2" />
+              )}
+              {accessory.name === "Bow Tie" && (
+                <div className="w-4 h-2 bg-purple-600 rounded-sm relative">
+                  <div className="absolute inset-y-0 left-1/2 w-1 bg-purple-800 transform -translate-x-1/2" />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+
+      {/* Sparkle effect when new accessory is equipped */}
+      {isAnimating && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-2 h-2 bg-yellow-400 rounded-full animate-ping" />
+          <div className="absolute bottom-0 left-0 w-1 h-1 bg-pink-400 rounded-full animate-ping delay-100" />
+          <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping delay-200" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Predefined accessories for the shop
+export const SMARTIE_ACCESSORIES: SmartieAccessory[] = [
+  {
+    id: "blue-beanie",
+    name: "Blue Beanie",
+    type: "hat",
+    price: 50,
+    unlocked: false,
+    equipped: false,
+    description: "A cozy blue beanie for cold saving days"
+  },
+  {
+    id: "graduation-cap",
+    name: "Graduation Cap",
+    type: "hat", 
+    price: 100,
+    unlocked: false,
+    equipped: false,
+    description: "For mastering your finances like a scholar"
+  },
+  {
+    id: "smart-glasses",
+    name: "Smart Glasses",
+    type: "glasses",
+    price: 75,
+    unlocked: false,
+    equipped: false,
+    description: "See your spending patterns more clearly"
+  },
+  {
+    id: "cool-shades",
+    name: "Cool Shades",
+    type: "glasses",
+    price: 60,
+    unlocked: false,
+    equipped: false,
+    description: "Look cool while saving money"
+  },
+  {
+    id: "superhero-cape",
+    name: "Superhero Cape",
+    type: "clothing",
+    price: 150,
+    unlocked: false,
+    equipped: false,
+    description: "For when you're a money-saving superhero"
+  },
+  {
+    id: "bow-tie",
+    name: "Bow Tie",
+    type: "clothing",
+    price: 40,
+    unlocked: false,
+    equipped: false,
+    description: "Dress up for financial success"
+  },
+  {
+    id: "chef-hat",
+    name: "Chef Hat",
+    type: "hat",
+    price: 80,
+    unlocked: false,
+    equipped: false,
+    description: "Cooking up some great savings recipes"
+  }
+];

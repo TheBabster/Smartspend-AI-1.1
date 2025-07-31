@@ -1,0 +1,47 @@
+Frontend Improvements:
+	•	Use streaming responses like ChatGPT for more natural typing.
+	•	Allow users to click on Smartie’s reply to expand for more tips (“Show detailed breakdown”).
+	•	Add voice input and reply with TTS (text-to-speech) for mobile friendliness.
+
+⸻
+
+🛍️ 3. Smartie Shop & Avatar System
+
+You mentioned accessories but didn’t finish—this is crucial:
+	•	Add dressing animation: When user equips an item (hat, glasses), Smartie changes visibly on all screens.
+	•	Unlockable perks: E.g., if user earns 100 SmartCoins, unlock “Savings Mode” hat that enables bonus features like Smart Suggestions or streak boosters.
+	•	Emotional responses: If a user makes poor financial decisions, Smartie frowns. If user breaks a streak, Smartie cries a little. Subtle animations help bond with the character.
+
+⸻
+
+💡 4. Feature & Dashboard Enhancements
+
+To make your homepage feel dynamic, intelligent, and ultra-useful:
+	•	Daily Insight Card: A rotating daily tip/analysis like “Yesterday you saved £8 by skipping takeout! That’s a win!” with Smartie thumbs-up.
+	•	Goal Tracking Widget: Show user’s current savings vs goal in a progress donut.
+	•	Impulse Control Heatmap: A visual graph of spending impulses throughout the week/month. Label with emojis (🔥 for impulse, 🧘 for calm).
+	•	Notification System:
+	•	Push reminders: “You haven’t made a Smart Purchase today! Stay streaky 🌟”
+	•	Weekly summary: “This week you saved £42 — enough for that hoodie you wanted 🎽”
+
+⸻
+
+🎨 5. Visual Polish & Design Enhancements
+
+You’re already at an 8.7–9.0 visually. Push to a 10 by:
+	•	Add micro-animations: Button hover effects, confetti pop when a user saves money or completes a Smart Streak.
+	•	Gradient upgrades: Make buttons have smooth transitions from one gradient state to another on hover (like modern Apple UI).
+	•	Smartie mood animation: Based on user score or recent choices, Smartie’s face/emotion shifts dynamically.
+	•	Dark mode: Allow toggle — already started, now polish with better contrast and Smartie color adaptation.
+	•	Use neumorphism sparingly for cards and inputs to give a modern soft depth feel.
+
+⸻
+
+📊 6. Behavioural Analytics Engine
+
+This takes your app to a new level — Smartie should feel smarter than the user:
+	•	Decision Pattern Recognition: Track regret/satisfaction scores after each decision. Learn the user’s tendencies and reflect back:
+“You tend to regret purchases made between 9–11 PM. Want to set a spending pause for those hours?”
+	•	Spending Mood Tracker: Show monthly pie chart of purchases made in happy vs. stressed states.
+	•	Smart Reminders: When emotion + time + history align, Smartie should intervene:
+“Looks like you often splurge on tech on Fridays. Want a 24hr lock on tech category this weekend?”

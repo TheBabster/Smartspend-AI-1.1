@@ -187,6 +187,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced Smartie Chat endpoint
+  app.post("/api/smartie/chat", async (req, res) => {
+    try {
+      const { message, userId } = req.body;
+      
+      if (!message || !userId) {
+        return res.status(400).json({ error: "Message and userId are required" });
+      }
+
+      // Get user profile for personalized responses
+      const user = await storage.getUser(userId);
+      
+      // Import OpenAI service
+      const { generateSmartieResponse } = await import("./openai");
+      
+      const response = await generateSmartieResponse(message, userId, user);
+      
+      res.json(response);
+    } catch (error) {
+      console.error("Smartie chat error:", error);
+      res.status(500).json({ 
+        error: "Failed to generate response",
+        message: "I'm having trouble connecting right now, but I'm still here to help! Try asking me about budgeting, saving, or financial planning. 💰"
+      });
+    }
+  });
+
   // Decision endpoints - User-specific
   app.get("/api/decisions/:userId", async (req, res) => {
     try {

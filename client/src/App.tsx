@@ -11,9 +11,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import NotFound from "@/pages/not-found";
 import SimpleDashboard from "@/pages/SimpleDashboard";
-import OnboardingFlow from "@/pages/OnboardingFlow";
+import ComprehensiveOnboarding from "@/pages/ComprehensiveOnboarding";
 import Decisions from "@/pages/Decisions";
 import EnhancedGoals from "@/pages/EnhancedGoals";
+import EnhancedSmartieChat from "@/pages/EnhancedSmartieChat";
 import Analytics from "@/pages/Analytics";
 import EnhancedAnalytics from "@/pages/EnhancedAnalytics";
 import SmartieCorner from "@/pages/SmartieCorner";
@@ -29,9 +30,10 @@ function Router() {
     <Switch>
       <Route path="/" component={SimpleDashboard} />
       <Route path="/auth" component={Auth} />
-      <Route path="/onboarding" component={OnboardingFlow} />
+      <Route path="/onboarding" component={ComprehensiveOnboarding} />
       <Route path="/decisions" component={Decisions} />
       <Route path="/goals" component={EnhancedGoals} />
+      <Route path="/chat" component={EnhancedSmartieChat} />
       <Route path="/analytics" component={EnhancedAnalytics} />
       <Route path="/analytics-old" component={Analytics} />
       <Route path="/smartie" component={SmartieCorner} />

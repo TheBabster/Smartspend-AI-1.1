@@ -191,7 +191,7 @@ export default function SimpleDashboard() {
           <Button 
             variant="outline" 
             className="h-20"
-            onClick={() => navigate("/smartie")}
+            onClick={() => navigate("/chat")}
           >
             <div className="text-center">
               <p className="font-semibold">Chat with Smartie</p>
@@ -202,27 +202,29 @@ export default function SimpleDashboard() {
 
         {/* New User Welcome or Dashboard Content */}
         {!user.onboardingCompleted ? (
-          <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-700">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <ModernSmartieAvatar mood="celebrating" size="lg" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                    Welcome to SmartSpend, {user.name}!
-                  </h3>
-                  <p className="text-blue-700 dark:text-blue-400 mb-4">
-                    You're starting with a clean slate! Let's set up your budget, goals, and preferences to create your personalized financial experience.
-                  </p>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={() => navigate("/onboarding")}
-                  >
-                    Complete Setup (2 minutes)
-                  </Button>
+          <div className="text-center">
+            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-700">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <ModernSmartieAvatar mood="celebrating" size="lg" />
+                  <div className="flex-1 text-left">
+                    <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
+                      Welcome to SmartSpend, {user.name}!
+                    </h3>
+                    <p className="text-blue-700 dark:text-blue-400 mb-4">
+                      You need to complete your financial setup to get personalized advice and start tracking your progress.
+                    </p>
+                    <Button 
+                      onClick={() => navigate("/onboarding")}
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    >
+                      Complete Financial Setup (Required)
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card>
