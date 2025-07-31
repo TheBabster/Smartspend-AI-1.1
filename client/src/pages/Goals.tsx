@@ -81,7 +81,7 @@ export default function Goals() {
       }).then(res => res.json());
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
       setShowAddGoal(false);
       setNewGoal({
         name: '',
@@ -103,7 +103,7 @@ export default function Goals() {
       }).then(res => res.json());
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
     }
   });
 

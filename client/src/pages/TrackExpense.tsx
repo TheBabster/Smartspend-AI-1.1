@@ -109,12 +109,23 @@ export default function TrackExpense() {
       return;
     }
 
-    addExpenseMutation.mutate({
-      description: formData.description,
-      amount: parseFloat(formData.amount).toFixed(2),
-      category: formData.category,
-      emotionalTag: formData.emotionalTag,
-      date: new Date().toISOString()
+    // Get user ID first
+    fetch('/api/auth/firebase-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firebaseUid: firebaseUser.uid,
+        email: firebaseUser.email,
+        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+      })
+    }).then(res => res.json()).then(userData => {
+      addExpenseMutation.mutate({
+        userId: userData.id,
+        description: formData.description,
+        amount: parseFloat(formData.amount).toFixed(2),
+        category: formData.category,
+        emotionalTag: formData.emotionalTag
+      });
     });
   };
 
@@ -147,7 +158,7 @@ export default function TrackExpense() {
         case 'year': limit.setFullYear(now.getFullYear() - 1); break;
       }
 
-      filtered = filtered.filter(exp => new Date(exp.date) >= limit);
+      filtered = filtered.filter(exp => new Date(exp.createdAt) >= limit);
     }
 
     if (filters.minAmount) {
