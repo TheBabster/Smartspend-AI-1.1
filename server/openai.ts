@@ -46,6 +46,13 @@ Respond with the same depth and quality as ChatGPT would. Be thorough, helpful, 
   } catch (error) {
     console.error("OpenAI API error:", error);
     
+    // Log the error but still try to provide helpful response
+    console.error("OpenAI API error details:", {
+      error: error.message,
+      type: error.type || 'unknown',
+      code: error.code || 'unknown'
+    });
+    
     // Provide intelligent fallback responses based on common financial questions
     const fallbackResponse = getIntelligentFallback(userMessage);
     
@@ -59,6 +66,8 @@ Respond with the same depth and quality as ChatGPT would. Be thorough, helpful, 
 
 function getIntelligentFallback(userMessage: string): string {
   const message = userMessage.toLowerCase();
+  
+  console.log("Checking fallback for message:", message);
   
   // Millionaire/wealth building questions
   if (message.includes('millionaire') || message.includes('wealth') || message.includes('rich')) {
@@ -112,6 +121,234 @@ Here's a comprehensive roadmap to building substantial wealth:
 **Remember**: Becoming a millionaire isn't about luck or inheritance for most people. It's about consistent habits, smart decisions, and time. The average millionaire takes 20-30 years to reach that milestone through steady saving and investing.
 
 *I'm experiencing some temporary connectivity issues, but this comprehensive guide will get you started on your wealth-building journey!*`;
+  }
+
+  // Billionaire questions - enhanced response (should trigger with single word)
+  if (message.includes('billionaire') || message.includes('become rich') || message.includes('become a billionaire')) {
+    return `# How to Become a Billionaire: The Elite Wealth Strategy 🚀
+
+**Warning**: Becoming a billionaire requires extreme dedication, risk-taking, and often a combination of skill, timing, and luck. Here's what separates billionaires from millionaires:
+
+## **The Billionaire Difference** 💡
+
+### **Scale & Leverage**
+- **Think in Systems**: Billionaires don't trade time for money - they build systems that generate wealth 24/7
+- **Global Impact**: Their businesses affect millions/billions of people worldwide
+- **Technology Multiplier**: Use technology to scale beyond physical limitations
+
+### **Business Ownership & Innovation**
+- **Start/Scale Companies**: 90%+ of billionaires own significant equity in high-growth companies
+- **Disrupt Industries**: Find broken systems and create better solutions
+- **Network Effects**: Build businesses where each new user makes the service more valuable
+
+## **The Billionaire Playbook** 📈
+
+### **1. Identify Massive Problems**
+- Climate change solutions
+- Healthcare inefficiencies  
+- Education gaps
+- Financial inclusion
+- Space exploration
+- AI/automation opportunities
+
+### **2. Build Scalable Solutions**
+- **Software/Tech**: Highest profit margins, infinite scalability
+- **Network Businesses**: Social media, marketplaces, platforms
+- **Capital-Light Models**: Asset-light businesses with high returns
+
+### **3. Raise Smart Capital**
+- Angel investors → Venture capital → Growth equity → IPO
+- Maintain significant ownership (10-50%+ even after dilution)
+- Use OPM (Other People's Money) to accelerate growth
+
+### **4. Execute at Scale**
+- **Hire A+ Talent**: Surround yourself with people smarter than you
+- **Think 10x**: Don't improve by 10% - aim for 10x better solutions
+- **Speed Matters**: Move fast and iterate quickly
+
+## **Real Billionaire Paths** 🎯
+
+### **Tech Founders**
+- **Software/SaaS**: Build tools millions use daily
+- **E-commerce Platforms**: Amazon, Shopify model
+- **Social Networks**: Connect people at massive scale
+
+### **Investment/Finance**
+- **Private Equity**: Buy, improve, sell companies
+- **Hedge Funds**: Manage billions in assets
+- **Real Estate Empires**: Commercial/residential at scale
+
+### **Traditional Business**
+- **Manufacturing**: Scale production globally
+- **Retail Chains**: Physical/digital distribution networks
+- **Energy/Resources**: Oil, mining, renewable energy
+
+## **The Reality Check** ⚠️
+
+### **Extreme Requirements**
+- **80-100 hour weeks** for years/decades
+- **High stress tolerance** and mental resilience
+- **Willing to risk everything** multiple times
+- **Delayed gratification** for 10-20+ years
+
+### **Success Rates**
+- Only ~2,700 billionaires globally (0.000035% of population)
+- Most failed multiple times before succeeding
+- Timing and luck play significant roles
+
+## **Start Today Steps** 🎯
+
+1. **Identify Your Billion-Dollar Idea**
+   - What problem affects 100M+ people?
+   - How can technology solve it better?
+
+2. **Build MVP (Minimum Viable Product)**
+   - Test your concept quickly and cheaply
+   - Get user feedback and iterate
+
+3. **Study Successful Billionaires**
+   - Jeff Bezos (Amazon): Customer obsession
+   - Elon Musk (Tesla/SpaceX): First principles thinking
+   - Mark Zuckerberg (Meta): Network effects
+
+4. **Develop Essential Skills**
+   - Sales & marketing
+   - Product development
+   - Team building & leadership
+   - Financial modeling
+
+**Remember**: Most people should focus on becoming millionaires first. Billionaire status requires sacrificing almost everything else for your business vision.
+
+*Connection issues should resolve shortly. Ready to discuss your specific business ideas!* 💼`;
+  }
+
+  // Budget and expense tracking
+  if (message.includes('budget') || message.includes('track') || message.includes('expense')) {
+    return `# Master Your Money: Complete Budgeting & Expense Tracking Guide 💰
+
+## **Why Most Budgets Fail** ❌
+- Too restrictive (diet mentality)
+- Track too many categories
+- Don't account for irregular expenses
+- No automation or systems
+
+## **The Smartie Budget System** ✅
+
+### **1. The 50/30/20 Foundation**
+- **50% Needs**: Rent, utilities, groceries, transport, minimum debt payments
+- **30% Wants**: Entertainment, dining out, hobbies, non-essential shopping
+- **20% Future**: Savings, investments, extra debt payments
+
+### **2. Automate Everything**
+- **Bills**: Set up automatic payments for all fixed expenses
+- **Savings**: Auto-transfer to savings account on payday
+- **Investments**: Automatic monthly investment contributions
+
+### **3. Track What Matters**
+**Essential Categories Only:**
+- Housing (rent/mortgage, utilities)
+- Transportation (car payment, fuel, insurance)
+- Food (groceries + dining out combined)
+- Personal (entertainment, shopping, subscriptions)
+- Future (savings, investments)
+
+## **Expense Tracking Made Simple** 📱
+
+### **Best Methods**
+1. **Bank App Categories**: Most banks auto-categorize transactions
+2. **Photo Receipts**: Snap pictures immediately, sort weekly
+3. **Weekly Money Dates**: 15-minute weekly review of all spending
+
+### **What to Track Daily**
+- All purchases over £10
+- Cash spending (write down immediately)
+- Subscription renewals
+
+### **What to Review Weekly**
+- Category totals vs budget
+- Unusual spending patterns
+- Upcoming irregular expenses
+
+## **The 5-Minute Daily System** ⏰
+
+**Morning (2 minutes):**
+- Check account balances
+- Review yesterday's spending
+
+**Evening (3 minutes):**
+- Log any cash purchases
+- Check if on track for daily spending target
+
+## **Advanced Budget Strategies** 🚀
+
+### **Zero-Based Budgeting**
+- Every pound gets assigned a job
+- Income - Expenses = Zero
+- Forces intentional spending decisions
+
+### **Envelope Method (Digital)**
+- Separate savings accounts for each category
+- Transfer monthly budget amounts to each "envelope"
+- When envelope is empty, you're done spending
+
+### **Variable Income Budgeting**
+- Budget using lowest income month
+- Save excess from high income months
+- Build 3-6 month buffer for stability
+
+## **Common Expense Tracking Mistakes** ⚠️
+
+1. **Over-categorizing**: Stick to 5-7 main categories max
+2. **Perfectionism**: 80% accuracy is better than 0% consistency
+3. **Shame Spirals**: View overspending as data, not failure
+4. **Ignoring Small Amounts**: £3 daily coffee = £1,095 annually
+
+## **Smart Spending Rules** 💡
+
+### **The 24-Hour Rule**
+- Wait 24 hours before purchases over £50
+- Wait 1 week for purchases over £200
+- Wait 1 month for purchases over £500
+
+### **Cost Per Use**
+- £100 shoes worn 100 times = £1 per wear
+- £20 dress worn twice = £10 per wear
+- Always calculate before buying
+
+### **The 1% Rule**
+- Don't spend more than 1% of annual income on any single non-essential item
+- £30k income = max £300 for that designer bag
+
+## **Start This Week** 🎯
+
+**Day 1-2**: Set up automatic bill payments
+**Day 3-4**: Create savings transfer automation  
+**Day 5-6**: Download banking app and set up categories
+**Day 7**: First weekly money review session
+
+*I'm here to help you master every aspect of your financial journey!*`;
+  }
+
+  // Default fallback with more comprehensive advice
+  return `I'm experiencing some temporary connectivity issues, but I'm still here to help with your financial questions! 🏦
+
+**Popular Topics I Love Discussing:**
+- **Budgeting & Expense Tracking**: Creating realistic budgets that actually work
+- **Saving Strategies**: Building emergency funds and reaching financial goals  
+- **Investment Basics**: Index funds, ISAs, and long-term wealth building
+- **Debt Management**: Paying off credit cards, loans, and mortgages faster
+- **Career & Income**: Salary negotiation and side hustle strategies
+
+**Quick Financial Wins While I'm Reconnecting:**
+- Track your spending for one week to identify problem areas
+- Set up automatic savings transfers (even £25/month helps!)
+- Check if you're getting the best rates on savings accounts
+- Review subscriptions and cancel unused services
+- Consider increasing pension contributions for tax relief
+
+Try asking me about any specific financial topic - I love talking money management and have detailed strategies for almost every situation!
+
+*Connection issues should resolve shortly. Thanks for your patience!* 🔧`;
   }
   
   // Budgeting questions

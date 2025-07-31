@@ -109,6 +109,8 @@ export default function TrackExpense() {
       return;
     }
 
+    if (!firebaseUser) return;
+    
     // Get user ID first
     fetch('/api/auth/firebase-user', {
       method: 'POST',
@@ -158,7 +160,7 @@ export default function TrackExpense() {
         case 'year': limit.setFullYear(now.getFullYear() - 1); break;
       }
 
-      filtered = filtered.filter(exp => new Date(exp.createdAt) >= limit);
+      filtered = filtered.filter(exp => exp.createdAt && new Date(exp.createdAt) >= limit);
     }
 
     if (filters.minAmount) {

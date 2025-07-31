@@ -99,8 +99,7 @@ export default function SmartieCoachingSummary({
             <div className="relative">
               <ModernSmartieAvatar 
                 mood={streak >= 3 ? 'celebrating' : 'happy'} 
-                size="lg" 
-                className="animate-bounce-subtle"
+                size="lg"
               />
               {showConfetti && (
                 <div className="absolute inset-0 pointer-events-none">
@@ -132,7 +131,7 @@ export default function SmartieCoachingSummary({
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary" className="bg-purple-100 text-purple-700">
-                  {personality.badge}
+                  {personality?.badge || "🧠 Smart Spender"}
                 </Badge>
                 <span className="text-sm text-gray-600">This week</span>
               </div>
@@ -143,11 +142,11 @@ export default function SmartieCoachingSummary({
                 animate={{ opacity: 1, y: 0 }}
                 className="text-lg font-medium text-purple-900 dark:text-purple-100 mb-1"
               >
-                {personality.message}
+                {personality?.message || "Keep up the great work with your smart spending!"}
               </motion.p>
               
               <p className="text-sm text-purple-700 dark:text-purple-300">
-                {personality.tone}
+                {personality?.tone || "You're building excellent financial habits!"}
               </p>
             </div>
           </div>
