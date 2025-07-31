@@ -28,8 +28,31 @@ export default function EnhancedAnalytics() {
   const [activeTab, setActiveTab] = useState("overview");
   const [personalityMode, setPersonalityMode] = useState<'motivational' | 'funny' | 'strict' | 'chill'>('motivational');
 
+  // Sync Firebase user with database first
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: 'PLOFcMQeHePcuXObAvpAkewhZYa2',
+          email: 'bdaniel6@outlook.com',
+          name: 'bdaniel6'
+        })
+      });
+      return response.json();
+    }
+  });
+
   const { data: expenses = [], isLoading: expensesLoading } = useQuery<Expense[]>({ 
-    queryKey: ["/api/expenses"] 
+    queryKey: ["/api/expenses", syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/expenses/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
   
   const { data: budgets = [], isLoading: budgetsLoading } = useQuery<Budget[]>({ 
@@ -37,7 +60,13 @@ export default function EnhancedAnalytics() {
   });
 
   const { data: goals = [] } = useQuery({ 
-    queryKey: ["/api/goals"] 
+    queryKey: ["/api/goals", syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/goals/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({ 

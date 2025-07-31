@@ -14,13 +14,13 @@ interface SavingsTreeProps {
     currentAmount: number;
     completed: boolean;
   }>;
-  onWaterTree: () => void;
+  onWaterTree?: () => void;
 }
 
 const SavingsTreeVisualization: React.FC<SavingsTreeProps> = ({
   totalSaved,
   goals,
-  onWaterTree
+  onWaterTree = () => {}
 }) => {
   const [treeStage, setTreeStage] = useState(0);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);

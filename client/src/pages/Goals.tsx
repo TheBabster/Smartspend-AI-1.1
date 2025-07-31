@@ -10,6 +10,8 @@ import { apiRequest } from '@/lib/queryClient';
 import ResponsiveLayout from '@/components/ResponsiveLayout';
 import BottomNav from '@/components/BottomNav';
 import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
+import FinancialPositionWizard from '@/components/FinancialPositionWizard';
+import SavingsTreeVisualization from '@/components/SavingsTreeVisualization';
 import { useAuth } from '@/hooks/useAuth';
 import { 
   Target, 
@@ -28,6 +30,7 @@ import type { Goal } from '@shared/schema';
 export default function Goals() {
   const { user: firebaseUser } = useAuth();
   const [showAddGoal, setShowAddGoal] = useState(false);
+  const [showFinancialWizard, setShowFinancialWizard] = useState(false);
   const [newGoal, setNewGoal] = useState({
     name: '',
     targetAmount: '',
@@ -191,13 +194,23 @@ export default function Goals() {
         animate={{ opacity: 1, scale: 1 }}
         className="mb-6"
       >
-        <Button
-          onClick={() => setShowAddGoal(true)}
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Add New Goal
-        </Button>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            onClick={() => setShowAddGoal(true)}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Add Goal
+          </Button>
+          <Button
+            onClick={() => setShowFinancialWizard(true)}
+            variant="outline"
+            className="border-2 border-blue-300 hover:bg-blue-50"
+          >
+            <Target className="w-5 h-5 mr-2" />
+            Financial Position
+          </Button>
+        </div>
       </motion.div>
 
       {/* Add Goal Form */}
@@ -290,6 +303,49 @@ export default function Goals() {
               </div>
             </CardContent>
           </Card>
+        </motion.div>
+      )}
+
+      {/* Financial Position Wizard */}
+      {showFinancialWizard && syncedUser?.id && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Financial Position Setup
+                <Button variant="outline" size="sm" onClick={() => setShowFinancialWizard(false)}>
+                  ×
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FinancialPositionWizard userId={syncedUser.id} />
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Savings Tree Visualization */}
+      {goals.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <SavingsTreeVisualization 
+            goals={goals.map(goal => ({
+              id: goal.id,
+              title: goal.title,
+              targetAmount: parseFloat(goal.targetAmount),
+              currentAmount: parseFloat(goal.currentAmount || '0'),
+              completed: parseFloat(goal.currentAmount || '0') >= parseFloat(goal.targetAmount)
+            }))}
+            totalSaved={goals.reduce((sum, goal) => sum + parseFloat(goal.currentAmount || '0'), 0)}
+          />
         </motion.div>
       )}
 

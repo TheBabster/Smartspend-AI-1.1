@@ -168,12 +168,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/goals", async (req, res) => {
     try {
+      console.log('🎯 Creating goal with data:', req.body);
       const goalData = insertGoalSchema.parse(req.body);
+      console.log('✅ Goal data validated:', goalData);
       const goal = await storage.createGoal(goalData);
+      console.log('✅ Goal created in database:', goal);
       res.json(goal);
     } catch (error) {
-      console.error("Error creating goal:", error);
-      res.status(400).json({ error: "Invalid goal data" });
+      console.error("❌ Error creating goal:", error);
+      res.status(400).json({ error: "Invalid goal data", details: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 

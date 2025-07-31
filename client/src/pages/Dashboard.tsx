@@ -46,7 +46,8 @@ import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
 import StreakTracker from "@/components/StreakTracker";
 import { CategoryIcon, getCategoryColor } from "@/components/CategoryIcons";
 import SmartieLifeAnimations from "@/components/SmartieLifeAnimations";
-import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
+import GoalsPreviewCard from "@/components/GoalsPreviewCard";
+import { type Budget, type User, type Streak, type Achievement, type Goal } from "@shared/schema";
 
 export default function Dashboard() {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
@@ -69,6 +70,26 @@ export default function Dashboard() {
   const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
   const { data: streaks = [] } = useQuery<Streak[]>({ queryKey: ["/api/streaks"] });
   const { data: achievements = [] } = useQuery<Achievement[]>({ queryKey: ["/api/achievements"] });
+  const { data: goals = [] } = useQuery<Goal[]>({ 
+    queryKey: ["/api/goals"],
+    queryFn: async () => {
+      if (!firebaseUser) return [];
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+        })
+      });
+      const userData = await response.json();
+      if (!userData.id) return [];
+      const goalResponse = await fetch(`/api/goals/${userData.id}`);
+      return goalResponse.json();
+    },
+    enabled: !!firebaseUser
+  });
 
   // Redirect to auth if not authenticated
   useEffect(() => {
@@ -584,6 +605,16 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </motion.div>
+
+        {/* Goals Preview Card */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="mb-6"
+        >
+          <GoalsPreviewCard goals={goals} />
         </motion.div>
 
         {/* Weekly Smartie Coaching Summary */}
