@@ -22,6 +22,7 @@ import SmartieCorner from "@/pages/SmartieCorner";
 import Growth from "@/pages/Growth";
 import TrackExpense from "@/pages/TrackExpense";
 import SmartPurchase from "@/pages/SmartPurchase";
+import FinancialPosition from "@/pages/FinancialPosition";
 import { LogoDemo } from "./pages/LogoDemo";
 
 
@@ -131,6 +132,9 @@ function Router() {
       </Route>
       <Route path="/expenses">
         <ProtectedRoute component={TrackExpense} />
+      </Route>
+      <Route path="/financial-position">
+        <ProtectedRoute component={FinancialPosition} />
       </Route>
       <Route component={NotFound} />
     </Switch>

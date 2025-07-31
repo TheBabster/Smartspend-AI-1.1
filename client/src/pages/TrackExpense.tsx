@@ -19,8 +19,9 @@ import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
 import SearchFilterSystem from '@/components/SearchFilterSystem';
 
 import { 
-  Plus, Receipt, TrendingDown, ArrowLeft 
+  Plus, Receipt, TrendingDown, ArrowLeft, Heart 
 } from 'lucide-react';
+import EmotionalTrackingButton from '@/components/EmotionalTrackingButton';
 
 import { type Expense, type Budget } from '@shared/schema';
 import { useLocation } from 'wouter';
@@ -59,8 +60,33 @@ export default function TrackExpense() {
     emotionalTag: ''
   });
 
+  // Sync Firebase user with database first
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user', firebaseUser?.uid],
+    queryFn: async () => {
+      if (!firebaseUser) return null;
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+        })
+      });
+      return response.json();
+    },
+    enabled: !!firebaseUser
+  });
+
   const { data: expenses = [], isLoading } = useQuery<Expense[]>({
-    queryKey: ['/api/expenses']
+    queryKey: ['/api/expenses', syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/expenses/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
 
   const { data: budgets = [] } = useQuery<Budget[]>({
@@ -80,13 +106,13 @@ export default function TrackExpense() {
       }).then(res => res.json());
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/expenses', syncedUser?.id] });
       queryClient.invalidateQueries({ queryKey: ['/api/budgets'] });
       setShowAddForm(false);
       setFormData({ description: '', amount: '', category: '', emotionalTag: '' });
       toast({
         title: "Expense Added Successfully!",
-        description: "Your expense has been tracked and budgets updated.",
+        description: `Your expense has been tracked with emotional insight: ${formData.emotionalTag || 'No emotion tagged'}`,
       });
     },
     onError: () => {
@@ -109,25 +135,14 @@ export default function TrackExpense() {
       return;
     }
 
-    if (!firebaseUser) return;
+    if (!syncedUser?.id) return;
     
-    // Get user ID first
-    fetch('/api/auth/firebase-user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        firebaseUid: firebaseUser.uid,
-        email: firebaseUser.email,
-        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
-      })
-    }).then(res => res.json()).then(userData => {
-      addExpenseMutation.mutate({
-        userId: userData.id,
-        description: formData.description,
-        amount: parseFloat(formData.amount).toFixed(2),
-        category: formData.category,
-        emotionalTag: formData.emotionalTag
-      });
+    addExpenseMutation.mutate({
+      userId: syncedUser.id,
+      description: formData.description,
+      amount: parseFloat(formData.amount).toFixed(2),
+      category: formData.category,
+      emotionalTag: formData.emotionalTag || null
     });
   };
 
@@ -360,22 +375,13 @@ export default function TrackExpense() {
                     </Select>
                   </div>
                   <div>
-                    <Label>Emotional Tag</Label>
-                    <Select
-                      value={formData.emotionalTag}
-                      onValueChange={(val) => setFormData(prev => ({ ...prev, emotionalTag: val }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="How did you feel?" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {emotionalTags.map(t => (
-                          <SelectItem key={t.label} value={t.label}>
-                            <span className="flex items-center gap-2">{t.emoji} {t.label}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label>How did this purchase make you feel?</Label>
+                    <div className="mt-2">
+                      <EmotionalTrackingButton
+                        onEmotionalTagSelected={(tag) => setFormData(prev => ({ ...prev, emotionalTag: tag }))}
+                        selectedTag={formData.emotionalTag}
+                      />
+                    </div>
                   </div>
                   <div className="flex gap-2 pt-4">
                     <Button variant="outline" type="button" onClick={() => setShowAddForm(false)} className="flex-1">Cancel</Button>

@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
 import EmotionalSpendingTracker from "@/components/EmotionalSpendingTracker";
 import SavingsGoalEngine from "@/components/SavingsGoalEngine";
+import SavingsTreeVisualization from "@/components/SavingsTreeVisualization";
 import ScrollSmartieComments from "@/components/ScrollSmartieComments";
 import { type Expense, type Budget } from "@shared/schema";
 
@@ -32,6 +33,10 @@ export default function EnhancedAnalytics() {
   
   const { data: budgets = [], isLoading: budgetsLoading } = useQuery<Budget[]>({ 
     queryKey: ["/api/budgets"] 
+  });
+
+  const { data: goals = [] } = useQuery({ 
+    queryKey: ["/api/goals"] 
   });
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({ 
@@ -243,7 +248,13 @@ export default function EnhancedAnalytics() {
                 <TabsContent value="goals" className="mt-6">
                   <div className="text-center py-12 text-gray-500">
                     <Target className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p>Create your first savings goal to get started!</p>
+                    <p>Visit the Goals page to create and track your savings goals!</p>
+                    <Button 
+                      onClick={() => window.location.href = '/goals'} 
+                      className="mt-4 bg-purple-500 hover:bg-purple-600"
+                    >
+                      Go to Goals
+                    </Button>
                   </div>
                 </TabsContent>
               </Tabs>
@@ -255,7 +266,17 @@ export default function EnhancedAnalytics() {
       <BottomNav currentTab="analytics" />
       
       {/* Scroll-based Smartie Comments */}
-      {expenses.length > 0 && <ScrollSmartieComments purchases={expenses} />}
+      {expenses.length > 0 && (
+        <ScrollSmartieComments 
+          purchases={expenses.map(expense => ({
+            id: expense.id,
+            name: expense.description,
+            amount: parseFloat(expense.amount),
+            category: expense.category,
+            utilityScore: 5 // Default utility score for now
+          }))} 
+        />
+      )}
     </div>
   );
 }

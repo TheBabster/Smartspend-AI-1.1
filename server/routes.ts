@@ -216,6 +216,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user financial information
+  app.patch("/api/user/:id/financial-info", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const user = await storage.updateUser(id, updateData);
+      res.json(user);
+    } catch (error) {
+      console.error("Error updating financial info:", error);
+      res.status(500).json({ error: "Failed to update financial information" });
+    }
+  });
+
   // Enhanced Smartie Chat endpoint with SmartCoin system
   app.post("/api/smartie/chat", async (req, res) => {
     try {

@@ -11,6 +11,8 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   currency: text("currency").notNull().default("GBP"),
   monthlyIncome: decimal("monthly_income", { precision: 10, scale: 2 }),
+  jobTitle: text("job_title"),
+  annualSalary: decimal("annual_salary", { precision: 10, scale: 2 }),
   onboardingCompleted: boolean("onboarding_completed").default(false),
   financialProfile: json("financial_profile"), // Store onboarding questionnaire data
   smartCoins: integer("smart_coins").default(25), // Starting coins for new users
