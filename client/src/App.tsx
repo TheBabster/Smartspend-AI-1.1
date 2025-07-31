@@ -1,7 +1,6 @@
+import Auth from "@/pages/Auth";
+import "./firebase";
 import { useAuth } from "@/hooks/useAuth";
-
-import Auth from "@/pages/Auth"; // 🔑 Sign in / Sign up page
-import "./firebase"; // This will run the Firebase init when the app loads
 
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
@@ -45,23 +44,23 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <div data-theme={theme}>{children}</div>;
 }
 
-function Router({ user }: { user: any }) {
+function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={Dashboard} />
+      <Route path="/auth" component={Auth} />
       <Route path="/onboarding" component={Onboarding} />
-      <Route path="/dashboard" component={user ? Dashboard : Auth} />
-      <Route path="/decisions" component={user ? Decisions : Auth} />
-      <Route path="/goals" component={user ? EnhancedGoals : Auth} />
-      <Route path="/analytics" component={user ? EnhancedAnalytics : Auth} />
-      <Route path="/analytics-old" component={user ? Analytics : Auth} />
-      <Route path="/smartie" component={user ? SmartieCorner : Auth} />
-      <Route path="/growth" component={user ? Growth : Auth} />
-      <Route path="/purchase" component={user ? SmartPurchase : Auth} />
-      <Route path="/track-expense" component={user ? TrackExpense : Auth} />
-      <Route path="/expenses" component={user ? TrackExpense : Auth} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/decisions" component={Decisions} />
+      <Route path="/goals" component={EnhancedGoals} />
+      <Route path="/analytics" component={EnhancedAnalytics} />
+      <Route path="/analytics-old" component={Analytics} />
+      <Route path="/smartie" component={SmartieCorner} />
+      <Route path="/growth" component={Growth} />
+      <Route path="/purchase" component={SmartPurchase} />
+      <Route path="/track-expense" component={TrackExpense} />
+      <Route path="/expenses" component={TrackExpense} />
       <Route path="/logo" component={LogoDemo} />
-      <Route path="/auth" component={Auth} /> {/* 🔑 Sign In/Sign Up */}
       <Route component={NotFound} />
     </Switch>
   );
@@ -77,7 +76,7 @@ function App() {
       <ThemeProvider>
         <TooltipProvider>
           <Toaster />
-          <Router user={user} />
+          <Router />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

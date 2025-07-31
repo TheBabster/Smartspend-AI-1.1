@@ -1,8 +1,9 @@
-import { doc, getDoc } from "firebase/firestore";  // ✅ Correct location
-import { getAuth, signOut } from "firebase/auth";        // ✅ Now only one getAuth import
-import { db } from "@/firebase";                     // ✅ Your custom Firestore instance
+import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { db, auth } from "@/firebase";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -61,27 +62,37 @@ export default function Dashboard() {
   } | null>(null);
   const [userName, setUserName] = useState("SmartSpender");
   const [, navigate] = useLocation();
-  const auth = getAuth();
+  const { user: firebaseUser, loading: authLoading } = useAuth();
 
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !firebaseUser) {
+      navigate("/auth");
+    }
+  }, [firebaseUser, authLoading, navigate]);
 
+  // Fetch user data from Firestore
   useEffect(() => {
     const fetchUserName = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+      if (!firebaseUser) return;
 
-      const userDoc = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userDoc);
+      try {
+        const userDoc = doc(db, "users", firebaseUser.uid);
+        const docSnap = await getDoc(userDoc);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.name) {
-          setUserName(data.name);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.name) {
+            setUserName(data.name);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserName();
-  }, []);
+  }, [firebaseUser]);
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -90,6 +101,23 @@ export default function Dashboard() {
       console.error("Logout error:", error);
     }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <ModernSmartieAvatar mood="thinking" size="xl" className="mb-4" />
+          <p className="text-lg font-medium text-gray-600">Loading your financial dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render dashboard if not authenticated
+  if (!firebaseUser) {
+    return null;
+  }
 
   const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
   const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });

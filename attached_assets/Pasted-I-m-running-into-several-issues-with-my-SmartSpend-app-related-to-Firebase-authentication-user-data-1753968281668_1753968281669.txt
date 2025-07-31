@@ -1,0 +1,22 @@
+I’m running into several issues with my SmartSpend app related to Firebase authentication, user data retrieval, and UI polish on the login screen, and I would really appreciate your help resolving them.
+
+1. Login flow issue:
+When I enter a valid email and password, the app displays the green “✅ Logged in successfully!” message — however, the app does not actually redirect the user to their dashboard or visibly update the session. It gives the impression of a successful login, but no authenticated session is established from the user’s perspective. This is making it difficult to determine whether the backend is truly registering the login event or whether the UI is simply displaying a success state prematurely.
+
+2. Name is not reflected on the dashboard:
+When a user signs up and enters their name (e.g., “Dan Babster”), the app continues to show “Alex” on the Dashboard even after login. This suggests that either:
+	•	The user’s display name is not being saved to Firestore or Firebase Auth on sign-up, or
+	•	The app is not correctly retrieving the name field from the database upon login and rendering it on the dashboard.
+
+I believe this may be an issue with how the user object is structured or fetched (possibly from Firestore), but I’m not entirely sure where the disconnect is happening. I’m currently using firebase/auth and firebase/firestore, and the Firestore instance is correctly configured and exported in firebase.ts.
+
+3. UI/UX Design of the login and sign-up pages:
+The visual design of the login and sign-up pages is currently very basic and doesn’t reflect the polished, professional aesthetic I’m aiming for. I would love help making it look and feel like a real app. Specific improvements I want include:
+	•	Centered layout with visually balanced spacing
+	•	Clear input fields with labels and helpful error feedback
+	•	Modern font and smooth transition animations
+	•	A consistent look-and-feel across login and sign-up (preferably using Tailwind or your recommended styling method)
+	•	On successful login, a proper redirect to the dashboard with the user’s name dynamically shown
+
+Bonus: Error edge case
+When I try to sign up with an email that was previously used, I get the expected error: auth/email-already-in-use. But when I try to log in with that same email afterwards, it says “logged in successfully” but doesn’t advance — again suggesting that the login event is not actually being registered.
