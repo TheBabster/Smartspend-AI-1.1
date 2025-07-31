@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, Target, Brain, Heart } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Target, Brain, Heart, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BottomNav from "@/components/BottomNav";
 import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
@@ -12,6 +12,7 @@ import EmotionalSpendingTracker from "@/components/EmotionalSpendingTracker";
 import SavingsGoalEngine from "@/components/SavingsGoalEngine";
 import SavingsTreeVisualization from "@/components/SavingsTreeVisualization";
 import ScrollSmartieComments from "@/components/ScrollSmartieComments";
+import BudgetSetupWizard from "@/components/BudgetSetupWizard";
 import { type Expense, type Budget } from "@shared/schema";
 
 const COLORS = {
@@ -294,6 +295,93 @@ export default function EnhancedAnalytics() {
 
                 <TabsContent value="financial-position" className="mt-6">
                   <div className="space-y-6">
+                    {/* Financial Position Wizard */}
+                    {showBudgetSetup && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6"
+                      >
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="flex items-center justify-between">
+                              Budget Setup
+                              <Button variant="outline" size="sm" onClick={() => setShowBudgetSetup(false)}>
+                                ×
+                              </Button>
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <BudgetSetupWizard onComplete={() => setShowBudgetSetup(false)} />
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    )}
+
+                    {/* Budget vs Actual Chart with Budget Setup */}
+                    <Card className="shadow-lg">
+                      <CardHeader>
+                        <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">Budget vs Actual</CardTitle>
+                        <Button 
+                          onClick={() => setShowBudgetSetup(true)}
+                          size="sm"
+                          className="ml-auto bg-purple-500 hover:bg-purple-600"
+                        >
+                          Set Budget
+                        </Button>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-80">
+                          {budgets.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={budgetComparisonData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="category" />
+                                <YAxis tickFormatter={(value) => `£${value}`} />
+                                <Tooltip formatter={(value, name) => [`£${value}`, name]} />
+                                <Bar dataKey="budget" fill="#8B5CF6" name="Budget" />
+                                <Bar dataKey="spent" fill="#EC4899" name="Spent" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          ) : (
+                            <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                              <div className="text-center">
+                                <BarChart3 className="w-12 h-12 mx-auto mb-3" />
+                                <p>No budget data yet</p>
+                                <p className="text-sm mt-2">Click "Set Budget" above to create your monthly budget categories</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Savings Tree Visualization */}
+                    {goals.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <Card className="shadow-lg">
+                          <CardHeader>
+                            <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100">Financial Goals Tree</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <SavingsTreeVisualization 
+                              goals={goals.map((goal: any) => ({
+                                id: goal.id,
+                                title: goal.title,
+                                targetAmount: parseFloat(goal.targetAmount),
+                                currentAmount: parseFloat(goal.currentAmount || '0'),
+                                completed: parseFloat(goal.currentAmount || '0') >= parseFloat(goal.targetAmount)
+                              }))}
+                              totalSaved={goals.reduce((sum: number, goal: any) => sum + parseFloat(goal.currentAmount || '0'), 0)}
+                            />
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    )}
+
                     {/* Financial Goals Progress */}
                     <Card className="shadow-lg">
                       <CardHeader>

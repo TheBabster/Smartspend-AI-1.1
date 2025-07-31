@@ -64,12 +64,15 @@ export default function Goals() {
   });
 
   // Fetch goals using the synced user ID
-  const { data: goals = [], isLoading } = useQuery<Goal[]>({ 
+  const { data: goals = [], isLoading, refetch: refetchGoals } = useQuery<Goal[]>({ 
     queryKey: ['/api/goals', syncedUser?.id],
     queryFn: async () => {
       if (!syncedUser?.id) return [];
+      console.log('🔍 Fetching goals for user:', syncedUser.id);
       const response = await fetch(`/api/goals/${syncedUser.id}`);
-      return response.json();
+      const data = await response.json();
+      console.log('📋 Goals received:', data);
+      return data;
     },
     enabled: !!syncedUser?.id
   });
@@ -95,10 +98,10 @@ export default function Goals() {
       return result;
     },
     onSuccess: (data) => {
-      console.log('✅ Goal creation successful, invalidating cache...');
+      console.log('✅ Goal creation successful, refreshing goals...');
+      // Force immediate refetch
+      refetchGoals();
       queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
-      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
-      queryClient.refetchQueries({ queryKey: ['/api/goals', syncedUser?.id] });
       setShowAddGoal(false);
       setNewGoal({
         name: '',
@@ -124,8 +127,8 @@ export default function Goals() {
     },
     onSuccess: () => {
       console.log('🔄 Refreshing goals after money addition...');
+      refetchGoals();
       queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
-      queryClient.refetchQueries({ queryKey: ['/api/goals', syncedUser?.id] });
     }
   });
 
@@ -201,7 +204,7 @@ export default function Goals() {
             Add Goal
           </Button>
           <Button
-            onClick={() => setShowFinancialWizard(true)}
+            onClick={() => window.location.href = '/analytics'}
             variant="outline"
             className="border-2 border-blue-300 hover:bg-blue-50"
           >
@@ -304,48 +307,7 @@ export default function Goals() {
         </motion.div>
       )}
 
-      {/* Financial Position Wizard */}
-      {showFinancialWizard && syncedUser?.id && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Financial Position Setup
-                <Button variant="outline" size="sm" onClick={() => setShowFinancialWizard(false)}>
-                  ×
-                </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FinancialPositionWizard userId={syncedUser.id} />
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
 
-      {/* Savings Tree Visualization */}
-      {goals.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
-        >
-          <SavingsTreeVisualization 
-            goals={goals.map(goal => ({
-              id: goal.id,
-              title: goal.title,
-              targetAmount: parseFloat(goal.targetAmount),
-              currentAmount: parseFloat(goal.currentAmount || '0'),
-              completed: parseFloat(goal.currentAmount || '0') >= parseFloat(goal.targetAmount)
-            }))}
-            totalSaved={goals.reduce((sum, goal) => sum + parseFloat(goal.currentAmount || '0'), 0)}
-          />
-        </motion.div>
-      )}
 
 
 
