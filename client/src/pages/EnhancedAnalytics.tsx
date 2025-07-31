@@ -244,8 +244,11 @@ export default function EnhancedAnalytics() {
 
                 <TabsContent value="coaching" className="mt-6">
                   <SmartieCoachingSummary
-                    weeklyAnalysis={weeklyAnalysis}
-                    recentPurchases={mockPurchases}
+                    weeklySpending={weeklyAnalysis?.totalSpent || 0}
+                    smartPurchases={mockPurchases?.filter(p => p.isWise)?.length || 3}
+                    streak={5}
+                    personalityMode="motivational"
+                    onPersonalityChange={(mode) => console.log("Personality changed to:", mode)}
                   />
                 </TabsContent>
 

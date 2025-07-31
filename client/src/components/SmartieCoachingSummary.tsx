@@ -47,22 +47,22 @@ export default function SmartieCoachingSummary({
   const getPersonalityResponse = () => {
     const responses = {
       motivational: {
-        message: `Amazing progress! You've made ${smartPurchases} smart decisions this week! 🌟`,
+        message: `Amazing progress! You've made ${smartPurchases || 0} smart decisions this week! 🌟`,
         badge: "🧠 Strategic Thinker",
         tone: "You're building incredible financial habits!"
       },
       funny: {
-        message: `${smartPurchases} smart buys? Your wallet is doing the happy dance! 💃`,
+        message: `${smartPurchases || 0} smart buys? Your wallet is doing the happy dance! 💃`,
         badge: "🎭 Budget Comedian",
         tone: "Even your bank account is laughing... with joy!"
       },
       strict: {
-        message: `${smartPurchases} smart decisions. Keep this discipline up.`,
+        message: `${smartPurchases || 0} smart decisions. Keep this discipline up.`,
         badge: "⚡ Discipline Master",
         tone: "No room for slip-ups. Excellence is the standard."
       },
       chill: {
-        message: `Nice and easy, ${smartPurchases} good choices this week. 😌`,
+        message: `Nice and easy, ${smartPurchases || 0} good choices this week. 😌`,
         badge: "🌱 Zen Spender",
         tone: "Take it slow, you're doing great."
       }
@@ -157,7 +157,7 @@ export default function SmartieCoachingSummary({
               className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg border"
             >
               <Brain className="w-6 h-6 mx-auto mb-1 text-purple-600" />
-              <div className="font-bold text-lg">{smartPurchases}</div>
+              <div className="font-bold text-lg">{smartPurchases || 0}</div>
               <div className="text-xs text-gray-600">Smart Buys</div>
             </motion.div>
             
@@ -166,7 +166,7 @@ export default function SmartieCoachingSummary({
               className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg border"
             >
               <Zap className="w-6 h-6 mx-auto mb-1 text-orange-600" />
-              <div className="font-bold text-lg">{streak}</div>
+              <div className="font-bold text-lg">{streak || 0}</div>
               <div className="text-xs text-gray-600">Day Streak</div>
             </motion.div>
             
@@ -175,7 +175,7 @@ export default function SmartieCoachingSummary({
               className="text-center p-3 bg-white dark:bg-gray-800 rounded-lg border"
             >
               <TrendingUp className="w-6 h-6 mx-auto mb-1 text-green-600" />
-              <div className="font-bold text-lg">£{weeklySpending.toFixed(0)}</div>
+              <div className="font-bold text-lg">£{(weeklySpending || 0).toFixed(0)}</div>
               <div className="text-xs text-gray-600">This Week</div>
             </motion.div>
           </div>
