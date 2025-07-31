@@ -130,25 +130,11 @@ export default function SmartieAICoach({
     }
   };
 
-  // Detect emotional spending patterns
+  // Detect emotional spending patterns from real user data
   const analyzeEmotionalTriggers = () => {
-    // This would analyze recent purchases for emotional patterns
-    const triggers = [
-      {
-        id: "1",
-        type: "stress" as const,
-        timestamp: new Date(),
-        amount: 45.99,
-        description: "Late night food delivery after difficult day"
-      },
-      {
-        id: "2", 
-        type: "boredom" as const,
-        timestamp: new Date(),
-        amount: 29.99,
-        description: "Impulse purchase while browsing online"
-      }
-    ];
+    // For now, start with empty array - this will be populated with real user regret data
+    // when users actually report regret purchases through the app
+    const triggers: EmotionalTrigger[] = [];
     
     setEmotionalTriggers(triggers);
   };

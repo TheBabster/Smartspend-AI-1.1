@@ -187,6 +187,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add money to goal
+  app.post("/api/goals/:id/add-money", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { amount } = req.body;
+      
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Valid amount is required" });
+      }
+
+      const goal = await storage.getGoal(id);
+      if (!goal) {
+        return res.status(404).json({ error: "Goal not found" });
+      }
+
+      const currentAmount = parseFloat(goal.currentAmount || '0');
+      const newAmount = currentAmount + parseFloat(amount);
+      
+      const updatedGoal = await storage.updateGoal(id, {
+        currentAmount: newAmount.toString()
+      });
+      
+      res.json(updatedGoal);
+    } catch (error) {
+      console.error("Error adding money to goal:", error);
+      res.status(500).json({ error: "Failed to add money to goal" });
+    }
+  });
+
   // Enhanced Smartie Chat endpoint with SmartCoin system
   app.post("/api/smartie/chat", async (req, res) => {
     try {

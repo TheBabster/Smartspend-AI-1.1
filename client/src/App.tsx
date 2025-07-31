@@ -14,7 +14,7 @@ import NotFound from "@/pages/not-found";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import ComprehensiveOnboarding from "@/pages/ComprehensiveOnboarding";
 import Decisions from "@/pages/Decisions";
-import EnhancedGoals from "@/pages/EnhancedGoals";
+import Goals from "@/pages/Goals";
 import EnhancedSmartieChat from "@/pages/EnhancedSmartieChat";
 import Analytics from "@/pages/Analytics";
 import EnhancedAnalytics from "@/pages/EnhancedAnalytics";
@@ -115,7 +115,7 @@ function Router() {
         <ProtectedRoute component={Decisions} />
       </Route>
       <Route path="/goals">
-        <ProtectedRoute component={EnhancedGoals} />
+        <ProtectedRoute component={Goals} />
       </Route>
       <Route path="/chat">
         <ProtectedRoute component={EnhancedSmartieChat} />

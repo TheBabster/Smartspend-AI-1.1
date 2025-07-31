@@ -197,8 +197,8 @@ export default function SimpleDashboard() {
             onClick={() => navigate("/goals")}
           >
             <div className="text-center">
-              <p className="font-semibold">View Budget</p>
-              <p className="text-xs opacity-70">Check progress</p>
+              <p className="font-semibold">Goals</p>
+              <p className="text-xs opacity-70">Manage goals</p>
             </div>
           </Button>
           
@@ -219,7 +219,7 @@ export default function SimpleDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <ModernSmartieAvatar mood="celebrating" size="sm" />
+                  <ModernSmartieAvatar mood="happy" size="sm" />
                   Welcome to SmartSpend!
                 </CardTitle>
               </CardHeader>
@@ -276,25 +276,40 @@ export default function SimpleDashboard() {
           </Card>
         </div>
 
-        {/* Smartie Corner - Motivational Message */}
+        {/* Smartie Tips & Motivation */}
         <Card className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <ModernSmartieAvatar mood="happy" size="lg" />
               <div className="flex-1">
-                <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">
-                  Great job, {user.name}! 🎉
+                <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-3">
+                  Smart Money Tips from Smartie
                 </h3>
-                <p className="text-purple-700 dark:text-purple-400 mb-4">
-                  You've completed your financial setup! I'm here to help you achieve your goals. 
-                  Let's make some smart financial decisions together!
-                </p>
-                <Button 
-                  className="bg-purple-600 hover:bg-purple-700"
-                  onClick={() => navigate("/chat")}
-                >
-                  Chat with Smartie
-                </Button>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                    <p className="text-sm text-purple-700 dark:text-purple-400">
+                      Start tracking every expense, no matter how small - awareness is the first step to financial control.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                    <p className="text-sm text-purple-700 dark:text-purple-400">
+                      Use the 24-hour rule for purchases over £50 - sleep on it before buying to avoid impulse spending.
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                    <p className="text-sm text-purple-700 dark:text-purple-400">
+                      Set up automatic savings transfers - pay yourself first before any spending decisions.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 p-3 bg-purple-100 dark:bg-purple-800/30 rounded-lg">
+                  <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
+                    Daily Motivation: "Every pound you save today is a step closer to financial freedom tomorrow!"
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
