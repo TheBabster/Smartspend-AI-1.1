@@ -25,25 +25,36 @@ export default function SimpleDashboard() {
   // Fetch user data from Firestore
   useEffect(() => {
     const fetchUserName = async () => {
-      if (!firebaseUser) return;
+      if (!firebaseUser) {
+        console.log("No Firebase user available");
+        return;
+      }
 
       try {
-        console.log("Fetching user data for:", firebaseUser.uid);
+        console.log("🔍 Fetching user data for UID:", firebaseUser.uid);
+        console.log("🔍 Firebase user email:", firebaseUser.email);
+        
         const userDoc = doc(db, "users", firebaseUser.uid);
         const docSnap = await getDoc(userDoc);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log("Firestore user data:", data);
+          console.log("✅ Firestore user data found:", data);
           if (data.name) {
             setUserName(data.name);
-            console.log("User name set to:", data.name);
+            console.log("✅ User name successfully set to:", data.name);
+          } else {
+            console.log("❌ No 'name' field found in document");
+            setUserName("User"); // Fallback
           }
         } else {
-          console.log("No Firestore document found for user");
+          console.log("❌ No Firestore document found for this user");
+          console.log("🔍 Checking if document path is correct: users/" + firebaseUser.uid);
+          setUserName("New User"); // Fallback for new users
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("❌ Error fetching user data:", error);
+        setUserName("User"); // Fallback on error
       }
     };
 
@@ -94,7 +105,7 @@ export default function SimpleDashboard() {
             <ModernSmartieAvatar mood="happy" size="lg" />
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-                {getGreeting()}, {userName || "SmartSpender"}!
+                {getGreeting()}, {userName || "Loading..."}!
               </h1>
               <p className="text-gray-600 dark:text-gray-300">Welcome to your SmartSpend dashboard</p>
             </div>
@@ -115,28 +126,43 @@ export default function SimpleDashboard() {
 
         {/* Quick Actions */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Button className="h-20 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+          <Button 
+            className="h-20 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+            onClick={() => navigate("/full")}
+          >
             <div className="text-center">
               <p className="font-semibold">Smart Purchase</p>
               <p className="text-xs opacity-90">Get AI advice</p>
             </div>
           </Button>
           
-          <Button variant="outline" className="h-20">
+          <Button 
+            variant="outline" 
+            className="h-20"
+            onClick={() => navigate("/full")}
+          >
             <div className="text-center">
               <p className="font-semibold">Add Expense</p>
               <p className="text-xs opacity-70">Track spending</p>
             </div>
           </Button>
           
-          <Button variant="outline" className="h-20">
+          <Button 
+            variant="outline" 
+            className="h-20"
+            onClick={() => navigate("/full")}
+          >
             <div className="text-center">
               <p className="font-semibold">View Budget</p>
               <p className="text-xs opacity-70">Check progress</p>
             </div>
           </Button>
           
-          <Button variant="outline" className="h-20">
+          <Button 
+            variant="outline" 
+            className="h-20"
+            onClick={() => navigate("/full")}
+          >
             <div className="text-center">
               <p className="font-semibold">Chat with Smartie</p>
               <p className="text-xs opacity-70">Financial coaching</p>
@@ -219,7 +245,10 @@ export default function SimpleDashboard() {
                   Welcome to SmartSpend! I'm here to help you make smarter financial decisions. 
                   Ready to start your journey to better financial wellness?
                 </p>
-                <Button className="bg-purple-600 hover:bg-purple-700">
+                <Button 
+                  className="bg-purple-600 hover:bg-purple-700"
+                  onClick={() => navigate("/full")}
+                >
                   Start Financial Setup
                 </Button>
               </div>

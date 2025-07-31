@@ -58,12 +58,14 @@ function Auth() {
         console.log("Account created:", user.uid);
 
         // Save the user's name and email to Firestore
-        await setDoc(doc(db, "users", user.uid), {
+        const userData = {
           name: name.trim(),
           email: email.trim(),
           createdAt: new Date()
-        });
-        console.log("User data saved to Firestore");
+        };
+        console.log("💾 Saving user data to Firestore:", userData);
+        await setDoc(doc(db, "users", user.uid), userData);
+        console.log("✅ User data successfully saved to Firestore with UID:", user.uid);
 
         setMessage("✅ Account created successfully! Redirecting...");
         setTimeout(() => {
