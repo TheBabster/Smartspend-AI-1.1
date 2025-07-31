@@ -14,6 +14,7 @@ import Home from "@/pages/Home";
 import Onboarding from "@/pages/Onboarding";
 import Dashboard from "@/pages/Dashboard";
 import SimpleDashboard from "@/pages/SimpleDashboard";
+import OnboardingFlow from "@/pages/OnboardingFlow";
 import Decisions from "@/pages/Decisions";
 import EnhancedGoals from "@/pages/EnhancedGoals";
 import Analytics from "@/pages/Analytics";
@@ -32,7 +33,7 @@ function Router() {
       <Route path="/" component={SimpleDashboard} />
       <Route path="/full" component={Dashboard} />
       <Route path="/auth" component={Auth} />
-      <Route path="/onboarding" component={Onboarding} />
+      <Route path="/onboarding" component={OnboardingFlow} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/simple" component={SimpleDashboard} />
       <Route path="/decisions" component={Decisions} />
