@@ -768,25 +768,24 @@ IMPORTANT: You can answer any question the user asks - from silly jokes to serio
       } catch (error) {
         console.log("OpenAI unavailable, using fallback response:", error);
         
-        // Friendly fallback responses for common topics
-        const fallbackResponses = {
-          budget: "💰 Great question about budgeting! I'd love to help you create a budget that works for your lifestyle. What's your main challenge with budgeting right now?",
-          save: "🎯 Saving money is one of my favorite topics! The key is to start small and build habits. Even £5 a week adds up to £260 a year!",
-          debt: "💪 Tackling debt can feel overwhelming, but you're asking the right questions! Let's break it down into manageable steps. What type of debt are you dealing with?",
-          invest: "📈 Investing is exciting! It's like planting seeds for your future financial garden. Are you just getting started or looking to diversify?",
-          default: "Hi there! I'm Smartie, your AI financial coach! 🧠✨ I'm here to help with all your money questions - budgeting, saving, spending decisions, or just a friendly chat about your financial goals. What's on your mind today?"
-        };
+        // Friendly fallback responses based on message content
+        const messageContent = message.toLowerCase();
+        let fallbackMessage = "Hi there! I'm Smartie, your AI financial coach! 🧠✨ I'm here to help with all your money questions - budgeting, saving, spending decisions, or just a friendly chat about your financial goals. What's on your mind today?";
         
-        let reply = fallbackResponses.default;
-        const lowerMessage = message.toLowerCase();
-        
-        if (lowerMessage.includes('budget')) reply = fallbackResponses.budget;
-        else if (lowerMessage.includes('save') || lowerMessage.includes('saving')) reply = fallbackResponses.save;
-        else if (lowerMessage.includes('debt')) reply = fallbackResponses.debt;
-        else if (lowerMessage.includes('invest')) reply = fallbackResponses.invest;
+        if (messageContent.includes('budget')) {
+          fallbackMessage = "💰 Great question about budgeting! I'd love to help you create a budget that works for your lifestyle. What's your main challenge with budgeting right now?";
+        } else if (messageContent.includes('save') || messageContent.includes('saving')) {
+          fallbackMessage = "🎯 Saving money is one of my favorite topics! The key is to start small and build habits. Even £5 a week adds up to £260 a year!";
+        } else if (messageContent.includes('debt')) {
+          fallbackMessage = "💪 Tackling debt can feel overwhelming, but you're asking the right questions! Let's break it down into manageable steps. What type of debt are you dealing with?";
+        } else if (messageContent.includes('invest')) {
+          fallbackMessage = "📈 Investing is exciting! It's like planting seeds for your future financial garden. Are you just getting started or looking to diversify?";
+        } else if (messageContent.includes('hello') || messageContent.includes('hi') || messageContent.includes('hey')) {
+          fallbackMessage = "Hello! 👋 I'm Smartie, your friendly AI financial coach! I'm here to help you make smart money decisions. What would you like to chat about today?";
+        }
         
         res.json({ 
-          message: reply,
+          message: fallbackMessage,
           timestamp: new Date().toISOString()
         });
       }

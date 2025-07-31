@@ -27,6 +27,7 @@ export default function EnhancedAnalytics() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
   const [personalityMode, setPersonalityMode] = useState<'motivational' | 'funny' | 'strict' | 'chill'>('motivational');
+  const [showBudgetSetup, setShowBudgetSetup] = useState(false);
 
   // Sync Firebase user with database first
   const { data: syncedUser } = useQuery({
@@ -162,7 +163,7 @@ export default function EnhancedAnalytics() {
                   <TabsTrigger value="overview">📊 Overview</TabsTrigger>
                   <TabsTrigger value="coaching">🧠 AI Coach</TabsTrigger>
                   <TabsTrigger value="emotions">💭 Emotions</TabsTrigger>
-                  <TabsTrigger value="goals">🎯 Goals</TabsTrigger>
+                  <TabsTrigger value="financial-position">💰 Financial Position</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="mt-6">
@@ -291,7 +292,7 @@ export default function EnhancedAnalytics() {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="goals" className="mt-6">
+                <TabsContent value="financial-position" className="mt-6">
                   <div className="space-y-6">
                     {/* Financial Goals Progress */}
                     <Card className="shadow-lg">
