@@ -259,10 +259,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Import OpenAI service
-      const { generateSmartieResponse } = await import("./openai");
-      
-      const response = await generateSmartieResponse(message, userId, user);
+      // Generate ChatGPT-like response using OpenAI directly
+      const userContext = `
+User Profile:
+- Name: ${user?.name || "User"}
+- Monthly Income: £${user?.monthlyIncome || "Not set"}
+- Currency: ${user?.currency || "GBP"}
+- Smart Coins: ${user?.smartCoins || 0}
+      `;
+
+      const systemPrompt = `You are Smartie, a friendly, enthusiastic, and knowledgeable AI financial coach. You're part of the SmartSpend app and help users with their financial wellness journey.
+
+Key personality traits:
+- Friendly and encouraging, like a supportive friend
+- Knowledgeable about personal finance, budgeting, saving, investing
+- Can answer ANY question - financial or not - while gently steering back to financial wellness when appropriate
+- Use emojis sparingly but effectively
+- Be conversational and avoid being preachy
+- Celebrate user wins and provide motivation during challenges
+
+${userContext}
+
+IMPORTANT: You can answer any question the user asks - from silly jokes to serious financial advice. If they ask non-financial questions, feel free to engage naturally while occasionally connecting back to financial wellness when relevant.`;
+
+      const openaiResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: message }
+        ],
+        max_tokens: 500,
+        temperature: 0.7,
+      });
+
+      const response = {
+        message: openaiResponse.choices[0].message.content || "I'm here to help! What would you like to know?",
+        timestamp: new Date().toISOString(),
+        coinsUsed: 0.5
+      };
       
       // Deduct coins from user - ensure integer value for smartCoins
       const userIdString = String(userId);
@@ -691,6 +725,8 @@ User Profile:
       }
 
       try {
+        console.log("🧠 Attempting OpenAI API call...");
+        
         // Generate ChatGPT-like response using GPT-4o
         // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         const systemPrompt = `You are Smartie, a friendly, enthusiastic, and knowledgeable AI financial coach. You're part of the SmartSpend app and help users with their financial wellness journey.
@@ -707,6 +743,10 @@ ${userContext}
 
 IMPORTANT: You can answer any question the user asks - from silly jokes to serious financial advice. If they ask non-financial questions, feel free to engage naturally while occasionally connecting back to financial wellness when relevant.`;
 
+        if (!process.env.OPENAI_API_KEY) {
+          throw new Error("OpenAI API key not configured");
+        }
+
         const response = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [
@@ -716,6 +756,8 @@ IMPORTANT: You can answer any question the user asks - from silly jokes to serio
           max_tokens: 500,
           temperature: 0.7,
         });
+
+        console.log("✅ OpenAI API call successful");
 
         const reply = response.choices[0].message.content || "I'm here to help! What would you like to know?";
         
@@ -807,6 +849,54 @@ IMPORTANT: You can answer any question the user asks - from silly jokes to serio
     } catch (error) {
       console.error("Error fetching analytics:", error);
       res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  // Mood tracking endpoints
+  app.post("/api/mood", async (req, res) => {
+    try {
+      const { mood, notes, userId } = req.body;
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+      const moodEntry = await storage.createMoodEntry({
+        userId,
+        mood,
+        notes: notes || null,
+        date: today
+      });
+
+      res.json(moodEntry);
+    } catch (error) {
+      console.error("Mood creation error:", error);
+      res.status(500).json({ error: "Failed to create mood entry" });
+    }
+  });
+
+  app.get("/api/mood/today/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const today = new Date().toISOString().split('T')[0];
+      
+      const mood = await storage.getMoodByDate(userId, today);
+      if (!mood) {
+        return res.status(404).json({ message: "No mood entry for today" });
+      }
+      
+      res.json(mood);
+    } catch (error) {
+      console.error("Get today mood error:", error);
+      res.status(500).json({ error: "Failed to get mood entry" });
+    }
+  });
+
+  app.get("/api/mood/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const moods = await storage.getMoodEntriesByUser(userId);
+      res.json(moods);
+    } catch (error) {
+      console.error("Get mood entries error:", error);
+      res.status(500).json({ error: "Failed to get mood entries" });
     }
   });
 

@@ -43,6 +43,7 @@ import EnhancedQuickActions from "@/components/EnhancedQuickActions";
 import SmartieShowcase from "@/components/SmartieShowcase";
 import { BounceButton, bounceVariants, LiftCard, liftVariants } from "@/components/MicroAnimations";
 import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
+import DailyMoodTracker from "@/components/DailyMoodTracker";
 import StreakTracker from "@/components/StreakTracker";
 import { CategoryIcon, getCategoryColor } from "@/components/CategoryIcons";
 import SmartieLifeAnimations from "@/components/SmartieLifeAnimations";
@@ -568,44 +569,17 @@ export default function Dashboard() {
           </motion.div>
         )}
 
-        {/* Enhanced Mood Tracker - Prominently Placed */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-6"
-        >
-          <Card className={`shadow-lg border-0 ${darkMode ? 'bg-gradient-to-r from-indigo-800/90 to-purple-800/90' : 'bg-gradient-to-r from-indigo-100 to-purple-100'} backdrop-blur-sm`}>
-            <CardContent className="p-6">
-              <h3 className={`text-lg font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                How are you feeling today?
-              </h3>
-              <div className="flex justify-between items-center">
-                {['😢', '😐', '😊', '😄', '🤩'].map((emoji, index) => (
-                  <motion.button
-                    key={index}
-                    className={`w-12 h-12 rounded-full text-2xl transition-all duration-300 ${darkMode ? 'hover:bg-white/20' : 'hover:bg-white/50'} flex items-center justify-center`}
-                    whileHover={{ scale: 1.2, y: -5 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {emoji}
-                  </motion.button>
-                ))}
-              </div>
-              <div className="mt-4 flex items-center gap-3">
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <ModernSmartieAvatar mood="happy" size="sm" />
-                </motion.div>
-                <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  Tracking your mood helps Smartie give better advice!
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Daily Mood Tracker - Emotional Spending Insights */}
+        {user?.id && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mb-6"
+          >
+            <DailyMoodTracker userId={user.id} />
+          </motion.div>
+        )}
 
         {/* Goals Preview Card */}
         {goals.length > 0 && (

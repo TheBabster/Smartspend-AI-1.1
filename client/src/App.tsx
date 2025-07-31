@@ -40,7 +40,12 @@ const ProtectedRoute = ({ component: Component }: { component: React.ComponentTy
       if (!firebaseUser || loading || redirected) return;
 
       try {
-        // Sync Firebase user with database
+        console.log('Syncing Firebase user with database:', firebaseUser.uid);
+        
+        // Sync Firebase user with database with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
         const response = await fetch('/api/auth/firebase-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -48,11 +53,15 @@ const ProtectedRoute = ({ component: Component }: { component: React.ComponentTy
             firebaseUid: firebaseUser.uid,
             email: firebaseUser.email || '',
             name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User'
-          })
+          }),
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const userData = await response.json();
+          console.log('User data received:', userData);
           setDbUser(userData);
           
           // Use wouter navigation instead of window.location.href to prevent infinite loops
@@ -62,16 +71,30 @@ const ProtectedRoute = ({ component: Component }: { component: React.ComponentTy
             navigate('/onboarding');
             return;
           }
+        } else {
+          console.error('Failed to sync user:', response.status, response.statusText);
         }
       } catch (error) {
-        console.error('Error checking user onboarding:', error);
-        // Don't block the app if there's an error
+        if (error.name === 'AbortError') {
+          console.error('Request timeout - continuing with limited functionality');
+        } else {
+          console.error('Error checking user onboarding:', error);
+        }
+        // Don't block the app if there's an error - allow user to continue
       } finally {
         setUserLoading(false);
       }
     };
 
+    // Add a safety timeout to prevent infinite loading
+    const safetyTimeout = setTimeout(() => {
+      console.log('Safety timeout triggered - stopping loading');
+      setUserLoading(false);
+    }, 15000); // 15 second safety net
+
     checkUserOnboarding();
+
+    return () => clearTimeout(safetyTimeout);
   }, [firebaseUser, loading, location, navigate, redirected]);
 
   if (loading || userLoading) {

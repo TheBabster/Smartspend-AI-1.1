@@ -164,6 +164,28 @@ const SavingsTreeVisualization: React.FC<SavingsTreeProps> = ({
             </div>
           </div>
 
+          {/* Reset Tree Button (when needed) */}
+          {totalSaved > 0 && (
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to reset your savings tree? This will clear your current savings record but keep your goals.')) {
+                    // This would trigger a savings tree reset
+                    onWaterTree(); // Placeholder for reset functionality
+                  }
+                }}
+                className="w-full text-gray-600 hover:text-red-600 hover:border-red-600"
+              >
+                Reset Savings Tree
+              </Button>
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                Only reset if your savings amount no longer reflects reality
+              </p>
+            </div>
+          )}
+
           {/* Goal Fruits on Tree */}
           {goals.length > 0 && (
             <div className="space-y-2">

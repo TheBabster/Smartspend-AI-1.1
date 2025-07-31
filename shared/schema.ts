@@ -98,6 +98,17 @@ export const insertDecisionSchema = createInsertSchema(decisions).omit({ id: tru
 export const insertStreakSchema = createInsertSchema(streaks).omit({ id: true });
 export const insertAchievementSchema = createInsertSchema(achievements).omit({ id: true, unlockedAt: true });
 
+export const moodEntries = pgTable("mood_entries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  mood: text("mood").notNull(),
+  notes: text("notes"),
+  date: text("date").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertMoodSchema = createInsertSchema(moodEntries).omit({ id: true, createdAt: true });
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -113,3 +124,5 @@ export type Streak = typeof streaks.$inferSelect;
 export type InsertStreak = z.infer<typeof insertStreakSchema>;
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type MoodEntry = typeof moodEntries.$inferSelect;
+export type InsertMoodEntry = z.infer<typeof insertMoodSchema>;

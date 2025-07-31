@@ -1,6 +1,6 @@
-import { users, budgets, expenses, goals, decisions, streaks, achievements, type User, type Budget, type Expense, type Goal, type Decision, type Streak, type Achievement, type InsertUser, type InsertBudget, type InsertExpense, type InsertGoal, type InsertDecision, type InsertStreak, type InsertAchievement } from "@shared/schema";
+import { users, budgets, expenses, goals, decisions, streaks, achievements, moodEntries, type User, type Budget, type Expense, type Goal, type Decision, type Streak, type Achievement, type MoodEntry, type InsertUser, type InsertBudget, type InsertExpense, type InsertGoal, type InsertDecision, type InsertStreak, type InsertAchievement, type InsertMoodEntry } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -40,6 +40,11 @@ export interface IStorage {
   // Achievements
   getAchievementsByUser(userId: string): Promise<Achievement[]>;
   createAchievement(achievement: InsertAchievement): Promise<Achievement>;
+  
+  // Mood tracking
+  getMoodByDate(userId: string, date: string): Promise<MoodEntry | undefined>;
+  createMoodEntry(mood: InsertMoodEntry): Promise<MoodEntry>;
+  getMoodEntriesByUser(userId: string, limit?: number): Promise<MoodEntry[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -221,6 +226,29 @@ export class DatabaseStorage implements IStorage {
       .values(insertAchievement)
       .returning();
     return achievement;
+  }
+
+  // Mood tracking methods
+  async getMoodByDate(userId: string, date: string): Promise<MoodEntry | undefined> {
+    const [mood] = await db.select().from(moodEntries).where(
+      and(eq(moodEntries.userId, userId), eq(moodEntries.date, date))
+    );
+    return mood || undefined;
+  }
+
+  async createMoodEntry(insertMood: InsertMoodEntry): Promise<MoodEntry> {
+    const [mood] = await db
+      .insert(moodEntries)
+      .values(insertMood)
+      .returning();
+    return mood;
+  }
+
+  async getMoodEntriesByUser(userId: string, limit: number = 30): Promise<MoodEntry[]> {
+    return await db.select().from(moodEntries)
+      .where(eq(moodEntries.userId, userId))
+      .orderBy(sql`${moodEntries.date} DESC`)
+      .limit(limit);
   }
 }
 

@@ -123,7 +123,9 @@ export default function Goals() {
       }).then(res => res.json());
     },
     onSuccess: () => {
+      console.log('🔄 Refreshing goals after money addition...');
       queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
+      queryClient.refetchQueries({ queryKey: ['/api/goals', syncedUser?.id] });
     }
   });
 
