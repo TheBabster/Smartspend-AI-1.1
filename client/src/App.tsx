@@ -9,6 +9,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import NotFound from "@/pages/not-found";
 import SimpleDashboard from "@/pages/SimpleDashboard";
 import ComprehensiveOnboarding from "@/pages/ComprehensiveOnboarding";
@@ -25,23 +26,108 @@ import { LogoDemo } from "./pages/LogoDemo";
 
 
 
+// Protected route component that enforces mandatory onboarding
+const ProtectedRoute = ({ component: Component }: { component: React.ComponentType }) => {
+  const { user: firebaseUser, loading } = useAuth();
+  const [location] = useLocation();
+  const [dbUser, setDbUser] = useState<any>(null);
+  const [userLoading, setUserLoading] = useState(true);
+
+  useEffect(() => {
+    const checkUserOnboarding = async () => {
+      if (!firebaseUser || loading) return;
+
+      try {
+        // Sync Firebase user with database
+        const response = await fetch('/api/auth/firebase-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User'
+          })
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setDbUser(userData);
+          
+          // Force redirect to onboarding if not completed and not already on onboarding page
+          if (!userData.onboardingCompleted && location !== '/onboarding') {
+            window.location.href = '/onboarding';
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user onboarding:', error);
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    checkUserOnboarding();
+  }, [firebaseUser, loading, location]);
+
+  if (loading || userLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading SmartSpend...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!firebaseUser) {
+    return <Auth />;
+  }
+
+  // Allow onboarding page even if not completed
+  if (location === '/onboarding') {
+    return <Component />;
+  }
+
+  // Block all other routes if onboarding not completed
+  if (dbUser && !dbUser.onboardingCompleted) {
+    return <ComprehensiveOnboarding />;
+  }
+
+  return <Component />;
+};
+
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={SimpleDashboard} />
       <Route path="/auth" component={Auth} />
-      <Route path="/onboarding" component={ComprehensiveOnboarding} />
-      <Route path="/decisions" component={Decisions} />
-      <Route path="/goals" component={EnhancedGoals} />
-      <Route path="/chat" component={EnhancedSmartieChat} />
-      <Route path="/analytics" component={EnhancedAnalytics} />
-      <Route path="/analytics-old" component={Analytics} />
-      <Route path="/smartie" component={SmartieCorner} />
-      <Route path="/growth" component={Growth} />
-      <Route path="/purchase" component={SmartPurchase} />
-      <Route path="/track-expense" component={TrackExpense} />
-      <Route path="/expenses" component={TrackExpense} />
-      <Route path="/logo" component={LogoDemo} />
+      <Route path="/onboarding">
+        <ProtectedRoute component={ComprehensiveOnboarding} />
+      </Route>
+      <Route path="/">
+        <ProtectedRoute component={SimpleDashboard} />
+      </Route>
+      <Route path="/decisions">
+        <ProtectedRoute component={Decisions} />
+      </Route>
+      <Route path="/goals">
+        <ProtectedRoute component={EnhancedGoals} />
+      </Route>
+      <Route path="/chat">
+        <ProtectedRoute component={EnhancedSmartieChat} />
+      </Route>
+      <Route path="/analytics">
+        <ProtectedRoute component={EnhancedAnalytics} />
+      </Route>
+      <Route path="/purchase">
+        <ProtectedRoute component={SmartPurchase} />
+      </Route>
+      <Route path="/track-expense">
+        <ProtectedRoute component={TrackExpense} />
+      </Route>
+      <Route path="/expenses">
+        <ProtectedRoute component={TrackExpense} />
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );

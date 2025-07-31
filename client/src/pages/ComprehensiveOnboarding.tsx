@@ -195,7 +195,8 @@ export default function ComprehensiveOnboarding() {
       }
 
       console.log("✅ Comprehensive onboarding completed successfully!");
-      navigate("/");
+      // Force full page refresh to trigger protected route logic
+      window.location.href = "/";
     } catch (error) {
       console.error("❌ Error completing onboarding:", error);
     } finally {

@@ -200,32 +200,7 @@ export default function SimpleDashboard() {
           </Button>
         </div>
 
-        {/* New User Welcome or Dashboard Content */}
-        {!user.onboardingCompleted ? (
-          <div className="text-center">
-            <Card className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200 dark:border-blue-700">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <ModernSmartieAvatar mood="celebrating" size="lg" />
-                  <div className="flex-1 text-left">
-                    <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                      Welcome to SmartSpend, {user.name}!
-                    </h3>
-                    <p className="text-blue-700 dark:text-blue-400 mb-4">
-                      You need to complete your financial setup to get personalized advice and start tracking your progress.
-                    </p>
-                    <Button 
-                      onClick={() => navigate("/onboarding")}
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                    >
-                      Complete Financial Setup (Required)
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ) : (
+        {/* Dashboard Content - User has completed onboarding */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader>
@@ -285,27 +260,26 @@ export default function SimpleDashboard() {
               </div>
             </CardContent>
           </Card>
-          </div>
-        )}
+        </div>
 
-        {/* Smartie Corner */}
+        {/* Smartie Corner - Motivational Message */}
         <Card className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <ModernSmartieAvatar mood="happy" size="lg" />
               <div className="flex-1">
                 <h3 className="font-semibold text-purple-800 dark:text-purple-300 mb-2">
-                  Hi {user.name}! I'm Smartie, your AI financial coach
+                  Great job, {user.name}! 🎉
                 </h3>
                 <p className="text-purple-700 dark:text-purple-400 mb-4">
-                  Welcome to SmartSpend! I'm here to help you make smarter financial decisions. 
-                  Ready to start your journey to better financial wellness?
+                  You've completed your financial setup! I'm here to help you achieve your goals. 
+                  Let's make some smart financial decisions together!
                 </p>
                 <Button 
                   className="bg-purple-600 hover:bg-purple-700"
-                  onClick={() => navigate("/onboarding")}
+                  onClick={() => navigate("/chat")}
                 >
-                  Start Financial Setup
+                  Chat with Smartie
                 </Button>
               </div>
             </div>
