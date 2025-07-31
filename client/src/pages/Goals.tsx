@@ -10,6 +10,7 @@ import { apiRequest } from '@/lib/queryClient';
 import ResponsiveLayout from '@/components/ResponsiveLayout';
 import BottomNav from '@/components/BottomNav';
 import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
+import { useAuth } from '@/hooks/useAuth';
 import { 
   Target, 
   Plus, 
@@ -25,6 +26,7 @@ import {
 import type { Goal } from '@shared/schema';
 
 export default function Goals() {
+  const { user: firebaseUser } = useAuth();
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [newGoal, setNewGoal] = useState({
     name: '',
@@ -33,20 +35,51 @@ export default function Goals() {
     targetDate: '',
     category: 'savings'
   });
+  const [dbUser, setDbUser] = useState<any>(null);
 
   const queryClient = useQueryClient();
 
-  // Fetch goals
+  // Sync Firebase user with database first
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user', firebaseUser?.uid],
+    queryFn: async () => {
+      if (!firebaseUser) return null;
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+        })
+      });
+      const userData = await response.json();
+      setDbUser(userData);
+      return userData;
+    },
+    enabled: !!firebaseUser
+  });
+
+  // Fetch goals using the synced user ID
   const { data: goals = [], isLoading } = useQuery<Goal[]>({ 
-    queryKey: ['/api/goals'],
+    queryKey: ['/api/goals', syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/goals/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
 
   // Add goal mutation
   const addGoalMutation = useMutation({
-    mutationFn: (goal: any) => apiRequest('/api/goals', {
-      method: 'POST',
-      body: goal
-    }),
+    mutationFn: (goal: any) => {
+      return fetch('/api/goals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(goal)
+      }).then(res => res.json());
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
       setShowAddGoal(false);
@@ -62,25 +95,28 @@ export default function Goals() {
 
   // Add money to goal mutation
   const addMoneyMutation = useMutation({
-    mutationFn: ({ goalId, amount }: { goalId: string, amount: number }) => 
-      apiRequest(`/api/goals/${goalId}/add-money`, {
+    mutationFn: ({ goalId, amount }: { goalId: string, amount: number }) => {
+      return fetch(`/api/goals/${goalId}/add-money`, {
         method: 'POST',
-        body: { amount }
-      }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+      }).then(res => res.json());
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
     }
   });
 
   const handleAddGoal = () => {
-    if (!newGoal.name || !newGoal.targetAmount) return;
+    if (!newGoal.name || !newGoal.targetAmount || !syncedUser?.id) return;
     
     addGoalMutation.mutate({
-      name: newGoal.name,
-      targetAmount: parseFloat(newGoal.targetAmount),
-      currentAmount: parseFloat(newGoal.currentAmount) || 0,
+      userId: syncedUser.id,
+      title: newGoal.name,
+      targetAmount: newGoal.targetAmount,
+      currentAmount: newGoal.currentAmount || '0',
       targetDate: newGoal.targetDate || null,
-      category: newGoal.category
+      icon: newGoal.category
     });
   };
 
@@ -249,7 +285,7 @@ export default function Goals() {
             className="text-center py-12"
           >
             <div className="w-20 h-20 mx-auto mb-4">
-              <ExactSmartieAvatar mood="encouraging" size="xl" animated={true} />
+              <ExactSmartieAvatar mood="happy" size="xl" animated={true} />
             </div>
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
               No Goals Yet
@@ -282,11 +318,11 @@ export default function Goals() {
                 <Card className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-3">
-                      <div className={getGoalColor(goal.category)}>
-                        {getGoalIcon(goal.category)}
+                      <div className={getGoalColor(goal.icon || 'savings')}>
+                        {getGoalIcon(goal.icon || 'savings')}
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold">{goal.name}</h3>
+                        <h3 className="font-semibold">{goal.title}</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           £{goal.currentAmount || 0} of £{goal.targetAmount}
                         </p>

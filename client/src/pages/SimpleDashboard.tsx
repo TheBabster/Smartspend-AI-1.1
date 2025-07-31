@@ -194,25 +194,57 @@ export default function SimpleDashboard() {
           <Button 
             variant="outline" 
             className="h-20"
-            onClick={() => navigate("/goals")}
+            onClick={() => navigate("/analytics")}
           >
             <div className="text-center">
-              <p className="font-semibold">Goals</p>
-              <p className="text-xs opacity-70">Manage goals</p>
+              <p className="font-semibold">View Budget</p>
+              <p className="text-xs opacity-70">Check progress</p>
             </div>
           </Button>
           
           <Button 
             variant="outline" 
             className="h-20"
-            onClick={() => navigate("/chat")}
+            onClick={() => navigate("/goals")}
           >
             <div className="text-center">
-              <p className="font-semibold">Chat with Smartie</p>
-              <p className="text-xs opacity-70">Financial coaching</p>
+              <p className="font-semibold">Goals</p>
+              <p className="text-xs opacity-70">Set targets</p>
             </div>
           </Button>
         </div>
+
+        {/* SmartCoin System & Chat Button */}
+        <Card className="mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-700">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+                  <span className="text-lg">🪙</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-yellow-800 dark:text-yellow-300">
+                    SmartCoins: {user?.smartCoins || 0}
+                  </h3>
+                  <p className="text-xs text-yellow-700 dark:text-yellow-400">
+                    Chat with Smartie costs 0.5 coins per message
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/chat")}
+                className="border-yellow-300 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:text-yellow-300"
+              >
+                Chat with Smartie
+              </Button>
+            </div>
+            <div className="mt-3 text-xs text-yellow-600 dark:text-yellow-400">
+              💡 <strong>Earn coins:</strong> Daily login (+2-3 coins) • Share app (+30 coins) • Smart decisions (+1 coin)
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Dashboard Content - User has completed onboarding */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

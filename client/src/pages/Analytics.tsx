@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from '@/hooks/useAuth';
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -18,18 +19,59 @@ const COLORS = {
 };
 
 export default function Analytics() {
+  const { user: firebaseUser } = useAuth();
   const [smartieReaction, setSmartieReaction] = useState<any>(null);
+  const [dbUser, setDbUser] = useState<any>(null);
+
+  // Sync Firebase user with database first
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user', firebaseUser?.uid],
+    queryFn: async () => {
+      if (!firebaseUser) return null;
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+        })
+      });
+      const userData = await response.json();
+      setDbUser(userData);
+      return userData;
+    },
+    enabled: !!firebaseUser
+  });
 
   const { data: expenses = [], isLoading: expensesLoading } = useQuery<Expense[]>({ 
-    queryKey: ["/api/expenses"] 
+    queryKey: ["/api/expenses", syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/expenses/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
   
   const { data: budgets = [], isLoading: budgetsLoading } = useQuery<Budget[]>({ 
-    queryKey: ["/api/budgets"] 
+    queryKey: ["/api/budgets", syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/budgets/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({ 
-    queryKey: ["/api/analytics"] 
+    queryKey: ["/api/analytics", syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return {};
+      const response = await fetch(`/api/analytics/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
 
   const isLoading = expensesLoading || budgetsLoading || analyticsLoading;

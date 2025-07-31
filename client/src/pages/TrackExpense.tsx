@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/hooks/useAuth';
 
 import BottomNav from '@/components/BottomNav';
 import ResponsiveLayout from '@/components/ResponsiveLayout';
@@ -44,6 +45,7 @@ const emotionalTags = [
 ];
 
 export default function TrackExpense() {
+  const { user: firebaseUser } = useAuth();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -70,7 +72,13 @@ export default function TrackExpense() {
   }, [expenses]);
 
   const addExpenseMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/expenses', 'POST', data),
+    mutationFn: (data: any) => {
+      return fetch('/api/expenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(res => res.json());
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/expenses'] });
       queryClient.invalidateQueries({ queryKey: ['/api/budgets'] });

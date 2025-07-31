@@ -247,9 +247,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const response = await generateSmartieResponse(message, userId, user);
       
-      // Deduct coins from user
-      await storage.updateUser(userId, { 
-        smartCoins: Math.max(0, (user.smartCoins || 0) - coinsRequired)
+      // Deduct coins from user - ensure integer value for smartCoins
+      const userIdString = String(userId);
+      const newCoinsAmount = Math.max(0, Math.floor((user.smartCoins || 0) - coinsRequired));
+      await storage.updateUser(userIdString, { 
+        smartCoins: newCoinsAmount
       });
       
       res.json({
