@@ -109,29 +109,72 @@ export default function SimpleDashboard() {
           </Button>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+          <Button className="h-20 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+            <div className="text-center">
+              <p className="font-semibold">Smart Purchase</p>
+              <p className="text-xs opacity-90">Get AI advice</p>
+            </div>
+          </Button>
+          
+          <Button variant="outline" className="h-20">
+            <div className="text-center">
+              <p className="font-semibold">Add Expense</p>
+              <p className="text-xs opacity-70">Track spending</p>
+            </div>
+          </Button>
+          
+          <Button variant="outline" className="h-20">
+            <div className="text-center">
+              <p className="font-semibold">View Budget</p>
+              <p className="text-xs opacity-70">Check progress</p>
+            </div>
+          </Button>
+          
+          <Button variant="outline" className="h-20">
+            <div className="text-center">
+              <p className="font-semibold">Chat with Smartie</p>
+              <p className="text-xs opacity-70">Financial coaching</p>
+            </div>
+          </Button>
+        </div>
+
         {/* Dashboard Content */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle>Welcome to SmartSpend!</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <ModernSmartieAvatar mood="celebrating" size="sm" />
+                Welcome to SmartSpend!
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-600">
-                Your authentication is working perfectly! Your name "{userName}" 
-                was successfully fetched from Firebase Firestore.
+                Authentication is working perfectly! Your SmartSpend journey starts here with 
+                AI-powered financial coaching from Smartie.
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Firebase User Info</CardTitle>
+              <CardTitle>Your Profile</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 text-sm">
-                <p><strong>Email:</strong> {firebaseUser.email}</p>
-                <p><strong>User ID:</strong> {firebaseUser.uid}</p>
-                <p><strong>Display Name:</strong> {userName}</p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Name:</span>
+                  <span className="text-sm text-gray-600">{userName}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Email:</span>
+                  <span className="text-sm text-gray-600">{firebaseUser.email}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Status:</span>
+                  <span className="text-sm text-green-600 font-medium">Authenticated</span>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -141,13 +184,44 @@ export default function SimpleDashboard() {
               <CardTitle>Next Steps</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600">
-                Now that authentication is working, we can integrate all the 
-                advanced SmartSpend features like budgets, expenses, and AI coaching.
-              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">Set up your budget</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                  <span className="text-sm">Add your first expense</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                  <span className="text-sm">Chat with Smartie for advice</span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Smartie Corner */}
+        <Card className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <ModernSmartieAvatar mood="happy" size="lg" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-purple-800 mb-2">
+                  Hi {userName}! I'm Smartie, your AI financial coach
+                </h3>
+                <p className="text-purple-700 mb-4">
+                  Welcome to SmartSpend! I'm here to help you make smarter financial decisions. 
+                  Ready to start your journey to better financial wellness?
+                </p>
+                <Button className="bg-purple-600 hover:bg-purple-700">
+                  Start Financial Setup
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

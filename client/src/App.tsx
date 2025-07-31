@@ -49,6 +49,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={SimpleDashboard} />
+      <Route path="/full" component={Dashboard} />
       <Route path="/auth" component={Auth} />
       <Route path="/onboarding" component={Onboarding} />
       <Route path="/dashboard" component={Dashboard} />
