@@ -330,6 +330,188 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Calculate user's real Financial IQ and stats
+  app.get("/api/user/:userId/financial-stats", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      // Get user's financial data
+      const [user, decisions, expenses, budgets, goals] = await Promise.all([
+        storage.getUser(userId),
+        storage.getDecisionsByUser(userId),
+        storage.getExpensesByUser(userId),
+        storage.getBudgetsByUser(userId),
+        storage.getGoalsByUser(userId)
+      ]);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Calculate Financial IQ based on actual behavior
+      let financialIQ = calculateFinancialIQ(user, decisions, expenses, budgets, goals);
+      
+      // Calculate other metrics
+      const totalDecisions = decisions.length;
+      const smartChoices = decisions.filter(d => 
+        (d.recommendation === 'no' && !d.followed) || 
+        (d.recommendation === 'yes' && d.followed)
+      ).length;
+      
+      // Calculate money saved from good decisions
+      const moneySaved = decisions
+        .filter(d => d.recommendation === 'no' && !d.followed)
+        .reduce((sum, d) => sum + parseFloat(d.amount), 0);
+      
+      // Calculate current streak based on recent smart decisions
+      const currentStreak = calculateDecisionStreak(decisions);
+
+      res.json({
+        totalDecisions,
+        smartChoices,
+        moneySaved: Math.round(moneySaved),
+        currentStreak,
+        financialIQ,
+        decisionAccuracy: totalDecisions > 0 ? Math.round((smartChoices / totalDecisions) * 100) : 0,
+        budgetAdherence: calculateBudgetAdherence(budgets),
+        goalProgress: calculateGoalProgress(goals)
+      });
+    } catch (error) {
+      console.error("Error calculating financial stats:", error);
+      res.status(500).json({ error: "Failed to calculate financial stats" });
+    }
+  });
+
+  function calculateFinancialIQ(user: any, decisions: any[], expenses: any[], budgets: any[], goals: any[]): number {
+    let score = 30; // Base score
+    
+    // Onboarding completion (+15 points)
+    if (user.onboardingCompleted) {
+      score += 15;
+    }
+
+    // Decision making quality (+30 points max)
+    if (decisions.length > 0) {
+      const goodDecisions = decisions.filter(d => 
+        (d.recommendation === 'no' && !d.followed) || 
+        (d.recommendation === 'yes' && d.followed) ||
+        (d.recommendation === 'think_again' && d.followed)
+      ).length;
+      const decisionScore = Math.min(30, (goodDecisions / decisions.length) * 30);
+      score += decisionScore;
+    }
+
+    // Budget adherence (+20 points max)
+    const budgetScore = calculateBudgetAdherence(budgets);
+    score += Math.min(20, budgetScore * 0.2);
+
+    // Goal setting and progress (+10 points max)
+    if (goals.length > 0) {
+      const activeGoals = goals.filter(g => !g.completed).length;
+      const completedGoals = goals.filter(g => g.completed).length;
+      score += Math.min(10, activeGoals * 2 + completedGoals * 3);
+    }
+
+    // Expense tracking consistency (+10 points max)
+    const recentExpenses = expenses.filter(e => {
+      const expenseDate = new Date(e.createdAt);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      return expenseDate > thirtyDaysAgo;
+    });
+    
+    if (recentExpenses.length >= 10) {
+      score += 10; // Active expense tracking
+    } else if (recentExpenses.length >= 5) {
+      score += 5;
+    }
+
+    // Savings rate bonus (+5 points max)
+    if (user.monthlyIncome && expenses.length > 0) {
+      const monthlyExpenses = expenses
+        .filter(e => {
+          const expenseDate = new Date(e.createdAt);
+          const currentMonth = new Date().getMonth();
+          return expenseDate.getMonth() === currentMonth;
+        })
+        .reduce((sum, e) => sum + parseFloat(e.amount), 0);
+      
+      const savingsRate = (parseFloat(user.monthlyIncome) - monthlyExpenses) / parseFloat(user.monthlyIncome);
+      if (savingsRate > 0.2) score += 5; // 20%+ savings rate
+      else if (savingsRate > 0.1) score += 3; // 10%+ savings rate
+    }
+
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }
+
+  function calculateDecisionStreak(decisions: any[]): number {
+    if (decisions.length === 0) return 0;
+    
+    // Sort decisions by date (newest first)
+    const sortedDecisions = decisions
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    let streak = 0;
+    for (const decision of sortedDecisions) {
+      const isGoodDecision = 
+        (decision.recommendation === 'no' && !decision.followed) ||
+        (decision.recommendation === 'yes' && decision.followed) ||
+        (decision.recommendation === 'think_again' && decision.followed);
+      
+      if (isGoodDecision) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  }
+
+  function calculateBudgetAdherence(budgets: any[]): number {
+    if (budgets.length === 0) return 0;
+    
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const currentBudgets = budgets.filter(b => b.month === currentMonth);
+    
+    if (currentBudgets.length === 0) return 0;
+    
+    let totalAdherence = 0;
+    let budgetCount = 0;
+    
+    for (const budget of currentBudgets) {
+      const spent = parseFloat(budget.spent || '0');
+      const limit = parseFloat(budget.monthlyLimit);
+      
+      if (limit > 0) {
+        const adherence = Math.max(0, Math.min(100, ((limit - spent) / limit) * 100));
+        totalAdherence += adherence;
+        budgetCount++;
+      }
+    }
+    
+    return budgetCount > 0 ? totalAdherence / budgetCount : 0;
+  }
+
+  function calculateGoalProgress(goals: any[]): number {
+    if (goals.length === 0) return 0;
+    
+    let totalProgress = 0;
+    let goalCount = 0;
+    
+    for (const goal of goals) {
+      const current = parseFloat(goal.currentAmount || '0');
+      const target = parseFloat(goal.targetAmount);
+      
+      if (target > 0) {
+        const progress = Math.min(100, (current / target) * 100);
+        totalProgress += progress;
+        goalCount++;
+      }
+    }
+    
+    return goalCount > 0 ? totalProgress / goalCount : 0;
+  }
+
   // Decision endpoints - User-specific
   app.get("/api/decisions/:userId", async (req, res) => {
     try {

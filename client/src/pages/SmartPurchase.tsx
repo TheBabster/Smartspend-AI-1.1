@@ -43,17 +43,42 @@ export default function SmartPurchase() {
     queryKey: ['/api/decisions'],
   });
 
-  // Fetch user stats
-  const { data: userStats } = useQuery({ 
-    queryKey: ['/api/user/stats'],
-    // Mock data for now
-    queryFn: () => Promise.resolve({
-      totalDecisions: decisions.length,
-      smartChoices: decisions.filter(d => d.recommendation === 'yes' && d.followed).length,
-      moneysSaved: 1250,
-      currentStreak: 7,
-      financialIQ: 78
-    })
+  // Fetch user stats using useAuth hook for proper authentication
+  const { data: userStats, isLoading: statsLoading } = useQuery({ 
+    queryKey: ['/api/user/financial-stats'],
+    queryFn: async () => {
+      // Get user from Firebase auth and sync with database
+      const user = window.auth?.currentUser;
+      if (!user?.email) {
+        throw new Error('User not authenticated');
+      }
+      
+      // First sync user with database to get user ID
+      const syncResponse = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: user.uid,
+          email: user.email,
+          name: user.displayName || user.email.split('@')[0]
+        })
+      });
+      
+      if (!syncResponse.ok) {
+        throw new Error('Failed to sync user');
+      }
+      
+      const userData = await syncResponse.json();
+      
+      // Now fetch financial stats
+      const response = await fetch(`/api/user/${userData.id}/financial-stats`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch stats');
+      }
+      return response.json();
+    },
+    retry: 2,
+    enabled: true
   });
 
   const recentDecisions = decisions.slice(0, 5);
@@ -151,38 +176,44 @@ export default function SmartPurchase() {
       </motion.div>
 
       {/* Stats Section */}
-      {userStats && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-        >
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600">{userStats.totalDecisions}</div>
-              <div className="text-sm text-gray-600">Total Decisions</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600">£{userStats.moneysSaved}</div>
-              <div className="text-sm text-gray-600">Money Saved</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-orange-600">{userStats.currentStreak}</div>
-              <div className="text-sm text-gray-600">Smart Streak</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{userStats.financialIQ}</div>
-              <div className="text-sm text-gray-600">Financial IQ</div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+      >
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600">
+              {statsLoading ? '...' : userStats?.totalDecisions || 0}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Total Decisions</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-600">
+              £{statsLoading ? '...' : userStats?.moneySaved || 0}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Money Saved</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-orange-600">
+              {statsLoading ? '...' : userStats?.currentStreak || 0}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Smart Streak</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-600">
+              {statsLoading ? '...' : userStats?.financialIQ || 45}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Financial IQ</div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Features Grid */}
       <motion.div
