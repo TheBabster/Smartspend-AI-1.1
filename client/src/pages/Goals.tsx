@@ -97,6 +97,8 @@ export default function Goals() {
     onSuccess: (data) => {
       console.log('✅ Goal creation successful, invalidating cache...');
       queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      queryClient.refetchQueries({ queryKey: ['/api/goals', syncedUser?.id] });
       setShowAddGoal(false);
       setNewGoal({
         name: '',
@@ -128,23 +130,17 @@ export default function Goals() {
   const handleAddGoal = () => {
     if (!newGoal.name || !newGoal.targetAmount || !syncedUser?.id) return;
     
-    console.log('🎯 Adding goal:', {
+    const goalData = {
       userId: syncedUser.id,
       title: newGoal.name,
-      targetAmount: parseFloat(newGoal.targetAmount),
-      currentAmount: parseFloat(newGoal.currentAmount || '0'),
+      targetAmount: newGoal.targetAmount, // Keep as string for decimal field
+      currentAmount: newGoal.currentAmount || '0', // Keep as string for decimal field
       targetDate: newGoal.targetDate || null,
       icon: newGoal.category
-    });
+    };
     
-    addGoalMutation.mutate({
-      userId: syncedUser.id,
-      title: newGoal.name,
-      targetAmount: parseFloat(newGoal.targetAmount),
-      currentAmount: parseFloat(newGoal.currentAmount || '0'),
-      targetDate: newGoal.targetDate || null,
-      icon: newGoal.category
-    });
+    console.log('🎯 Sending goal data:', goalData);
+    addGoalMutation.mutate(goalData);
   };
 
   const getGoalIcon = (category: string) => {

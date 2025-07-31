@@ -66,7 +66,9 @@ export default function EnhancedAnalytics() {
       const response = await fetch(`/api/goals/${syncedUser.id}`);
       return response.json();
     },
-    enabled: !!syncedUser?.id
+    enabled: !!syncedUser?.id,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({ 
