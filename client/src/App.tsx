@@ -1,3 +1,8 @@
+import { useAuth } from "@/hooks/useAuth";
+
+import Auth from "@/pages/Auth"; // 🔑 Sign in / Sign up page
+import "./firebase"; // This will run the Firebase init when the app loads
+
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -25,7 +30,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     const initialTheme = savedTheme || systemTheme;
-    
+
     setTheme(initialTheme);
     document.documentElement.classList.toggle("dark", initialTheme === "dark");
   }, []);
@@ -37,41 +42,42 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
-  return (
-    <div data-theme={theme}>
-      {children}
-    </div>
-  );
+  return <div data-theme={theme}>{children}</div>;
 }
 
-function Router() {
+function Router({ user }: { user: any }) {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/onboarding" component={Onboarding} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/decisions" component={Decisions} />
-      <Route path="/goals" component={EnhancedGoals} />
-      <Route path="/analytics" component={EnhancedAnalytics} />
-      <Route path="/analytics-old" component={Analytics} />
-      <Route path="/smartie" component={SmartieCorner} />
-      <Route path="/growth" component={Growth} />
-      <Route path="/purchase" component={SmartPurchase} />
-      <Route path="/track-expense" component={TrackExpense} />
-      <Route path="/expenses" component={TrackExpense} />
+      <Route path="/dashboard" component={user ? Dashboard : Auth} />
+      <Route path="/decisions" component={user ? Decisions : Auth} />
+      <Route path="/goals" component={user ? EnhancedGoals : Auth} />
+      <Route path="/analytics" component={user ? EnhancedAnalytics : Auth} />
+      <Route path="/analytics-old" component={user ? Analytics : Auth} />
+      <Route path="/smartie" component={user ? SmartieCorner : Auth} />
+      <Route path="/growth" component={user ? Growth : Auth} />
+      <Route path="/purchase" component={user ? SmartPurchase : Auth} />
+      <Route path="/track-expense" component={user ? TrackExpense : Auth} />
+      <Route path="/expenses" component={user ? TrackExpense : Auth} />
       <Route path="/logo" component={LogoDemo} />
+      <Route path="/auth" component={Auth} /> {/* 🔑 Sign In/Sign Up */}
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) return <div style={{ textAlign: "center", padding: "2rem" }}>Loading...</div>;
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <Router user={user} />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

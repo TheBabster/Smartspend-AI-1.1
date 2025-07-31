@@ -1,3 +1,7 @@
+import { doc, getDoc } from "firebase/firestore";  // ✅ Correct location
+import { getAuth, signOut } from "firebase/auth";        // ✅ Now only one getAuth import
+import { db } from "@/firebase";                     // ✅ Your custom Firestore instance
+import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -42,7 +46,6 @@ import StreakTracker from "@/components/StreakTracker";
 import { CategoryIcon, getCategoryColor } from "@/components/CategoryIcons";
 import SmartieLifeAnimations from "@/components/SmartieLifeAnimations";
 import { type Budget, type User, type Streak, type Achievement } from "@shared/schema";
-import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
@@ -56,7 +59,37 @@ export default function Dashboard() {
     message: string;
     type: 'success' | 'warning' | 'info' | 'celebration';
   } | null>(null);
+  const [userName, setUserName] = useState("SmartSpender");
   const [, navigate] = useLocation();
+  const auth = getAuth();
+
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userDoc = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userDoc);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.name) {
+          setUserName(data.name);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, []);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/auth");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   const { data: user } = useQuery<User>({ queryKey: ["/api/user"] });
   const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
@@ -124,7 +157,24 @@ export default function Dashboard() {
         />
         {showSmartieChat && (
           <SmartieIntelligentChat onClose={() => setShowSmartieChat(false)} />
-        )}
+        )}<button
+          onClick={handleLogout}
+          style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            zIndex: 9999,
+            padding: '10px 16px',
+            backgroundColor: '#dc2626',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+            cursor: 'pointer'
+          }}
+        >
+          Logout
+        </button>
       </>
     );
   }
