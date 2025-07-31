@@ -39,9 +39,13 @@ function Auth() {
 
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email.trim(), password);
+        const result = await signInWithEmailAndPassword(auth, email.trim(), password);
+        console.log("Login successful:", result.user.uid);
         setMessage("✅ Welcome back! Redirecting to your dashboard...");
-        // Navigation will happen automatically via useAuth effect
+        setTimeout(() => {
+          navigate("/");
+          setLoading(false);
+        }, 1500);
       } else {
         if (!name.trim()) {
           setMessage("❌ Please enter your name.");
@@ -51,6 +55,7 @@ function Auth() {
 
         const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
         const user = userCredential.user;
+        console.log("Account created:", user.uid);
 
         // Save the user's name and email to Firestore
         await setDoc(doc(db, "users", user.uid), {
@@ -58,12 +63,17 @@ function Auth() {
           email: email.trim(),
           createdAt: new Date()
         });
+        console.log("User data saved to Firestore");
 
         setMessage("✅ Account created successfully! Redirecting...");
-        // Navigation will happen automatically via useAuth effect
+        setTimeout(() => {
+          navigate("/");
+          setLoading(false);
+        }, 1500);
       }
     } catch (error: any) {
       setLoading(false);
+      console.error("Auth error:", error);
       const errorMessage = error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' 
         ? "Invalid email or password" 
         : error.code === 'auth/email-already-in-use'
@@ -86,11 +96,12 @@ function Auth() {
         <Card className="shadow-2xl border-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
-              <ModernSmartieAvatar 
-                mood="happy" 
-                size="lg" 
-                className="drop-shadow-lg" 
-              />
+              <div className="drop-shadow-lg">
+                <ModernSmartieAvatar 
+                  mood="happy" 
+                  size="lg" 
+                />
+              </div>
             </div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
               {isLogin ? "Welcome Back!" : "Join SmartSpend"}

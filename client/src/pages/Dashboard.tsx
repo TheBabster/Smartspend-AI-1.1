@@ -77,14 +77,21 @@ export default function Dashboard() {
       if (!firebaseUser) return;
 
       try {
+        console.log("Fetching user data for:", firebaseUser.uid);
         const userDoc = doc(db, "users", firebaseUser.uid);
         const docSnap = await getDoc(userDoc);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
+          console.log("Firestore user data:", data);
           if (data.name) {
             setUserName(data.name);
+            console.log("User name set to:", data.name);
+          } else {
+            console.log("No name field in Firestore document");
           }
+        } else {
+          console.log("No Firestore document found for user");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -107,7 +114,9 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
-          <ModernSmartieAvatar mood="thinking" size="xl" className="mb-4" />
+          <div className="mb-4">
+            <ModernSmartieAvatar mood="thinking" size="xl" />
+          </div>
           <p className="text-lg font-medium text-gray-600">Loading your financial dashboard...</p>
         </div>
       </div>
@@ -139,9 +148,9 @@ export default function Dashboard() {
   const budgetStreak = streaks.find(s => s.type === "budget");
   const recentAchievement = achievements[achievements.length - 1];
 
-  // Enhanced user context for emotional design
+  // Enhanced user context for emotional design - using Firebase user data
   const userContext = {
-    name: user?.name || "SmartSpender",
+    name: userName, // Use Firebase user name instead of API user
     financialScore: calculateFinancialScore(),
     streak: budgetStreak?.currentStreak || 0,
     totalSaved: remainingBudget > 0 ? remainingBudget : 0,
