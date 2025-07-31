@@ -29,13 +29,14 @@ import { LogoDemo } from "./pages/LogoDemo";
 // Protected route component that enforces mandatory onboarding
 const ProtectedRoute = ({ component: Component }: { component: React.ComponentType }) => {
   const { user: firebaseUser, loading } = useAuth();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [dbUser, setDbUser] = useState<any>(null);
   const [userLoading, setUserLoading] = useState(true);
+  const [redirected, setRedirected] = useState(false);
 
   useEffect(() => {
     const checkUserOnboarding = async () => {
-      if (!firebaseUser || loading) return;
+      if (!firebaseUser || loading || redirected) return;
 
       try {
         // Sync Firebase user with database
@@ -53,21 +54,24 @@ const ProtectedRoute = ({ component: Component }: { component: React.ComponentTy
           const userData = await response.json();
           setDbUser(userData);
           
-          // Force redirect to onboarding if not completed and not already on onboarding page
+          // Use wouter navigation instead of window.location.href to prevent infinite loops
           if (!userData.onboardingCompleted && location !== '/onboarding') {
-            window.location.href = '/onboarding';
+            console.log('🚀 Redirecting to onboarding for incomplete setup');
+            setRedirected(true);
+            navigate('/onboarding');
             return;
           }
         }
       } catch (error) {
         console.error('Error checking user onboarding:', error);
+        // Don't block the app if there's an error
       } finally {
         setUserLoading(false);
       }
     };
 
     checkUserOnboarding();
-  }, [firebaseUser, loading, location]);
+  }, [firebaseUser, loading, location, navigate, redirected]);
 
   if (loading || userLoading) {
     return (

@@ -17,9 +17,10 @@ import type { User } from "@shared/schema";
 export default function ComprehensiveOnboarding() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [userLoading, setUserLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [, navigate] = useLocation();
-  const { user: firebaseUser } = useAuth();
+  const { user: firebaseUser, loading: authLoading } = useAuth();
   
   // Comprehensive onboarding data
   const [onboardingData, setOnboardingData] = useState({
@@ -69,30 +70,57 @@ export default function ComprehensiveOnboarding() {
 
   // Redirect if not authenticated and fetch user data
   useEffect(() => {
-    if (!firebaseUser) {
-      navigate("/auth");
-      return;
-    }
-
     const fetchUser = async () => {
+      if (authLoading) return; // Wait for auth to complete
+      
+      if (!firebaseUser) {
+        navigate("/auth");
+        return;
+      }
+
       try {
-        const response = await fetch(`/api/user/${encodeURIComponent(firebaseUser.email!)}`);
-        if (response.ok) {
-          const userData = await response.json();
+        setUserLoading(true);
+        
+        // First sync the Firebase user with database
+        const syncResponse = await fetch('/api/auth/firebase-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firebaseUid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User'
+          })
+        });
+
+        if (syncResponse.ok) {
+          const userData = await syncResponse.json();
           setUser(userData);
-          // Pre-populate name from Firebase
+          
+          // Pre-populate name from database or Firebase
           setOnboardingData(prev => ({
             ...prev,
             name: userData.name || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || ""
           }));
+
+          // If user has already completed onboarding, redirect to dashboard
+          if (userData.onboardingCompleted) {
+            console.log('✅ User already completed onboarding, redirecting to dashboard');
+            navigate('/');
+            return;
+          }
+        } else {
+          console.error('Failed to sync user with database');
         }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
+        // Still allow onboarding to proceed even if there's an error
+      } finally {
+        setUserLoading(false);
       }
     };
 
     fetchUser();
-  }, [firebaseUser, navigate]);
+  }, [firebaseUser, authLoading, navigate]);
 
   const updateField = (field: string, value: any) => {
     setOnboardingData(prev => ({
@@ -668,6 +696,18 @@ export default function ComprehensiveOnboarding() {
       </div>
     );
   };
+
+  // Show loading while waiting for authentication or user data
+  if (authLoading || userLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900 dark:to-pink-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600 dark:text-gray-300">Setting up your financial profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Don't render if not authenticated
   if (!firebaseUser) {
