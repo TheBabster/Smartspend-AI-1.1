@@ -10,7 +10,7 @@ import ModernSmartieAvatar from "@/components/ModernSmartieAvatar";
 import { LogOut } from "lucide-react";
 
 export default function SimpleDashboard() {
-  const [userName, setUserName] = useState("SmartSpender");
+  const [userName, setUserName] = useState("");
   const [, navigate] = useLocation();
   const { user: firebaseUser, loading: authLoading } = useAuth();
 
@@ -37,9 +37,15 @@ export default function SimpleDashboard() {
           if (data.name) {
             setUserName(data.name);
             console.log("User name set to:", data.name);
+          } else {
+            console.log("No name field in Firestore document");
+            // Fallback to display name or email if no name field
+            setUserName(firebaseUser.displayName || firebaseUser.email?.split('@')[0] || "SmartSpender");
           }
         } else {
           console.log("No Firestore document found for user");
+          // Fallback to display name or email if no document
+          setUserName(firebaseUser.displayName || firebaseUser.email?.split('@')[0] || "SmartSpender");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -93,7 +99,7 @@ export default function SimpleDashboard() {
             <ModernSmartieAvatar mood="happy" size="lg" />
             <div>
               <h1 className="text-3xl font-bold text-gray-800">
-                {getGreeting()}, {userName}!
+                {getGreeting()}, {userName || firebaseUser.email?.split('@')[0] || "there"}!
               </h1>
               <p className="text-gray-600">Welcome to your SmartSpend dashboard</p>
             </div>
@@ -165,7 +171,7 @@ export default function SimpleDashboard() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Name:</span>
-                  <span className="text-sm text-gray-600">{userName}</span>
+                  <span className="text-sm text-gray-600">{userName || firebaseUser.email?.split('@')[0] || "User"}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Email:</span>
@@ -209,7 +215,7 @@ export default function SimpleDashboard() {
               <ModernSmartieAvatar mood="happy" size="lg" />
               <div className="flex-1">
                 <h3 className="font-semibold text-purple-800 mb-2">
-                  Hi {userName}! I'm Smartie, your AI financial coach
+                  Hi {userName || firebaseUser.email?.split('@')[0] || "there"}! I'm Smartie, your AI financial coach
                 </h3>
                 <p className="text-purple-700 mb-4">
                   Welcome to SmartSpend! I'm here to help you make smarter financial decisions. 
