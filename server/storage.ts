@@ -26,6 +26,7 @@ export interface IStorage {
   getGoal(id: string): Promise<Goal | undefined>;
   createGoal(goal: InsertGoal): Promise<Goal>;
   updateGoal(id: string, goal: Partial<Goal>): Promise<Goal | undefined>;
+  deleteGoal(id: string): Promise<void>;
 
   // Decisions
   getDecisionsByUser(userId: string): Promise<Decision[]>;
@@ -159,6 +160,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(goals.id, id))
       .returning();
     return goal || undefined;
+  }
+
+  async deleteGoal(id: string): Promise<void> {
+    await db.delete(goals).where(eq(goals.id, id));
   }
 
   async getDecisionsByUser(userId: string): Promise<Decision[]> {

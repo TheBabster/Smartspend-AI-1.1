@@ -222,6 +222,18 @@ const updatedUser = await storage.updateUser(userId, {
     }
   });
 
+  // Delete goal endpoint
+  app.delete("/api/goals/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteGoal(id);
+      res.json({ message: "Goal deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting goal:", error);
+      res.status(500).json({ error: "Failed to delete goal" });
+    }
+  });
+
   // Add money to goal
   app.post("/api/goals/:id/add-money", async (req, res) => {
     try {
