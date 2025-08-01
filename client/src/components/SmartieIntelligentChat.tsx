@@ -62,24 +62,62 @@ const SmartieIntelligentChat: React.FC<SmartieIntelligentChatProps> = ({
   const { data: expenses = [] } = useQuery<Expense[]>({ queryKey: ['/api/expenses'] });
   const { data: goals = [] } = useQuery<Goal[]>({ queryKey: ['/api/goals'] });
 
-  // AI Chat mutation (simulated for now - would use OpenAI API)
+  // Real AI Chat mutation using our backend API
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
-      // Simulate AI thinking time
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      return generateSmartieResponse(message, { budgets, expenses, goals });
+      const userId = localStorage.getItem('userId') || '9663b57c-1eff-420e-a77f-4c706e29ef24'; // Default test user
+      
+      const response = await fetch('/api/smartie/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, userId })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get response from Smartie');
+      }
+      
+      return await response.json();
     },
     onSuccess: (response) => {
       setIsTyping(false);
       const newMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'smartie',
-        content: response.content,
+        content: response.message,
         timestamp: new Date(),
-        mood: response.mood,
-        suggestions: response.suggestions
+        mood: response.actionPerformed ? 'celebrating' : 'happy',
+        suggestions: response.actionPerformed ? [] : ['Log £20 for food', 'Create goal for laptop £1200', 'Reset my tree']
       };
       setMessages(prev => [...prev, newMessage]);
+      
+      // Show success feedback if action was performed
+      if (response.actionPerformed) {
+        setTimeout(() => {
+          const successMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            type: 'smartie',
+            content: getSuccessMessage(response.actionPerformed.type),
+            timestamp: new Date(),
+            mood: 'celebrating'
+          };
+          setMessages(prev => [...prev, successMessage]);
+        }, 1000);
+      }
+    },
+    onError: (error) => {
+      setIsTyping(false);
+      console.error('Chat error:', error);
+      const errorMessage: ChatMessage = {
+        id: Date.now().toString(),
+        type: 'smartie',
+        content: "I'm having trouble right now, but I'm still here to help! Try asking me to log expenses or create goals.",
+        timestamp: new Date(),
+        mood: 'concerned'
+      };
+      setMessages(prev => [...prev, errorMessage]);
     }
   });
 
@@ -363,7 +401,7 @@ function generateSmartieResponse(
     
     return {
       content: `You're making great progress! You've completed ${completedGoals} out of ${totalGoals} financial goals. ${totalGoals > 0 ? "Your dedication is paying off! 🎯" : "Ready to set some exciting financial goals? I can help you create achievable targets!"}`,
-      mood: completedGoals > 0 ? 'celebrating' : 'encouraging',
+      mood: completedGoals > 0 ? 'celebrating' : 'happy',
       suggestions: ["Create new goal", "Review progress", "Goal strategies"]
     };
   }
@@ -415,6 +453,21 @@ function getTopSpendingCategory(expenses: Expense[]) {
   , { name: 'Other', amount: 0 });
   
   return topCategory;
+}
+
+function getSuccessMessage(actionType: string): string {
+  switch (actionType) {
+    case 'expense_added':
+      return "Perfect! I've successfully logged that expense for you. Your spending is now updated! 💰";
+    case 'goal_created':
+      return "Awesome! Your new savings goal has been created and added to your tree! 🌱";
+    case 'savings_reset':
+      return "Done! Your savings tree has been completely reset. Fresh start! 🌱";
+    case 'money_added':
+      return "Great! I've added money to your goal. You're getting closer! 🎯";
+    default:
+      return "Success! Your action has been completed! ✅";
+  }
 }
 
 export default SmartieIntelligentChat;
