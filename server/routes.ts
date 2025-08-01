@@ -179,9 +179,16 @@ const updatedUser = await storage.updateUser(userId, {
   app.post("/api/goals", async (req, res) => {
     try {
       console.log('🎯 Creating goal with data:', req.body);
-      const goalData = insertGoalSchema.parse(req.body);
-      console.log('✅ Goal data validated:', goalData);
-      const goal = await storage.createGoal(goalData);
+      
+      // Convert targetDate string to Date object if provided
+      const goalData = {
+        ...req.body,
+        targetDate: req.body.targetDate ? new Date(req.body.targetDate) : null
+      };
+      
+      const validatedGoal = insertGoalSchema.parse(goalData);
+      console.log('✅ Goal data validated:', validatedGoal);
+      const goal = await storage.createGoal(validatedGoal);
       console.log('✅ Goal created in database:', goal);
       res.json(goal);
     } catch (error) {
