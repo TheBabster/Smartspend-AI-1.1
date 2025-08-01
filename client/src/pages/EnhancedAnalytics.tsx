@@ -125,19 +125,16 @@ export default function EnhancedAnalytics() {
     mutationFn: async () => {
       if (!syncedUser?.id) throw new Error('User authentication required');
       
-      // Reset all goals to 0 current amount
-      const promises = goals.map(goal => 
-        fetch(`/api/goals/${goal.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...goal,
-            currentAmount: '0'
-          })
-        })
-      );
+      const response = await fetch(`/api/goals/reset/${syncedUser.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
       
-      await Promise.all(promises);
+      if (!response.ok) {
+        throw new Error('Failed to reset goals');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
@@ -219,7 +216,9 @@ export default function EnhancedAnalytics() {
                           <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-2">
                             <DollarSign className="text-white" size={16} />
                           </div>
-                          <div className="text-xl font-bold text-gray-900 dark:text-gray-100">£{((analytics as any)?.totalSpent || 0).toFixed(0)}</div>
+                          <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
+  £{expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0).toFixed(0)}
+</div>
                           <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Total Spent</div>
                         </CardContent>
                       </Card>
@@ -229,7 +228,9 @@ export default function EnhancedAnalytics() {
                           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2">
                             <TrendingUp className="text-white" size={16} />
                           </div>
-                          <div className="text-xl font-bold text-gray-900 dark:text-gray-100">£{((analytics as any)?.remaining || 0).toFixed(0)}</div>
+                          <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
+  £{(analytics?.totalSaved ?? 0).toFixed(0)}
+</div>
                           <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Remaining</div>
                         </CardContent>
                       </Card>
@@ -250,8 +251,10 @@ export default function EnhancedAnalytics() {
                             <TrendingDown className="text-white" size={16} />
                           </div>
                           <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                            {(analytics as any)?.totalBudget ? Math.round(((analytics as any).totalSpent / (analytics as any).totalBudget) * 100) : 0}%
-                          </div>
+  £{(user?.monthlyIncome && analytics?.totalSpent !== undefined
+    ? user.monthlyIncome - analytics.totalSpent
+    : 0).toFixed(0)}
+</div>
                           <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Budget Used</div>
                         </CardContent>
                       </Card>
@@ -419,7 +422,8 @@ export default function EnhancedAnalytics() {
                                 completed: parseFloat(goal.currentAmount || '0') >= parseFloat(goal.targetAmount)
                               }))}
                               totalSaved={goals.reduce((sum: number, goal: any) => sum + parseFloat(goal.currentAmount || '0'), 0)}
-                              onWaterTree={handleResetSavingsTree}
+                              onWaterTree={() => {}}
+                              onResetTree={handleResetSavingsTree}
                             />
                           </CardContent>
                         </Card>

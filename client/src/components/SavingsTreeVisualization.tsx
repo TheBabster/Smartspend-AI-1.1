@@ -15,12 +15,14 @@ interface SavingsTreeProps {
     completed: boolean;
   }>;
   onWaterTree?: () => void;
+  onResetTree?: () => void;
 }
 
 const SavingsTreeVisualization: React.FC<SavingsTreeProps> = ({
   totalSaved,
   goals,
-  onWaterTree = () => {}
+  onWaterTree = () => {},
+  onResetTree = () => {}
 }) => {
   const [treeStage, setTreeStage] = useState(0);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number }>>([]);
@@ -172,8 +174,7 @@ const SavingsTreeVisualization: React.FC<SavingsTreeProps> = ({
                 size="sm"
                 onClick={() => {
                   if (window.confirm('Are you sure you want to reset your savings tree? This will clear your current savings record but keep your goals.')) {
-                    // This would trigger a savings tree reset
-                    onWaterTree(); // Placeholder for reset functionality
+                    onResetTree();
                   }
                 }}
                 className="w-full text-gray-600 hover:text-red-600 hover:border-red-600"

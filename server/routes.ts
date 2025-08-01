@@ -73,7 +73,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId } = req.params;
       const userData = insertUserSchema.partial().parse(req.body);
-      const updatedUser = await storage.updateUser(userId, userData);
+
+// Fetch all expenses for this user
+const expenses = await storage.getExpensesByUserId(userId);
+const totalSpent = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
+const totalSaved = userData.monthlyIncome ? userData.monthlyIncome - totalSpent : 0;
+// Add totalSpent to the data being saved
+const updatedUser = await storage.updateUser(userId, {
+  ...userData,
+  totalSpent,
+  totalSaved,
+});
       res.json(updatedUser);
     } catch (error) {
       console.error("Error updating user:", error);
@@ -187,6 +197,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(goal);
     } catch (error) {
       res.status(400).json({ error: "Invalid goal data" });
+    }
+  });
+
+  // Reset all goals for a user (set currentAmount to 0)
+  app.post("/api/goals/reset/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const goals = await storage.getGoalsByUser(userId);
+      
+      // Reset each goal's currentAmount to 0
+      const resetPromises = goals.map(goal => 
+        storage.updateGoal(goal.id, { currentAmount: '0' })
+      );
+      
+      await Promise.all(resetPromises);
+      
+      // Return updated goals
+      const updatedGoals = await storage.getGoalsByUser(userId);
+      res.json(updatedGoals);
+    } catch (error) {
+      console.error("Error resetting goals:", error);
+      res.status(500).json({ error: "Failed to reset goals" });
     }
   });
 
