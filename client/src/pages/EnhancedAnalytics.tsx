@@ -62,7 +62,13 @@ export default function EnhancedAnalytics() {
   });
   
   const { data: budgets = [], isLoading: budgetsLoading } = useQuery<Budget[]>({ 
-    queryKey: ["/api/budgets"] 
+    queryKey: ["/api/budgets", syncedUser?.id],
+    queryFn: async () => {
+      if (!syncedUser?.id) return [];
+      const response = await fetch(`/api/budgets/${syncedUser.id}`);
+      return response.json();
+    },
+    enabled: !!syncedUser?.id
   });
 
   const { data: goals = [] } = useQuery({ 
@@ -105,12 +111,33 @@ export default function EnhancedAnalytics() {
     color: COLORS[category as keyof typeof COLORS] || "#6B7280",
   }));
 
-  const budgetComparisonData = budgets.map(budget => ({
-    category: budget.category.split(" ")[0],
-    budgeted: parseFloat(budget.monthlyLimit),
-    spent: parseFloat(budget.spent || "0"),
-    remaining: parseFloat(budget.monthlyLimit) - parseFloat(budget.spent || "0"),
-  }));
+  // Calculate actual spending vs budgets with proper category matching
+  const totalBudgeted = budgets.reduce((sum, budget) => sum + parseFloat(budget.monthlyLimit), 0);
+  const totalSpent = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+  const totalRemaining = totalBudgeted - totalSpent;
+  const budgetUsedPercentage = totalBudgeted > 0 ? Math.round((totalSpent / totalBudgeted) * 100) : 0;
+
+  // Create budget vs actual data for chart
+  const budgetComparisonData = budgets.map(budget => {
+    // Map budget categories to expense categories
+    const categoryMap: Record<string, string> = {
+      'food': 'Food & Dining',
+      'entertainment': 'Entertainment',
+      'shopping': 'Shopping',
+      'transportation': 'Transportation',
+      'utilities': 'Utilities'
+    };
+    
+    const expenseCategory = categoryMap[budget.category.toLowerCase()] || budget.category;
+    const actualSpent = categorySpending[expenseCategory] || 0;
+    
+    return {
+      category: budget.category.charAt(0).toUpperCase() + budget.category.slice(1),
+      budgeted: parseFloat(budget.monthlyLimit),
+      spent: actualSpent,
+      remaining: parseFloat(budget.monthlyLimit) - actualSpent,
+    };
+  });
 
   // Create wealth projection data from financial position
   const wealthProjectionData = Array.from({ length: 12 }, (_, i) => ({
@@ -229,7 +256,7 @@ export default function EnhancedAnalytics() {
                             <TrendingUp className="text-white" size={16} />
                           </div>
                           <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-  £{(analytics?.totalSaved ?? 0).toFixed(0)}
+  £{totalRemaining.toFixed(0)}
 </div>
                           <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Remaining</div>
                         </CardContent>
@@ -251,9 +278,7 @@ export default function EnhancedAnalytics() {
                             <TrendingDown className="text-white" size={16} />
                           </div>
                           <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
-  £{(user?.monthlyIncome && analytics?.totalSpent !== undefined
-    ? user.monthlyIncome - analytics.totalSpent
-    : 0).toFixed(0)}
+  {budgetUsedPercentage}%
 </div>
                           <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">Budget Used</div>
                         </CardContent>
@@ -312,8 +337,10 @@ export default function EnhancedAnalytics() {
                               </BarChart>
                             </ResponsiveContainer>
                           ) : (
-                            <div className="flex items-center justify-center h-64 text-gray-500">
-                              No budget data yet
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                              <BarChart3 className="w-12 h-12 mb-3 text-gray-400" />
+                              <p className="text-center">No budget data yet</p>
+                              <p className="text-sm text-center mt-1">Click "Set Budget" above to create your monthly budget categories</p>
                             </div>
                           )}
                         </CardContent>
