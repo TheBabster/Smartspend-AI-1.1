@@ -60,13 +60,16 @@ export default function BudgetSetupWizard({ onComplete }: BudgetSetupWizardProps
       return;
     }
 
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+    
     for (const [category, amount] of Object.entries(budgets)) {
       if (amount && parseFloat(amount) > 0) {
         await createBudgetMutation.mutateAsync({
           userId: syncedUser.id,
           category,
           monthlyLimit: amount,
-          spent: '0'
+          spent: '0',
+          month: currentMonth
         });
       }
     }

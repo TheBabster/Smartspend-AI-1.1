@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Target, Brain, Heart, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 import SmartieCoachingSummary from "@/components/SmartieCoachingSummary";
 import EmotionalSpendingTracker from "@/components/EmotionalSpendingTracker";
@@ -29,6 +30,9 @@ export default function EnhancedAnalytics() {
   const [activeTab, setActiveTab] = useState("overview");
   const [personalityMode, setPersonalityMode] = useState<'motivational' | 'funny' | 'strict' | 'chill'>('motivational');
   const [showBudgetSetup, setShowBudgetSetup] = useState(false);
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Sync Firebase user with database first
   const { data: syncedUser } = useQuery({
@@ -115,6 +119,45 @@ export default function EnhancedAnalytics() {
     optimistic: 5000 + (i * 750),
     conservative: 5000 + (i * 250),
   }));
+
+  // Reset Savings Tree functionality
+  const resetGoalsMutation = useMutation({
+    mutationFn: async () => {
+      if (!syncedUser?.id) throw new Error('User authentication required');
+      
+      // Reset all goals to 0 current amount
+      const promises = goals.map(goal => 
+        fetch(`/api/goals/${goal.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...goal,
+            currentAmount: '0'
+          })
+        })
+      );
+      
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      toast({
+        title: 'Savings Tree Reset',
+        description: 'Your savings tree has been reset. All goals are back to £0.',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Reset Failed',
+        description: 'Failed to reset savings tree. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  });
+
+  const handleResetSavingsTree = () => {
+    resetGoalsMutation.mutate();
+  };
 
   if (isLoading) {
     return (
@@ -376,6 +419,7 @@ export default function EnhancedAnalytics() {
                                 completed: parseFloat(goal.currentAmount || '0') >= parseFloat(goal.targetAmount)
                               }))}
                               totalSaved={goals.reduce((sum: number, goal: any) => sum + parseFloat(goal.currentAmount || '0'), 0)}
+                              onWaterTree={handleResetSavingsTree}
                             />
                           </CardContent>
                         </Card>
