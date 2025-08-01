@@ -47,10 +47,10 @@ const SmartieIntelligentChat: React.FC<SmartieIntelligentChatProps> = ({
     {
       id: '1',
       type: 'smartie',
-      content: getInitialMessage(initialContext),
+      content: "Hi bdaniel6! 👋 I'm Smartie, your AI financial coach. I've got your financial profile loaded and I'm ready to help you make smart money decisions. Each message costs 0.5 SmartCoins (you have 24 coins). What would you like to chat about today?",
       timestamp: new Date(),
       mood: 'happy',
-      suggestions: getInitialSuggestions(initialContext)
+      suggestions: ['Log £20 for food', 'Create goal for laptop £1200', 'Reset my tree']
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');

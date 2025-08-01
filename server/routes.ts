@@ -335,7 +335,7 @@ Current Financial Data:
       let responseMessage = "I'm here to help! What would you like to know?";
       let actionPerformed = null;
       let functionName = null;
-      let functionArgs = {};
+      let functionArgs: any = {};
 
       // First try to get OpenAI response
       try {
@@ -353,11 +353,13 @@ Current Financial Data:
         
         // Fallback: Simple pattern matching for common commands
         const lowerMessage = message.toLowerCase();
+        console.log(`🔍 Fallback debug - message: "${message}", lowerMessage: "${lowerMessage}"`);
+        console.log(`🔍 Includes log: ${lowerMessage.includes('log')}, includes £: ${lowerMessage.includes('£')}, includes for: ${lowerMessage.includes('for')}`);
         
-        if (lowerMessage.includes('log') && lowerMessage.includes('£')) {
-          // Extract amount and category from message like "log £20 for food"
-          const amountMatch = message.match(/£(\d+(?:\.\d{2})?)/);
-          const amount = amountMatch ? parseFloat(amountMatch[1]) : null;
+        if (lowerMessage.includes('log') && (lowerMessage.includes('£') || lowerMessage.includes('for'))) {
+          // Extract amount and category from message like "log £20 for food" or "log 20£ for food"
+          const amountMatch = message.match(/(?:£(\d+(?:\.\d{2})?)|(\d+(?:\.\d{2})?)£)/);
+          const amount = amountMatch ? parseFloat(amountMatch[1] || amountMatch[2]) : null;
           
           if (amount) {
             let category = 'other';
@@ -370,15 +372,15 @@ Current Financial Data:
             functionName = 'add_expense';
             functionArgs = {
               amount,
-              description: message.replace(/log|add|£\d+(?:\.\d{2})?/gi, '').trim() || `${category} expense`,
+              description: message.replace(/log|add|£?\d+(?:\.\d{2})?£?|for/gi, '').trim() || `${category} expense`,
               category
             };
             responseMessage = `I can't connect to my AI brain right now, but I understand you want to log an expense! Let me help you with that. 💰`;
           }
         } else if (lowerMessage.includes('goal') && (lowerMessage.includes('create') || lowerMessage.includes('add') || lowerMessage.includes('new'))) {
-          // Extract goal details from message like "create a goal for laptop £1200"
-          const amountMatch = message.match(/£(\d+(?:\.\d{2})?)/);
-          const amount = amountMatch ? parseFloat(amountMatch[1]) : 1000;
+          // Extract goal details from message like "create a goal for laptop £1200" or "create goal for laptop 1200£"
+          const amountMatch = message.match(/(?:£(\d+(?:\.\d{2})?)|(\d+(?:\.\d{2})?)£)/);
+          const amount = amountMatch ? parseFloat(amountMatch[1] || amountMatch[2]) : 1000;
           
           const goalTitle = message.replace(/create|add|new|goal|for|£\d+(?:\.\d{2})?/gi, '').trim() || 'New Goal';
           
@@ -414,8 +416,7 @@ Or visit the Goals and Expenses pages to manage your finances directly. I'll be 
                 userId,
                 amount: functionArgs.amount.toString(),
                 description: functionArgs.description,
-                category: functionArgs.category,
-                date: new Date()
+                category: functionArgs.category
               });
               actionPerformed = { type: 'expense_added', expense };
               responseMessage += `\n\n✅ I've logged your expense: £${functionArgs.amount} for ${functionArgs.description} (${functionArgs.category}).`;
