@@ -134,6 +134,23 @@ export default function AdvancedPurchaseDecisionModal({ open, onOpenChange }: Ad
     }
   }, [formData.itemName, formData.category]);
 
+  // Sync Firebase user with database first  
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: 'PLOFcMQeHePcuXObAvpAkewhZYa2',
+          email: 'bdaniel6@outlook.com',
+          name: 'bdaniel6'
+        })
+      });
+      return response.json();
+    }
+  });
+
   // Fetch user's financial data for context
   const { data: budgets = [] } = useQuery({ queryKey: ['/api/budgets'] });
   const { data: userProfile } = useQuery({ queryKey: ['/api/user'] });
@@ -230,16 +247,26 @@ export default function AdvancedPurchaseDecisionModal({ open, onOpenChange }: Ad
   };
 
   const handleSubmit = async () => {
+    if (!syncedUser?.id) {
+      toast({
+        title: 'Error',
+        description: 'User authentication required to save decision.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     const decisionData = {
+      userId: syncedUser.id,
       itemName: formData.itemName,
-      amount: parseFloat(formData.amount),
+      amount: formData.amount,
       category: formData.category,
       desireLevel: formData.desireLevel[0],
       urgency: formData.isTimeSensitive ? 8 : 3,
+      emotion: formData.emotionalState,
+      notes: formData.notes || null,
       recommendation: decision?.recommendation,
-      reasoning: decision?.reasoning,
-      emotionalState: formData.emotionalState,
-      utilityLevel: formData.utilityLevel[0]
+      reasoning: decision?.reasoning
     };
 
     await createDecisionMutation.mutateAsync(decisionData);

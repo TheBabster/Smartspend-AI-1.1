@@ -66,6 +66,23 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Sync Firebase user with database first  
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: 'PLOFcMQeHePcuXObAvpAkewhZYa2',
+          email: 'bdaniel6@outlook.com',
+          name: 'bdaniel6'
+        })
+      });
+      return response.json();
+    }
+  });
+
   // Fetch current budgets for impact simulation
   const { data: budgets = [] } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
 
@@ -1013,18 +1030,27 @@ export default function EnhancedPurchaseDecisionModal({ open, onOpenChange }: En
   );
 
   const handleReflectionSubmit = async (reason: string) => {
+    if (!syncedUser?.id) {
+      toast({
+        title: 'Error',
+        description: 'User authentication required to save decision.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     try {
       await createDecisionMutation.mutateAsync({
+        userId: syncedUser.id,
         itemName,
-        amount: parseFloat(amount),
+        amount: amount,
         category,
         desireLevel: desireLevel[0],
         urgency: urgency[0],
-        reasoning,
+        emotion: null,
+        notes: personalReason || null,
         recommendation: decision?.recommendation,
-        followed: true,
-        reflection_reason: reason,
-        createdAt: new Date().toISOString()
+        reasoning: decision?.reasoning
       });
       
       setShowReflectionPrompt(false);

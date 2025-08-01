@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Wallet, ShoppingCart, Car, Home, Utensils, Gamepad2 } from 'lucide-react';
 
 const budgetCategories = [
@@ -22,6 +22,23 @@ export default function BudgetSetupWizard({ onComplete }: BudgetSetupWizardProps
   const [budgets, setBudgets] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
 
+  // Sync Firebase user with database first  
+  const { data: syncedUser } = useQuery({
+    queryKey: ['sync-user'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/firebase-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firebaseUid: 'PLOFcMQeHePcuXObAvpAkewhZYa2',
+          email: 'bdaniel6@outlook.com',
+          name: 'bdaniel6'
+        })
+      });
+      return response.json();
+    }
+  });
+
   const createBudgetMutation = useMutation({
     mutationFn: async (budgetData: any) => {
       const response = await fetch('/api/budgets', {
@@ -38,10 +55,15 @@ export default function BudgetSetupWizard({ onComplete }: BudgetSetupWizardProps
   });
 
   const handleSaveBudgets = async () => {
+    if (!syncedUser?.id) {
+      console.error('User authentication required to save budgets');
+      return;
+    }
+
     for (const [category, amount] of Object.entries(budgets)) {
       if (amount && parseFloat(amount) > 0) {
         await createBudgetMutation.mutateAsync({
-          userId: 'current-user',
+          userId: syncedUser.id,
           category,
           monthlyLimit: amount,
           spent: '0'
