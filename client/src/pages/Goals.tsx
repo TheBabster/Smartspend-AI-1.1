@@ -13,6 +13,7 @@ import ExactSmartieAvatar from '@/components/ExactSmartieAvatar';
 import FinancialPositionWizard from '@/components/FinancialPositionWizard';
 import SavingsTreeVisualization from '@/components/SavingsTreeVisualization';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Target, 
   Plus, 
@@ -29,6 +30,7 @@ import type { Goal } from '@shared/schema';
 
 export default function Goals() {
   const { user: firebaseUser } = useAuth();
+  const { toast } = useToast();
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [showFinancialWizard, setShowFinancialWizard] = useState(false);
   const [newGoal, setNewGoal] = useState({
@@ -129,6 +131,35 @@ export default function Goals() {
       console.log('🔄 Refreshing goals after money addition...');
       refetchGoals();
       queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
+    }
+  });
+
+  // Delete goal mutation
+  const deleteGoalMutation = useMutation({
+    mutationFn: async (goalId: string) => {
+      const response = await fetch(`/api/goals/${goalId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete goal');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchGoals();
+      queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
+      toast({
+        title: 'Goal Deleted',
+        description: 'Your goal has been successfully deleted.',
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Delete Failed',
+        description: 'Failed to delete goal. Please try again.',
+        variant: 'destructive'
+      });
     }
   });
 
@@ -369,10 +400,25 @@ export default function Goals() {
                           £{goal.currentAmount || 0} of £{goal.targetAmount}
                         </p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-green-600">
-                          {progress.toFixed(1)}%
-                        </p>
+                      <div className="text-right flex items-center gap-2">
+                        <div>
+                          <p className="text-lg font-bold text-green-600">
+                            {progress.toFixed(1)}%
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete "${goal.title}"? This action cannot be undone.`)) {
+                              deleteGoalMutation.mutate(goal.id);
+                            }
+                          }}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1"
+                          disabled={deleteGoalMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </CardTitle>
                   </CardHeader>
