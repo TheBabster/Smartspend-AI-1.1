@@ -409,12 +409,18 @@ export default function Goals() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Delete button clicked for goal:', goal.id, goal.title);
                             if (window.confirm(`Are you sure you want to delete "${goal.title}"? This action cannot be undone.`)) {
+                              console.log('User confirmed deletion, calling mutation');
                               deleteGoalMutation.mutate(goal.id);
+                            } else {
+                              console.log('User cancelled deletion');
                             }
                           }}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 z-10 relative"
                           disabled={deleteGoalMutation.isPending}
                         >
                           <Trash2 className="w-4 h-4" />
