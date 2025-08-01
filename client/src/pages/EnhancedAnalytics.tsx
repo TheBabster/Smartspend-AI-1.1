@@ -164,7 +164,7 @@ export default function EnhancedAnalytics() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/goals'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/goals', syncedUser?.id] });
       toast({
         title: 'Savings Tree Reset',
         description: 'Your savings tree has been reset. All goals are back to £0.',
