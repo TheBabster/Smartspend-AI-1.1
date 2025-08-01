@@ -10,6 +10,7 @@ const openai = new OpenAI({
 });
 
 import { initializeDatabase } from "./init-db";
+import { generateSmartieResponse, availableFunctions } from "./openai.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize database on startup
@@ -284,7 +285,7 @@ const updatedUser = await storage.updateUser(userId, {
     }
   });
 
-  // Enhanced Smartie Chat endpoint with SmartCoin system
+  // Enhanced Smartie Chat endpoint with function calling and SmartCoin system
   app.post("/api/smartie/chat", async (req, res) => {
     try {
       const { message, userId } = req.body;
@@ -310,61 +311,194 @@ const updatedUser = await storage.updateUser(userId, {
         });
       }
 
-      // Generate ChatGPT-like response using OpenAI directly
+      // Get user's current financial data for context
+      const [budgets, expenses, goals] = await Promise.all([
+        storage.getBudgetsByUser(userId),
+        storage.getExpensesByUser(userId),
+        storage.getGoalsByUser(userId)
+      ]);
+
       const userContext = `
 User Profile:
 - Name: ${user?.name || "User"}
 - Monthly Income: £${user?.monthlyIncome || "Not set"}
 - Currency: ${user?.currency || "GBP"}
 - Smart Coins: ${user?.smartCoins || 0}
+
+Current Financial Data:
+- Budgets: ${budgets.length} active budgets
+- Expenses: ${expenses.length} total expenses
+- Goals: ${goals.length} savings goals
+- Goals List: ${goals.map(g => `"${g.title}" (£${g.currentAmount}/${g.targetAmount})`).join(', ') || 'None'}
       `;
 
-      const systemPrompt = `You are Smartie, a friendly, enthusiastic, and knowledgeable AI financial coach. You're part of the SmartSpend app and help users with their financial wellness journey.
+      let responseMessage = "I'm here to help! What would you like to know?";
+      let actionPerformed = null;
+      let functionName = null;
+      let functionArgs = {};
 
-Key personality traits:
-- Friendly and encouraging, like a supportive friend
-- Knowledgeable about personal finance, budgeting, saving, investing
-- Can answer ANY question - financial or not - while gently steering back to financial wellness when appropriate
-- Use emojis sparingly but effectively
-- Be conversational and avoid being preachy
-- Celebrate user wins and provide motivation during challenges
+      // First try to get OpenAI response
+      try {
+        const choice = await generateSmartieResponse(message, userContext, availableFunctions);
+        responseMessage = choice.message.content || responseMessage;
+        
+        // Handle function calls (tool calls in newer OpenAI API)
+        if (choice.message.tool_calls && choice.message.tool_calls.length > 0) {
+          const toolCall = choice.message.tool_calls[0];
+          functionName = toolCall.function.name;
+          functionArgs = JSON.parse(toolCall.function.arguments);
+        }
+      } catch (openaiError) {
+        console.error("OpenAI error, using fallback:", openaiError);
+        
+        // Fallback: Simple pattern matching for common commands
+        const lowerMessage = message.toLowerCase();
+        
+        if (lowerMessage.includes('log') && lowerMessage.includes('£')) {
+          // Extract amount and category from message like "log £20 for food"
+          const amountMatch = message.match(/£(\d+(?:\.\d{2})?)/);
+          const amount = amountMatch ? parseFloat(amountMatch[1]) : null;
+          
+          if (amount) {
+            let category = 'other';
+            if (lowerMessage.includes('food') || lowerMessage.includes('coffee') || lowerMessage.includes('lunch') || lowerMessage.includes('dinner')) category = 'food';
+            else if (lowerMessage.includes('transport') || lowerMessage.includes('bus') || lowerMessage.includes('train') || lowerMessage.includes('uber')) category = 'transport';
+            else if (lowerMessage.includes('shopping') || lowerMessage.includes('clothes') || lowerMessage.includes('shop')) category = 'shopping';
+            else if (lowerMessage.includes('entertainment') || lowerMessage.includes('movie') || lowerMessage.includes('game')) category = 'entertainment';
+            else if (lowerMessage.includes('bill') || lowerMessage.includes('rent') || lowerMessage.includes('utility')) category = 'bills';
+            
+            functionName = 'add_expense';
+            functionArgs = {
+              amount,
+              description: message.replace(/log|add|£\d+(?:\.\d{2})?/gi, '').trim() || `${category} expense`,
+              category
+            };
+            responseMessage = `I can't connect to my AI brain right now, but I understand you want to log an expense! Let me help you with that. 💰`;
+          }
+        } else if (lowerMessage.includes('goal') && (lowerMessage.includes('create') || lowerMessage.includes('add') || lowerMessage.includes('new'))) {
+          // Extract goal details from message like "create a goal for laptop £1200"
+          const amountMatch = message.match(/£(\d+(?:\.\d{2})?)/);
+          const amount = amountMatch ? parseFloat(amountMatch[1]) : 1000;
+          
+          const goalTitle = message.replace(/create|add|new|goal|for|£\d+(?:\.\d{2})?/gi, '').trim() || 'New Goal';
+          
+          functionName = 'create_goal';
+          functionArgs = {
+            title: goalTitle,
+            targetAmount: amount,
+            icon: 'savings'
+          };
+          responseMessage = `I can't connect to my AI brain right now, but I understand you want to create a savings goal! Let me help you with that. 🎯`;
+        } else if (lowerMessage.includes('reset') && (lowerMessage.includes('tree') || lowerMessage.includes('goals'))) {
+          functionName = 'reset_savings_tree';
+          functionArgs = { userId };
+          responseMessage = `I can't connect to my AI brain right now, but I understand you want to reset your savings tree! Let me help you with that. 🌱`;
+        } else {
+          responseMessage = `I'm having trouble connecting to my AI brain right now, but I'm still here to help! 
 
-${userContext}
+Try asking me to:
+• "Log £20 for food" - to add an expense
+• "Create a goal for laptop £1200" - to add a savings goal  
+• "Reset my tree" - to reset your savings
 
-IMPORTANT: You can answer any question the user asks - from silly jokes to serious financial advice. If they ask non-financial questions, feel free to engage naturally while occasionally connecting back to financial wellness when relevant.`;
+Or visit the Goals and Expenses pages to manage your finances directly. I'll be back to full power once my connection is restored! 💙`;
+        }
+      }
 
-      const openaiResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: message }
-        ],
-        max_tokens: 500,
-        temperature: 0.7,
-      });
+      // Execute function if we have one
+      if (functionName) {
+        try {
+          switch (functionName) {
+            case 'add_expense':
+              const expense = await storage.createExpense({
+                userId,
+                amount: functionArgs.amount.toString(),
+                description: functionArgs.description,
+                category: functionArgs.category,
+                date: new Date()
+              });
+              actionPerformed = { type: 'expense_added', expense };
+              responseMessage += `\n\n✅ I've logged your expense: £${functionArgs.amount} for ${functionArgs.description} (${functionArgs.category}).`;
+              break;
+
+            case 'create_goal':
+              const goal = await storage.createGoal({
+                userId,
+                title: functionArgs.title,
+                targetAmount: functionArgs.targetAmount.toString(),
+                currentAmount: '0',
+                targetDate: functionArgs.targetDate ? new Date(functionArgs.targetDate) : null,
+                icon: functionArgs.icon || 'savings'
+              });
+              actionPerformed = { type: 'goal_created', goal };
+              responseMessage += `\n\n🎯 I've created your savings goal: "${functionArgs.title}" with a target of £${functionArgs.targetAmount}!`;
+              break;
+
+            case 'add_money_to_goal':
+              const existingGoal = await storage.getGoal(functionArgs.goalId);
+              if (existingGoal) {
+                const currentAmount = parseFloat(existingGoal.currentAmount || '0');
+                const newAmount = currentAmount + functionArgs.amount;
+                await storage.updateGoal(functionArgs.goalId, {
+                  currentAmount: newAmount.toString()
+                });
+                actionPerformed = { type: 'money_added', goalId: functionArgs.goalId, amount: functionArgs.amount };
+                responseMessage += `\n\n💰 I've added £${functionArgs.amount} to your "${existingGoal.title}" goal! New total: £${newAmount}`;
+              } else {
+                responseMessage += "\n\n❌ Sorry, I couldn't find that goal. Could you try again?";
+              }
+              break;
+
+            case 'reset_savings_tree':
+              const userGoals = await storage.getGoalsByUser(userId);
+              const resetPromises = userGoals.map(goal => 
+                storage.updateGoal(goal.id, { currentAmount: '0' })
+              );
+              await Promise.all(resetPromises);
+              actionPerformed = { type: 'savings_reset' };
+              responseMessage += `\n\n🌱 I've reset your savings tree! All goals are back to £0 for a fresh start.`;
+              break;
+
+            case 'get_financial_summary':
+              const summary = {
+                budgets: budgets.length,
+                totalExpenses: expenses.reduce((sum, e) => sum + parseFloat(e.amount), 0),
+                goals: goals.length,
+                totalSaved: goals.reduce((sum, g) => sum + parseFloat(g.currentAmount || '0'), 0)
+              };
+              actionPerformed = { type: 'summary_provided', summary };
+              responseMessage += `\n\n📊 Here's your financial summary:\n- ${summary.budgets} active budgets\n- £${summary.totalExpenses.toFixed(2)} total expenses\n- ${summary.goals} savings goals\n- £${summary.totalSaved.toFixed(2)} total saved`;
+              break;
+          }
+        } catch (error) {
+          console.error(`Function ${functionName} error:`, error);
+          responseMessage += `\n\n❌ I had trouble performing that action. Please try again!`;
+        }
+      }
 
       const response = {
-        message: openaiResponse.choices[0].message.content || "I'm here to help! What would you like to know?",
+        message: responseMessage,
         timestamp: new Date().toISOString(),
-        coinsUsed: 0.5
+        coinsUsed: 0.5,
+        actionPerformed
       };
       
-      // Deduct coins from user - ensure integer value for smartCoins
-      const userIdString = String(userId);
-      const newCoinsAmount = Math.max(0, Math.floor((user.smartCoins || 0) - coinsRequired));
-      await storage.updateUser(userIdString, { 
+      // Deduct coins from user (ensure integer values)
+      const currentCoins = Math.floor(parseFloat(user.smartCoins || 0));
+      const newCoinsAmount = Math.max(0, currentCoins - Math.floor(coinsRequired));
+      await storage.updateUser(userId, { 
         smartCoins: newCoinsAmount
       });
       
       res.json({
         ...response,
-        remainingCoins: Math.max(0, (user.smartCoins || 0) - coinsRequired)
+        remainingCoins: newCoinsAmount
       });
     } catch (error) {
       console.error("Smartie chat error:", error);
       res.status(500).json({ 
         error: "Failed to generate response",
-        message: "I'm having trouble connecting right now, but I'm still here to help! Try asking me about budgeting, saving, or financial planning. 💰"
+        message: responseMessage || "I'm having trouble connecting right now, but I'm still here to help! Try asking me about budgeting, saving, or financial planning. 💰"
       });
     }
   });
