@@ -16,11 +16,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-console.log('🔧 Firebase Config loaded successfully:', {
-  hasApiKey: !!firebaseConfig.apiKey,
-  projectId: firebaseConfig.projectId,
-  authDomain: firebaseConfig.authDomain
-});
+console.log('🔧 Firebase Config loaded successfully:', firebaseConfig.projectId);
 
 // ✅ Initialize Firebase services (with duplicate app check)
 let app;
