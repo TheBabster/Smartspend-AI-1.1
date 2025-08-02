@@ -16,17 +16,22 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-console.log('🔧 Firebase Config loaded successfully:', firebaseConfig.projectId);
+console.log('🔧 Firebase Config loaded successfully:', {
+  hasApiKey: !!firebaseConfig.apiKey,
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain
+});
 
 // ✅ Initialize Firebase services (with duplicate app check)
 let app;
 try {
   app = initializeApp(firebaseConfig);
-} catch (error) {
+} catch (error: any) {
   // If app already exists, get the existing instance
   if (error.code === 'app/duplicate-app') {
     app = getApp();
   } else {
+    console.error('Firebase initialization error:', error);
     throw error;
   }
 }
